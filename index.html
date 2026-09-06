@@ -358,6 +358,12 @@ const ZONES = {
   research:[600,2500], awards:[1990,2430], life:[3200,2490],
   teaching:[1470,3660], hi:[3130,3690]
 };
+/* per-zone "fit" zoom: denser clusters sit back a little so the whole group
+   lands in frame when you fly to it (scaled down further on small screens). */
+const VIEW = {
+  home:0.92, about:0.82, work:0.7, research:0.66,
+  awards:0.72, life:0.66, teaching:0.74, hi:0.92
+};
 
 /* ================= HERO ================= */
 node(ZONES.home[0], ZONES.home[1], -1.5, 'draggable', `
@@ -401,7 +407,7 @@ node(ZONES.about[0], ZONES.about[1], 2, 'draggable', `
       combine hardware and software with an understanding of the people i build for to create
       <b style="color:var(--red)">tools that give independence back and help people feel seen.</b></p>
   </div>`);
-node(ZONES.about[0]-40, ZONES.about[1]+340, -3, 'draggable', `
+node(ZONES.about[0]-40, ZONES.about[1]+300, -3, 'draggable', `
   <div class="card" style="--tape:var(--teal);max-width:270px">
     <span class="tape"></span>
     <p class="eyebrow">the school bit 🎓</p>
@@ -409,9 +415,9 @@ node(ZONES.about[0]-40, ZONES.about[1]+340, -3, 'draggable', `
       Washington University in St. Louis<br>B.S. Biomedical Engineering<br>
       <span style="color:var(--ink-soft)">minor: CS + Mechanical Eng · '24 to '28</span></p>
   </div>`);
-photo(ZONES.about[0]+320, ZONES.about[1]+150, 4, "photos/tom-crew.jpg",
+photo(ZONES.about[0]+320, ZONES.about[1]+140, 4, "photos/tom-crew.jpg",
   "me + my Tikkun Olam Makers crew ♿", "--sage", "♿", 205, "4/3");
-photo(ZONES.about[0]-330, ZONES.about[1]+150, -4, "photos/taiwan-kid.jpg",
+photo(ZONES.about[0]-330, ZONES.about[1]+130, -4, "photos/taiwan-kid.jpg",
   "growing up in Taiwan 🇹🇼", "--pink-lt", "🇹🇼", 185, "4/3");
 node(ZONES.about[0]-250, ZONES.about[1]-150, 0,'',`<div class="bob slow">${blobSVG('--pink','--red',82,'happy')}</div>`);
 
@@ -432,7 +438,7 @@ node(ZONES.work[0], ZONES.work[1], -2.5,'draggable',`
     </div>
   </div>`);
 
-const workCols = [ [-440,-240],[440,-240],[-440,280],[440,280] ];
+const workCols = [ [-430,-230],[430,-230],[-430,255],[430,255] ];
 BUILDS.forEach((p,i)=>{
   const [dx,dy]=workCols[i]||[i*260,0];
   node(ZONES.work[0]+dx, ZONES.work[1]+dy, (i%2?1:-1)*(2+i), 'draggable', `
@@ -454,11 +460,11 @@ BUILDS.forEach((p,i)=>{
       </div>
     </div>`);
 });
-photo(ZONES.work[0]+0, ZONES.work[1]+380, -3, "photos/tom-build.jpg",
-  "Tikkun Olam Makers build 🛠️", "--lime", "🛠️", 210, "4/3");
-photo(ZONES.work[0]+0, ZONES.work[1]-380, -3, "photos/building-sew.jpg",
-  "stitching a wearable 🧵", "--pink", "🧵", 195, "3/4");
-node(ZONES.work[0]+760, ZONES.work[1]+0, 0,'',`<div class="bob fast">${starSVG('--pink',54)}</div>`);
+photo(ZONES.work[0]+0, ZONES.work[1]+350, -3, "photos/tom-build.jpg",
+  "Tikkun Olam Makers build 🛠️", "--lime", "🛠️", 195, "4/3");
+photo(ZONES.work[0]+0, ZONES.work[1]-345, -3, "photos/building-sew.jpg",
+  "stitching a wearable 🧵", "--pink", "🧵", 185, "3/4");
+node(ZONES.work[0]+610, ZONES.work[1]+0, 0,'',`<div class="bob fast">${starSVG('--pink',54)}</div>`);
 
 /* ================= RESEARCH ================= */
 node(ZONES.research[0]+120, ZONES.research[1]-340, -3,'',`
@@ -594,8 +600,15 @@ node(2600,820,0,'',`<div class="spin">${starSVG('--sage',46)}</div>`);
 let tx=0, ty=0, scale=1;
 const MINS=0.25, MAXS=1.4;
 function apply(){ board.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`; }
-function centerOn(zx,zy,animate){
-  tx = innerWidth/2 - zx*scale; ty = innerHeight/2 - zy*scale;
+function vpW(){ return window.innerWidth || document.documentElement.clientWidth || 1024; }
+function vpH(){ return window.innerHeight || document.documentElement.clientHeight || 768; }
+function centerOn(zx,zy,animate,vs){
+  var w = vpW(), h = vpH();
+  if(vs){
+    var mul = w < 620 ? 0.62 : w < 1000 ? 0.82 : 1;
+    scale = Math.min(MAXS, Math.max(MINS, vs*mul));
+  }
+  tx = w/2 - zx*scale; ty = h/2 - zy*scale;
   if(animate){ board.classList.add('flying'); clearTimeout(centerOn._t);
     centerOn._t=setTimeout(()=>board.classList.remove('flying'),900); }
   apply();
@@ -617,7 +630,7 @@ const zoneBtns=[...document.querySelectorAll('#dock [data-zone]')];
 zoneBtns.forEach(b=>b.onclick=()=>{
   const z=ZONES[b.dataset.zone]; if(!z) return;
   if(locked && b.dataset.zone!=='home'){ openGate(); return; }
-  userMoved=true; centerOn(z[0],z[1],true);
+  userMoved=true; centerOn(z[0],z[1],true, VIEW[b.dataset.zone]||0.9);
   zoneBtns.forEach(x=>x.classList.toggle('active',x===b));
 });
 
@@ -769,10 +782,14 @@ function fitScale(){
   return w < 620 ? 0.45 : w < 1000 ? 0.72 : 1;
 }
 let userMoved = false;
-scale = fitScale();
-centerOn(ZONES.home[0],ZONES.home[1],false);
-/* if the true viewport size only settles after full load, re-fit once (unless exploring) */
-addEventListener('load', function(){ if(!userMoved){ scale = fitScale(); centerOn(ZONES.home[0],ZONES.home[1],false); } });
+function landHome(){ if(!userMoved){ centerOn(ZONES.home[0],ZONES.home[1],false, VIEW.home); } }
+landHome();
+/* the embedded frame can report a 0 size until it settles; re-center home on load,
+   on the next few frames, and on resize so the landing is always framed (unless exploring) */
+addEventListener('load', landHome);
+addEventListener('resize', landHome);
+requestAnimationFrame(landHome);
+setTimeout(landHome, 120); setTimeout(landHome, 400);
 
 /* ===================== preloader ===================== */
 (function(){
