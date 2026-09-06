@@ -1,0 +1,794 @@
+<meta charset="utf-8">
+<title>Jacqueline Chuang ✿</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<style>
+  /* ---------- palette: sun-bleached tropical ---------- */
+  :root{
+    --cream:#F3EEE4; --cream-2:#EDE6D8; --paper:#FCFAF4;
+    --ink:#2C2620; --ink-soft:#7A6E62;
+    --orange:#F49306; --orange-2:#F27305; --red:#F13D09; --red-2:#E63A26;
+    --pink:#EE6A92; --pink-lt:#F5CAE8; --coral:#E0858E;
+    --teal:#6DB8BE; --lime:#A5BB1A; --sage:#9EC6AA; --mustard:#C9B749;
+    --line:#2C2620; --dot:rgba(44,38,32,.10); --shadow:rgba(44,38,32,.18);
+    --font-hand:"Chalkboard SE","Comic Sans MS","Marker Felt","Comic Neue",ui-rounded,"Segoe UI",system-ui,sans-serif;
+    --font-body:ui-rounded,"Nunito","Segoe UI",system-ui,-apple-system,sans-serif;
+    --font-type:"Courier New",ui-monospace,"SFMono-Regular",monospace;
+  }
+  :root[data-theme="dark"]{
+    --cream:#241F1A; --cream-2:#2B251F; --paper:#332C25;
+    --ink:#F3EEE4; --ink-soft:#B9AC9C; --line:#F3EEE4;
+    --dot:rgba(243,238,228,.10); --shadow:rgba(0,0,0,.45);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --cream:#241F1A; --cream-2:#2B251F; --paper:#332C25;
+      --ink:#F3EEE4; --ink-soft:#B9AC9C; --line:#F3EEE4;
+      --dot:rgba(243,238,228,.10); --shadow:rgba(0,0,0,.45);
+    }
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;overflow:hidden}
+  body{font-family:var(--font-body);color:var(--ink);background:var(--cream);
+    -webkit-font-smoothing:antialiased;touch-action:none}
+
+  #stage{position:fixed;inset:0;overflow:hidden;cursor:grab;background:var(--cream)}
+  #stage.grabbing{cursor:grabbing}
+  #board{position:absolute;left:0;top:0;width:3900px;height:4300px;transform-origin:0 0;
+    background-image:radial-gradient(var(--dot) 1.6px,transparent 1.6px);
+    background-size:34px 34px;will-change:transform}
+  #board.flying{transition:transform .85s cubic-bezier(.22,.61,.36,1)}
+
+  .node{position:absolute;transform:translate(-50%,-50%)}
+  .node .tilt{transform:rotate(var(--r,0deg))}
+  .draggable{cursor:grab}
+  .draggable.dragging{cursor:grabbing;z-index:60!important}
+
+  .card{background:var(--paper);border:2.5px solid var(--line);
+    border-radius:255px 15px 225px 15px/15px 225px 15px 255px;
+    box-shadow:6px 7px 0 var(--shadow);padding:22px 24px;max-width:340px}
+  .tape{position:absolute;top:-15px;left:50%;translate:-50% 0;width:96px;height:30px;
+    background:var(--tape,var(--teal));opacity:.72;border-radius:3px;
+    box-shadow:0 2px 4px var(--shadow);rotate:-4deg}
+  .tape::after{content:"";position:absolute;inset:0;background:
+     repeating-linear-gradient(90deg,rgba(255,255,255,.25) 0 6px,transparent 6px 12px)}
+
+  .eyebrow{font-family:var(--font-hand);font-size:.8rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px}
+  h1,h2,h3{font-family:var(--font-hand);margin:0;line-height:1.05;text-wrap:balance}
+
+  .hero{max-width:520px;text-align:left}
+  .hero h1{font-size:clamp(2.2rem,4.2vw,3.4rem)}
+  .hero .wave{display:inline-block;transform-origin:70% 70%;animation:wave 2.6s ease-in-out infinite}
+  @keyframes wave{0%,60%,100%{rotate:0deg}70%{rotate:16deg}80%{rotate:-8deg}90%{rotate:12deg}}
+  .type-line{font-family:var(--font-type);font-size:clamp(1.05rem,2.3vw,1.45rem);
+    color:var(--red-2);margin:10px 0 0;font-weight:700;min-height:1.6em}
+  .type-line .caret{display:inline-block;width:.6ch;color:var(--orange);animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .hero p.lede{font-size:1.04rem;line-height:1.5;color:var(--ink);margin:14px 0 0;max-width:36ch}
+  .scrawl{font-family:var(--font-hand);color:var(--pink);font-size:1.05rem}
+
+  .swatch-card{width:262px;text-align:left}
+  .swatch{display:block;width:100%;height:170px;overflow:visible}
+  .build-media{position:relative;width:100%}
+  .build-media img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;
+    border:2.5px solid var(--line);border-radius:6px}
+  .build-media .swatch{display:none}
+  .build-media.noimg .swatch{display:block}
+  .swatch-card .meta{margin-top:12px}
+  .swatch-card h3{font-size:1.3rem}
+  .swatch-card .blurb{font-size:.93rem;color:var(--ink-soft);margin:4px 0 0;line-height:1.4}
+  .pill-link{display:inline-block;font-family:var(--font-hand);font-size:.9rem;text-decoration:none;
+    color:var(--ink);background:var(--accent,var(--teal));border:2.5px solid var(--line);
+    border-radius:40px;padding:5px 15px;box-shadow:3px 3px 0 var(--shadow);cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease}
+  .pill-link:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--shadow)}
+  .pill-link:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+
+  .sticker{font-family:var(--font-hand);font-size:1rem;font-weight:700;color:var(--ink);
+    background:var(--c,var(--sage));border:2.5px solid var(--line);border-radius:40px;
+    padding:8px 16px;white-space:nowrap;box-shadow:4px 4px 0 var(--shadow)}
+
+  /* ---------- polaroid photos ---------- */
+  .polaroid{background:var(--paper);border:2.5px solid var(--line);padding:10px 10px 0;
+    box-shadow:6px 7px 0 var(--shadow);width:var(--pw,220px);border-radius:6px;margin:0}
+  .polaroid .ph{width:100%;aspect-ratio:var(--ar,4/3);overflow:hidden;border:2px solid var(--line);
+    background:var(--phc,var(--cream-2));position:relative;display:flex;align-items:center;justify-content:center}
+  .polaroid .ph img{width:100%;height:100%;object-fit:cover;display:block}
+  .polaroid .ph.noimg::after{content:attr(data-emoji);font-size:2.6rem;opacity:.9}
+  .polaroid figcaption{font-family:var(--font-hand);font-size:.92rem;color:var(--ink);
+    padding:9px 4px 13px;text-align:center;line-height:1.2}
+
+  .contact{max-width:360px}
+  .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .links a{font-family:var(--font-hand);text-decoration:none;color:var(--ink);
+    border:2.5px solid var(--line);border-radius:40px;padding:6px 14px;
+    box-shadow:3px 3px 0 var(--shadow);background:var(--paper);transition:transform .12s ease}
+  .links a:hover{transform:translate(-1px,-1px) rotate(-2deg)}
+
+  /* ---------- project story modal ---------- */
+  .modal{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;
+    background:rgba(44,38,32,.5);padding:20px;animation:fadein .2s ease}
+  .modal[hidden]{display:none}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  .modal-card{background:var(--paper);color:var(--ink);border:2.5px solid var(--line);
+    border-radius:22px 8px 22px 8px/8px 22px 8px 22px;box-shadow:9px 10px 0 rgba(0,0,0,.28);
+    max-width:540px;width:100%;max-height:86vh;overflow-y:auto;padding:30px 32px 32px;position:relative;
+    animation:popin .22s cubic-bezier(.22,1.2,.36,1)}
+  @keyframes popin{from{transform:scale(.94);opacity:.4}to{transform:scale(1);opacity:1}}
+  .modal-x{position:absolute;top:14px;right:14px;background:var(--cream-2);border:2.5px solid var(--line);
+    border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:.9rem;color:var(--ink);
+    box-shadow:2px 2px 0 var(--shadow);line-height:1}
+  .modal-x:hover{transform:translate(-1px,-1px)}
+  .modal-card .mImg{width:100%;max-height:340px;object-fit:contain;background:var(--cream-2);
+    border:2.5px solid var(--line);border-radius:12px;margin:2px 0 16px;display:block}
+  .modal-card .mImg[hidden]{display:none}
+  .modal-card h2{font-family:var(--font-hand);font-size:2rem;margin:8px 0 0;line-height:1.05;padding-right:34px}
+  .modal-card .mTag{font-size:1.06rem;color:var(--ink);margin:12px 0 0;line-height:1.45;font-weight:700}
+  .modal-card .mDetail{font-size:.98rem;color:var(--ink-soft);line-height:1.6;margin:14px 0 0}
+  .modal-card .links{margin-top:18px}
+  .gate-card{max-width:400px;text-align:center}
+  .gate-card h2{padding-right:0;font-size:1.7rem;margin-top:6px}
+  .gate-emoji{font-size:2.6rem;line-height:1}
+  .gate-card .mDetail{margin-top:8px}
+  .gate-input{font-family:var(--font-body);font-size:1.05rem;width:100%;margin-top:18px;
+    padding:12px 16px;border:2.5px solid var(--line);border-radius:14px;background:var(--cream-2);
+    color:var(--ink);text-align:center}
+  .gate-input:focus{outline:3px dashed var(--pink);outline-offset:2px}
+  .gate-err{color:var(--red);font-family:var(--font-hand);margin:10px 0 0}
+  .gate-err[hidden]{display:none}
+  .gate-go{margin-top:16px;background:var(--orange);font-size:1rem;padding:9px 22px}
+
+  .blob{width:var(--w,120px);height:auto;overflow:visible}
+  .bob{animation:bob 3.4s ease-in-out infinite}
+  .bob.slow{animation-duration:4.6s}
+  .bob.fast{animation-duration:2.6s}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-9px) rotate(2deg)}}
+  .spin{animation:spin 12s linear infinite;transform-origin:center}
+  @keyframes spin{to{rotate:360deg}}
+  .signpost{font-family:var(--font-hand);font-size:.85rem;color:var(--ink-soft);text-align:center}
+
+  #dock{position:fixed;left:50%;bottom:18px;translate:-50% 0;z-index:200;display:flex;gap:8px;
+    align-items:center;background:var(--paper);border:2.5px solid var(--line);border-radius:44px;
+    padding:8px 10px;box-shadow:5px 6px 0 var(--shadow);max-width:calc(100vw - 24px);
+    overflow-x:auto;scrollbar-width:none}
+  #dock::-webkit-scrollbar{display:none}
+  #dock button{font-family:var(--font-hand);font-size:.92rem;color:var(--ink);background:transparent;
+    border:2px solid transparent;border-radius:30px;padding:6px 13px;cursor:pointer;
+    white-space:nowrap;transition:background .15s}
+  #dock button:hover{background:var(--cream-2)}
+  #dock button.active{background:var(--orange);border-color:var(--line)}
+  #dock .sep{width:2px;height:22px;background:var(--dot);border-radius:2px;flex:0 0 auto}
+  #dock .icon{font-size:1rem;padding:6px 11px}
+  :focus-visible{outline:3px dashed var(--pink);outline-offset:3px;border-radius:6px}
+
+  #hint{position:fixed;top:16px;left:50%;translate:-50% 0;z-index:150;font-family:var(--font-hand);
+    color:var(--ink-soft);font-size:.9rem;background:var(--paper);border:2px solid var(--line);
+    border-radius:30px;padding:6px 15px;box-shadow:3px 3px 0 var(--shadow);
+    display:flex;gap:8px;align-items:center;transition:opacity .5s}
+  #hint .hand{animation:point 1.4s ease-in-out infinite}
+  @keyframes point{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+
+  #pre{position:fixed;inset:0;z-index:1000;background:var(--cream);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:22px;
+    background-image:radial-gradient(var(--dot) 1.6px,transparent 1.6px);background-size:34px 34px;
+    transition:opacity .6s ease}
+  #pre.gone{opacity:0;pointer-events:none}
+  #pre .pblob{width:150px;animation:bob 2.2s ease-in-out infinite}
+  #pre .ptxt{font-family:var(--font-hand);color:var(--ink);font-size:1.15rem}
+  #pre .bar{width:230px;height:20px;background:var(--paper);border:2.5px solid var(--line);
+    border-radius:40px;overflow:hidden;box-shadow:3px 3px 0 var(--shadow)}
+  #pre .fill{height:100%;width:0;background:repeating-linear-gradient(45deg,var(--orange) 0 12px,var(--red) 12px 24px);
+    border-radius:40px;transition:width .2s linear}
+  #pre .pct{font-family:var(--font-type);color:var(--ink-soft);font-size:.8rem}
+  #pre .skip{position:absolute;bottom:22px;font-family:var(--font-hand);color:var(--ink-soft);
+    background:none;border:none;cursor:pointer;font-size:.85rem;text-decoration:underline}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}#board.flying{transition:transform .3s linear}}
+  @media (max-width:560px){.card{max-width:290px}.hero{max-width:320px}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="9"/></filter>
+  <filter id="rough2"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="3" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="6"/></filter>
+</svg>
+
+<!-- PRELOADER -->
+<div id="pre">
+  <svg class="pblob" viewBox="0 0 120 120" aria-hidden="true">
+    <path d="M60 8c26 0 46 18 46 44 0 30-22 56-46 56S14 82 14 52C14 26 34 8 60 8Z" fill="#F49306" filter="url(#rough2)"/>
+    <circle cx="45" cy="58" r="6" fill="#2C2620"/><circle cx="75" cy="58" r="6" fill="#2C2620"/>
+    <circle cx="47" cy="56" r="2" fill="#fff"/><circle cx="77" cy="56" r="2" fill="#fff"/>
+    <ellipse cx="38" cy="72" rx="7" ry="4" fill="#F13D09" opacity=".55"/>
+    <ellipse cx="82" cy="72" rx="7" ry="4" fill="#F13D09" opacity=".55"/>
+    <path d="M50 74c4 5 16 5 20 0" stroke="#2C2620" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </svg>
+  <div class="ptxt">painting my little corner…</div>
+  <div class="bar"><div class="fill" id="preFill"></div></div>
+  <div class="pct" id="prePct">0%</div>
+  <button class="skip" id="preSkip">skip →</button>
+</div>
+
+<div id="stage"><div id="board"></div></div>
+
+<div id="modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="modal-card">
+    <button class="modal-x" id="modalX" aria-label="close">✕</button>
+    <img id="mImg" class="mImg" alt="" hidden>
+    <p class="eyebrow" id="mSub"></p>
+    <h2 id="mTitle"></h2>
+    <p class="mTag" id="mTag"></p>
+    <p class="mDetail" id="mDetail"></p>
+    <div class="links" id="mLinks"></div>
+  </div>
+</div>
+
+<div id="gate" class="modal" hidden role="dialog" aria-modal="true">
+  <div class="modal-card gate-card">
+    <div class="gate-emoji">🔒</div>
+    <h2>psst… it's locked!</h2>
+    <p class="mDetail">this little corner is password-protected. enter the password to explore the rest.</p>
+    <input id="gateInput" class="gate-input" type="password" placeholder="password" autocomplete="off" aria-label="password">
+    <p id="gateErr" class="gate-err" hidden>hmm, that's not it. try again!</p>
+    <button id="gateGo" class="pill-link gate-go">let me in →</button>
+  </div>
+</div>
+
+<div id="hint"><span class="hand">👆</span><span>drag anywhere to explore · pick up the cards & photos!</span></div>
+
+<nav id="dock" aria-label="jump around">
+  <button data-zone="home" class="active">✿ home</button>
+  <button data-zone="about">about</button>
+  <button data-zone="work">builds</button>
+  <button data-zone="research">research</button>
+  <button data-zone="awards">celebrations</button>
+  <button data-zone="life">life</button>
+  <button data-zone="teaching">teaching</button>
+  <button data-zone="hi">say hi</button>
+  <span class="sep"></span>
+  <button class="icon" id="zoomOut" aria-label="zoom out">−</button>
+  <button class="icon" id="zoomIn" aria-label="zoom in">+</button>
+  <button class="icon" id="themeBtn" aria-label="toggle light or dark">☾</button>
+</nav>
+
+<script>
+"use strict";
+const board = document.getElementById('board');
+const stage = document.getElementById('stage');
+const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+/* ---------- helpers ---------- */
+function node(x,y,rot,cls,html){
+  const n=document.createElement('div');
+  n.className='node '+(cls||'');
+  n.style.left=x+'px'; n.style.top=y+'px';
+  const t=document.createElement('div'); t.className='tilt'; t.style.setProperty('--r',(rot||0)+'deg');
+  t.innerHTML=html; n.appendChild(t); board.appendChild(n);
+  return n;
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function cv(v){return v.startsWith('--')?`var(${v})`:v;}
+
+function blobSVG(fill,blush,w,eyes){
+  const eyeMk = eyes==='happy'
+    ? `<path d="M40 56c3-4 9-4 12 0" stroke="#2C2620" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+       <path d="M68 56c3-4 9-4 12 0" stroke="#2C2620" stroke-width="3.5" fill="none" stroke-linecap="round"/>`
+    : `<circle cx="46" cy="58" r="5.5" fill="#2C2620"/><circle cx="74" cy="58" r="5.5" fill="#2C2620"/>
+       <circle cx="48" cy="56" r="1.8" fill="#fff"/><circle cx="76" cy="56" r="1.8" fill="#fff"/>`;
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 120" aria-hidden="true">
+    <path d="M60 10c25 0 44 17 44 42 0 29-21 54-44 54S16 81 16 52C16 27 35 10 60 10Z" fill="${cv(fill)}" filter="url(#rough2)"/>
+    ${eyeMk}
+    <ellipse cx="38" cy="72" rx="6.5" ry="4" fill="${cv(blush)}" opacity=".5"/>
+    <ellipse cx="82" cy="72" rx="6.5" ry="4" fill="${cv(blush)}" opacity=".5"/>
+    <path d="M52 74c4 5 12 5 16 0" stroke="#2C2620" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+function starSVG(fill,w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 120" aria-hidden="true">
+    <path d="M60 12l13 28 30 4-22 21 6 30-27-15-27 15 6-30-22-21 30-4z" fill="${cv(fill)}" filter="url(#rough2)"/>
+    <circle cx="50" cy="60" r="4" fill="#2C2620"/><circle cx="70" cy="60" r="4" fill="#2C2620"/>
+    <path d="M54 70c3 3 9 3 12 0" stroke="#2C2620" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+/* photo polaroid with graceful fallback if the image file is missing */
+function photo(x,y,rot,src,cap,color,emoji,w,ar,pos){
+  return node(x,y,rot,'draggable',`
+    <figure class="polaroid" style="--pw:${w||220}px;--ar:${ar||'4/3'};--phc:${cv(color)}">
+      <div class="ph">
+        <img src="${esc(src)}" alt="${esc(cap)}" decoding="async"${pos?` style="object-position:${pos}"`:''}
+          onerror="var p=this.parentNode;this.remove();p.classList.add('noimg');p.setAttribute('data-emoji','${emoji||'📷'}')">
+      </div>
+      <figcaption>${esc(cap)}</figcaption>
+    </figure>`);
+}
+
+/* ---------- data ---------- */
+const BUILDS = [
+  { title:"Hybrid Body", tag:"WashU Robotics · software lead",
+    subtitle:"assistive wearable for Alzheimer's care · WashU Robotics · 2025-2026",
+    blurb:"a smart wearable system that helps people with Alzheimer's keep their independence, and gives caregivers peace of mind.",
+    detail:"three connected devices work as one: smart glasses that recognize everyday objects and people in real time (on-device computer vision with YOLO + Gemini) and remember where things were last seen; a stress-monitoring wristband tracking heart rate, skin conductance, and temperature to catch early stress and alert caregivers; and an iOS app (Swift) as the hub for object training, memory history, task reminders, and two-way caregiver communication, all over Bluetooth Low Energy. i led the software: the real-time computer-vision and memory-mapping pipeline, and the iOS app that ties it together.",
+    c1:"--teal", c2:"--orange", accent:"--pink", img:"photos/alzheimers.jpg",
+    link:"https://canva.link/hybridbodypresentation", linkLabel:"view the deck →" },
+  { title:"Tremor-Quantifying Wristband", tag:"Washington University in St. Louis",
+    subtitle:"Washington University in St. Louis · 2025-2026",
+    blurb:"a low-cost wearable that turns Parkinson's tremor from something a specialist eyeballs into an objective, numeric readout, for under $25 in parts.",
+    detail:"Parkinson's hand tremor is usually assessed visually by a neurologist, which is subjective and hard to access outside major clinics. we built a wrist-worn device to quantify it in real time: a 6-axis IMU samples wrist motion at 500 Hz, and on an Arduino i wrote a zero-crossing algorithm that computes tremor frequency over a rolling 5-second window, showing it live on an LCD and lighting an LED when it lands in the 3-6 Hz Parkinson's range.",
+    c1:"--pink", c2:"--mustard", accent:"--teal", img:"photos/parkinson-tremor.jpg" },
+  { title:"Adaptive 3D-Printed Tools", tag:"Tikkun Olam Makers · Board",
+    blurb:"user-driven accessibility devices from rapid make-a-thons, then designed, printed & donated to disability orgs.",
+    c1:"--lime", c2:"--red-2", accent:"--orange", img:"photos/tom-prints.jpg" },
+  { title:"In Tune", tag:"children's book · co-author & illustrator 🌸",
+    subtitle:"self-published children's book · June 2025",
+    blurb:"a children's book about twin Asian-American sisters learning to step into the spotlight as their own selves, made by a team of teenage AAPI girls 🌸",
+    detail:"In Tune brings Angela and Celeste to life as the kind of Asian-American leads rarely seen in children's books, ones who break the mold instead of fitting the 'quiet, straight-A' stereotype. published in June 2025, every dollar of profit goes to the SF Asian Women's Shelter, which supports survivors of domestic abuse. so far: 560+ copies sold, about $2,500 raised, plus read-alouds and free copies for kids through Bay Area libraries and bilingual literacy programs.",
+    c1:"--coral", c2:"--pink-lt", accent:"--pink", img:"photos/in-tune.jpg" },
+];
+const RESEARCH = [
+  { org:"Vena Vitals", role:"R&D Intern", date:"2026", tape:"--teal",
+    txt:"Python GUI workflows for actuator control, sensor calibration & real-time data on wearable cardiovascular monitors." },
+  { org:"Gutmann Lab · WashU Med", role:"Research Assistant", date:"'25 to now", tape:"--pink",
+    txt:"translational neuro-oncology on NF1 tumor models plus assistive tech for children with Neurofibromatosis Type 1." },
+  { org:"Expedera Inc.", role:"SWE Co-Op", date:"'22 to '24", tape:"--orange",
+    txt:"built Python visualization tools for an AI-acceleration platform; performance-estimation module for hardware latency." },
+  { org:"Academia Sinica", role:"Research Intern", date:"2025", tape:"--lime",
+    txt:"automated microfluidics plus scRNA-seq on 100k+ immune cells, cutting reagent waste 25% and lifting reproducibility 35%." },
+  { org:"Columbia Chem-Genomics", role:"Research Intern", date:"2023", tape:"--mustard",
+    txt:"computational scRNA-seq: dimensionality reduction & differential expression workflows." },
+];
+const WINS = [
+  {t:"🥇 Sling Health Demo Day, 1st", c:"--orange"},
+  {t:"🥇 SAME Innovation Challenge, 1st", c:"--teal"},
+  {t:"🎖️ NIH DEBUT, Honorable Mention", c:"--pink-lt"},
+  {t:"🚀 VentureWell E-Team Pioneer '26", c:"--lime"},
+  {t:"💰 Skandalaris Disruptor Funding", c:"--sage"},
+  {t:"🏅 Gold Presidential Volunteer Award", c:"--coral"},
+];
+const INTO = [
+  {t:"assistive tech ♿", c:"--teal"}, {t:"wearables ⌚", c:"--pink-lt"}, {t:"haptics", c:"--lime"},
+  {t:"computer vision 👁️", c:"--sage"}, {t:"ROS + robotics 🤖", c:"--orange"}, {t:"embedded systems", c:"--mustard"},
+  {t:"neuro-oncology 🧠", c:"--coral"}, {t:"3D printing 🖨️", c:"--pink-lt"}, {t:"Python · C++ · React", c:"--sage"},
+];
+
+const ZONES = {
+  home:[1900,1250], about:[640,1050], work:[3060,1200],
+  research:[600,2500], awards:[1990,2430], life:[3200,2490],
+  teaching:[1470,3660], hi:[3130,3690]
+};
+
+/* ================= HERO ================= */
+node(ZONES.home[0], ZONES.home[1], -1.5, 'draggable', `
+  <div class="hero card" style="--tape:var(--pink)">
+    <span class="tape"></span>
+    <p class="eyebrow">welcome to my little corner ✿</p>
+    <h1>hi, i'm <span style="color:var(--red)">Jacqueline</span> <span class="wave">👋</span></h1>
+    <p class="type-line"><span id="tw"></span><span class="caret">▌</span></p>
+    <p class="lede"><b style="color:var(--red)">what if we could engineer the body to sense, heal & remember? ✨</b>
+      i'm a biomedical engineering student & startup co-founder chasing hands-on medtech R&D:
+      surgical robotics 🤖, cardiovascular & assistive devices 🦾, cancer therapeutics 🧬 & AI 👾.
+      off the clock, i'm teaching kids STEM & playing soccer ⚽. this is my
+      <span class="scrawl">freeform sketchbook</span>, drag it around & poke at stuff.</p>
+  </div>`);
+
+const heroBuddy = node(ZONES.home[0]+330, ZONES.home[1]+50, 4, '',
+  `<div class="bob">${blobSVG('--teal','--pink',150,'happy')}</div>`);
+
+/* a few memories scattered around home */
+photo(ZONES.home[0]-470, ZONES.home[1]+320, -4, "photos/liondance-team.jpg",
+  "WashU lion dance team 🦁", "--red", "🦁", 205, "4/3");
+photo(ZONES.home[0]+520, ZONES.home[1]+300, 4, "photos/bmes.jpg",
+  "BMES with my Locus team 🔬", "--teal", "🔬", 205, "4/3");
+photo(ZONES.home[0]-40, ZONES.home[1]+300, -2, "photos/tom-build.jpg",
+  "Tikkun Olam Makers build 🛠️", "--lime", "🛠️", 200, "4/3");
+photo(ZONES.home[0]-560, ZONES.home[1]-150, 3, "photos/building-rig.jpg",
+  "at the test rig 🔧", "--mustard", "🔧", 195, "3/4");
+photo(ZONES.home[0]+560, ZONES.home[1]-140, -3, "photos/newgen-selfie.jpg",
+  "STEM camp selfie 🔬", "--orange", "🔬", 195, "4/3");
+
+/* ================= ABOUT ================= */
+node(ZONES.about[0], ZONES.about[1], 2, 'draggable', `
+  <div class="card" style="--tape:var(--lime);max-width:352px">
+    <span class="tape"></span>
+    <p class="eyebrow">who i am ✿</p>
+    <h2 style="font-size:1.5rem">a bit about me</h2>
+    <p style="line-height:1.5;margin:10px 0 0;font-size:.96rem">
+      as a Cantonese-Taiwanese American raised in the Bay Area, i'm drawn to how technology,
+      empathy, and thoughtful design can shape more independent, more dignified lives. i'm
+      especially interested in assistive technology and wearable health devices, where i can
+      combine hardware and software with an understanding of the people i build for to create
+      <b style="color:var(--red)">tools that give independence back and help people feel seen.</b></p>
+  </div>`);
+node(ZONES.about[0]-40, ZONES.about[1]+340, -3, 'draggable', `
+  <div class="card" style="--tape:var(--teal);max-width:270px">
+    <span class="tape"></span>
+    <p class="eyebrow">the school bit 🎓</p>
+    <p style="font-family:var(--font-hand);font-size:1.02rem;margin:4px 0 0;line-height:1.45">
+      Washington University in St. Louis<br>B.S. Biomedical Engineering<br>
+      <span style="color:var(--ink-soft)">minor: CS + Mechanical Eng · '24 to '28</span></p>
+  </div>`);
+photo(ZONES.about[0]+320, ZONES.about[1]+150, 4, "photos/tom-crew.jpg",
+  "me + my Tikkun Olam Makers crew ♿", "--sage", "♿", 205, "4/3");
+photo(ZONES.about[0]-330, ZONES.about[1]+150, -4, "photos/taiwan-kid.jpg",
+  "growing up in Taiwan 🇹🇼", "--pink-lt", "🇹🇼", 185, "4/3");
+node(ZONES.about[0]-250, ZONES.about[1]-150, 0,'',`<div class="bob slow">${blobSVG('--pink','--red',82,'happy')}</div>`);
+
+/* ================= WORK: Locus flagship (centered) + build cards fanned to corners ================= */
+node(ZONES.work[0], ZONES.work[1], -2.5,'draggable',`
+  <div class="card" style="background:var(--red);color:#fff;max-width:330px;--line:#2C2620;--tape:var(--mustard)">
+    <span class="tape"></span>
+    <p class="eyebrow" style="color:#ffe">⭐ flagship · Chief Technological Officer</p>
+    <h2 style="color:#fff;font-size:2rem">Locus Suit</h2>
+    <p style="margin:8px 0 0;font-size:.98rem;color:#fff;line-height:1.45">
+      an assistive wearable pairing a haptic vest with a portable vision module. depth sensing
+      plus computer vision translate the world into vibrations, while an LLM answers questions about
+      your surroundings. i built the full sensor-fusion stack in ROS, Python & C++.</p>
+    <div class="links" style="margin-top:14px">
+      <a class="pill-link" href="https://www.youtube.com/watch?v=IDM4owhf4fY" target="_blank" rel="noopener" data-nodrag style="background:var(--mustard)">▶ watch the demo</a>
+      <a class="pill-link" href="https://locussuit.com/" target="_blank" rel="noopener" data-nodrag style="background:var(--teal)">🌐 locussuit.com</a>
+      <a class="pill-link" href="https://canva.link/locussuitpresentation" target="_blank" rel="noopener" data-nodrag style="background:var(--pink-lt)">📊 pitch deck</a>
+    </div>
+  </div>`);
+
+const workCols = [ [-440,-240],[440,-240],[-440,280],[440,280] ];
+BUILDS.forEach((p,i)=>{
+  const [dx,dy]=workCols[i]||[i*260,0];
+  node(ZONES.work[0]+dx, ZONES.work[1]+dy, (i%2?1:-1)*(2+i), 'draggable', `
+    <div class="card swatch-card" style="--accent:${cv(p.accent)}">
+      <div class="build-media${p.img?'':' noimg'}">
+        ${p.img?`<img src="${esc(p.img)}" alt="${esc(p.title)}" decoding="async"
+            onerror="var w=this.closest('.build-media');this.remove();w.classList.add('noimg')">`:''}
+        <svg class="swatch" viewBox="0 0 260 170" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <rect x="18" y="10" width="150" height="150" fill="${cv(p.c1)}" filter="url(#rough)"/>
+          <rect x="86" y="52" width="120" height="96" fill="${cv(p.c2)}" filter="url(#rough)"/>
+        </svg>
+      </div>
+      <div class="meta">
+        <p class="eyebrow" style="margin-bottom:2px">${esc(p.tag)}</p>
+        <h3>${esc(p.title)}</h3>
+        <p class="blurb">${esc(p.blurb)}</p>
+        ${p.detail?`<button class="pill-link" data-nodrag data-build="${i}" style="margin-top:10px;background:${cv(p.accent)}">the full story →</button>`
+          : p.link?`<a class="pill-link" href="${esc(p.link)}" target="_blank" rel="noopener" data-nodrag style="margin-top:10px;background:${cv(p.accent)}">${esc(p.linkLabel||'learn more →')}</a>`:''}
+      </div>
+    </div>`);
+});
+photo(ZONES.work[0]+0, ZONES.work[1]+380, -3, "photos/tom-build.jpg",
+  "Tikkun Olam Makers build 🛠️", "--lime", "🛠️", 210, "4/3");
+photo(ZONES.work[0]+0, ZONES.work[1]-380, -3, "photos/building-sew.jpg",
+  "stitching a wearable 🧵", "--pink", "🧵", 195, "3/4");
+node(ZONES.work[0]+760, ZONES.work[1]+0, 0,'',`<div class="bob fast">${starSVG('--pink',54)}</div>`);
+
+/* ================= RESEARCH ================= */
+node(ZONES.research[0]+120, ZONES.research[1]-340, -3,'',`
+  <div class="signpost">${starSVG('--teal',64)}
+    <div style="font-size:1.6rem;font-family:var(--font-hand);color:var(--ink);margin-top:2px">research & work 🔬</div></div>`);
+const rPos=[[-200,-130],[110,-50],[-160,150],[190,210],[-20,380]];
+RESEARCH.forEach((r,i)=>{
+  const [dx,dy]=rPos[i%rPos.length];
+  node(ZONES.research[0]+dx, ZONES.research[1]+dy, (i%2?1:-1)*(2+i%3),'draggable',`
+    <div class="card" style="--tape:${cv(r.tape)};max-width:260px">
+      <span class="tape"></span>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+        <h3 style="font-size:1.15rem">${esc(r.org)}</h3>
+        <span style="font-family:var(--font-type);font-size:.72rem;color:var(--ink-soft);white-space:nowrap">${esc(r.date)}</span>
+      </div>
+      <p class="eyebrow" style="margin:2px 0 6px;color:var(--red-2)">${esc(r.role)}</p>
+      <p style="font-size:.9rem;line-height:1.4;color:var(--ink-soft);margin:0">${esc(r.txt)}</p>
+    </div>`);
+});
+photo(ZONES.research[0]-380, ZONES.research[1]+150, 3, "photos/research-poster.jpg",
+  "presenting my NF1 research 🧠", "--pink-lt", "🧠", 205, "3/4");
+photo(ZONES.research[0]+330, ZONES.research[1]+300, -3, "photos/lab-rig.jpg",
+  "my lab bench 🔬", "--teal", "🔬", 200, "4/3");
+photo(ZONES.research[0]+360, ZONES.research[1]-140, 4, "photos/vena-wearable.jpg",
+  "the Vena Vitals wearable 🫀", "--pink", "🫀", 190, "3/4");
+photo(ZONES.research[0]-330, ZONES.research[1]-250, -4, "photos/lab-group.jpg",
+  "my WashU lab family 🥼", "--mustard", "🥼", 215, "4/3");
+photo(ZONES.research[0]-340, ZONES.research[1]+350, 3, "photos/lab-imaging.jpg",
+  "imaging tumor tissue 🔬", "--red-2", "🔬", 205, "4/3");
+photo(ZONES.research[0]+170, ZONES.research[1]+400, -3, "photos/present-sinica.jpg",
+  "presenting @ Academia Sinica 🎤", "--teal", "🎤", 205, "4/3");
+photo(ZONES.research[0]-110, ZONES.research[1]+430, 4, "photos/vena-team.jpg",
+  "the Vena Vitals team 🫀", "--sage", "🫀", 195, "4/3");
+
+/* ================= AWARDS / trophy shelf + startup life ================= */
+node(ZONES.awards[0], ZONES.awards[1]-240, 2,'',`
+  <div class="signpost">${starSVG('--mustard',68)}
+    <div style="font-size:1.6rem;font-family:var(--font-hand);color:var(--ink);margin-top:2px">little celebrations ✨</div></div>`);
+const wPos=[[-320,-70],[10,-90],[320,-60],[-280,50],[40,40],[340,60]];
+WINS.forEach((w,i)=>{
+  const [dx,dy]=wPos[i%wPos.length];
+  node(ZONES.awards[0]+dx, ZONES.awards[1]+dy, (i%2?1:-1)*(2+i%4),'draggable',
+    `<div class="sticker" style="--c:${cv(w.c)}">${esc(w.t)}</div>`);
+});
+node(ZONES.awards[0]-350, ZONES.awards[1]+170, -2,'draggable',`
+  <div class="card" style="--tape:var(--pink);max-width:280px">
+    <span class="tape"></span>
+    <p class="eyebrow">patent · co-inventor · 2023</p>
+    <h3 style="font-size:1.2rem">CNN with Fixed-Point Processing 📜</h3>
+    <p style="font-size:.9rem;line-height:1.4;color:var(--ink-soft);margin:6px 0 0">
+      hardware optimization for neural-net efficiency in medical imaging: floating-point to fixed-point
+      conversion for faster, lower-power inference.</p>
+  </div>`);
+photo(ZONES.awards[0]+30, ZONES.awards[1]+180, 3, "photos/venturewell.jpg",
+  "VentureWell, Boston 🚀", "--lime", "🚀", 205, "4/3");
+photo(ZONES.awards[0]+320, ZONES.awards[1]+200, -3, "photos/bmes.jpg",
+  "BMES conf with my Locus team", "--teal", "🔬", 205, "4/3");
+photo(ZONES.awards[0]+180, ZONES.awards[1]+400, 3, "photos/venturewell2.jpg",
+  "pitching @ VentureWell 🚀", "--orange", "🚀", 195, "3/4");
+node(ZONES.awards[0]-490, ZONES.awards[1]+30, 0,'',`<div class="bob slow">${blobSVG('--orange','--red',82)}</div>`);
+
+/* ================= LIFE / hobbies ================= */
+node(ZONES.life[0], ZONES.life[1]-260, 3,'',`
+  <div class="signpost">${starSVG('--pink',64)}
+    <div style="font-size:1.6rem;font-family:var(--font-hand);color:var(--ink);margin-top:2px">life beyond the lab ♡</div></div>`);
+photo(ZONES.life[0]-300, ZONES.life[1]-40, -4, "photos/liondance-team.jpg",
+  "WashU lion dance team 🦁", "--red", "🦁", 240, "4/3");
+photo(ZONES.life[0]+20, ZONES.life[1]+30, 3, "photos/liondance-stage.jpg",
+  "performing at the show", "--mustard", "🎭", 210, "4/3");
+photo(ZONES.life[0]+300, ZONES.life[1]-30, 5, "photos/soccer.jpg",
+  "soccer szn ⚽", "--sage", "⚽", 210, "4/3");
+photo(ZONES.life[0]-160, ZONES.life[1]+260, 2, "photos/tsa-formal.jpg",
+  "Taiwanese Student Assoc fam", "--pink-lt", "🇹🇼", 230, "4/3");
+photo(ZONES.life[0]+180, ZONES.life[1]+280, -3, "photos/tsa-newbies.jpg",
+  "TSA newbies night 🎮", "--teal", "🎮", 200, "3/4");
+photo(ZONES.life[0]-470, ZONES.life[1]+250, 4, "photos/liondance-gala.jpg",
+  "lion dancing at a gala 🧧", "--red", "🧧", 220, "4/3");
+/* hand-placed so no pill sits on the heading (at dy -260) or a photo */
+const intoPos=[[-430,-170],[440,-165],[540,70],[470,215],[-340,110],[-520,-70],[250,-160],[130,340],[380,330]];
+INTO.forEach((s,i)=>{
+  const [dx,dy]=intoPos[i%intoPos.length];
+  node(ZONES.life[0]+dx, ZONES.life[1]+dy,(i%2?1:-1)*4,'draggable',
+    `<div class="sticker" style="--c:${cv(s.c)}">${esc(s.t)}</div>`);
+});
+node(ZONES.life[0]+430, ZONES.life[1]+60, 0,'',`<div class="bob fast">${starSVG('--teal',52)}</div>`);
+
+/* ================= TEACHING / New Gen Scientists ================= */
+node(ZONES.teaching[0], ZONES.teaching[1]-300, -2,'',`
+  <div class="signpost">${starSVG('--lime',66)}
+    <div style="font-size:1.6rem;font-family:var(--font-hand);color:var(--ink);margin-top:2px">teaching the tiny scientists 🌏</div></div>`);
+node(ZONES.teaching[0]-40, ZONES.teaching[1]-70, -2,'draggable',`
+  <div class="card" style="--tape:var(--lime);max-width:300px">
+    <span class="tape"></span>
+    <p class="eyebrow">founder & exec director</p>
+    <h3 style="font-size:1.25rem">New Gen Scientists 🌏</h3>
+    <p style="font-size:.92rem;line-height:1.45;color:var(--ink-soft);margin:6px 0 0">
+      an international STEM outreach program i started in 2022. taught 300+ students across the U.S.,
+      Taiwan & the Philippines, and earned the Gold Presidential Volunteer Award in '22 & '23.</p>
+  </div>`);
+const ngPhotos=[
+  ["photos/newgen-selfie.jpg","STEM camp selfie 🔬","--orange","🔬",[-330,-40],-4,"4/3",220],
+  ["photos/newgen-crew.jpg","my curious kiddos 💛","--pink-lt","💛",[300,-70],4,"4/3",210,"50% 12%"],
+  ["photos/newgen-science.jpg","hands-on science day 🧪","--teal","🧪",[-360,250],3,"4/3",215],
+  ["photos/newgen-kids3.jpg","camp crew 🎈","--sage","🎈",[10,310],-3,"4/3",215],
+  ["photos/newgen-cart.jpg","they built a whole cart! 🛠️","--coral","🛠️",[380,240],-4,"4/3",210],
+];
+ngPhotos.forEach(p=>photo(ZONES.teaching[0]+p[4][0], ZONES.teaching[1]+p[4][1], p[5], p[0], p[1], p[2], p[3], p[7], p[6], p[8]));
+node(ZONES.teaching[0]+30, ZONES.teaching[1]+120, 0,'',`<div class="bob">${blobSVG('--lime','--red',72,'happy')}</div>`);
+
+/* ================= SAY HI ================= */
+node(ZONES.hi[0], ZONES.hi[1], -1.5, 'draggable', `
+  <div class="card contact" style="--tape:var(--teal)">
+    <span class="tape"></span>
+    <p class="eyebrow">the edge of the map</p>
+    <h2 style="font-size:1.8rem">let's build something! 🚀</h2>
+    <p style="line-height:1.5;margin:10px 0 0">have an idea, a role, or a device that needs
+      building? i love collaborators. say hi, i reply fast.</p>
+    <div class="links">
+      <a href="mailto:chuang.j@wustl.edu" data-nodrag>✉️ email</a>
+      <a href="https://www.linkedin.com/in/jacquelinec07" target="_blank" rel="noopener" data-nodrag>💼 linkedin</a>
+      <a href="https://locussuit.com/" target="_blank" rel="noopener" data-nodrag>🌐 locus suit</a>
+    </div>
+  </div>`);
+node(ZONES.hi[0]+300, ZONES.hi[1]-30, 5,'',`<div class="bob slow">${blobSVG('--orange','--red',110)}</div>`);
+
+/* ================= ambient doodles ================= */
+node(ZONES.home[0]-380, ZONES.home[1]-280, 0,'',`<div class="spin">${starSVG('--lime',54)}</div>`);
+node(ZONES.home[0]+60, ZONES.home[1]-320, 0,'',`<div class="bob fast">${starSVG('--coral',44)}</div>`);
+node(2750,2150,0,'',`<div class="bob">${blobSVG('--mustard','--red',70,'happy')}</div>`);
+node(2600,820,0,'',`<div class="spin">${starSVG('--sage',46)}</div>`);
+
+/* ===================== PAN / ZOOM ===================== */
+let tx=0, ty=0, scale=1;
+const MINS=0.25, MAXS=1.4;
+function apply(){ board.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`; }
+function centerOn(zx,zy,animate){
+  tx = innerWidth/2 - zx*scale; ty = innerHeight/2 - zy*scale;
+  if(animate){ board.classList.add('flying'); clearTimeout(centerOn._t);
+    centerOn._t=setTimeout(()=>board.classList.remove('flying'),900); }
+  apply();
+}
+function zoomBy(factor){
+  if(locked){ openGate(); return; }
+  userMoved=true;
+  const wx=(innerWidth/2 - tx)/scale, wy=(innerHeight/2 - ty)/scale;
+  scale=Math.min(MAXS,Math.max(MINS, scale*factor));
+  tx=innerWidth/2 - wx*scale; ty=innerHeight/2 - wy*scale;
+  board.classList.add('flying'); clearTimeout(zoomBy._t);
+  zoomBy._t=setTimeout(()=>board.classList.remove('flying'),300);
+  apply();
+}
+document.getElementById('zoomIn').onclick=()=>zoomBy(1.18);
+document.getElementById('zoomOut').onclick=()=>zoomBy(1/1.18);
+
+const zoneBtns=[...document.querySelectorAll('#dock [data-zone]')];
+zoneBtns.forEach(b=>b.onclick=()=>{
+  const z=ZONES[b.dataset.zone]; if(!z) return;
+  if(locked && b.dataset.zone!=='home'){ openGate(); return; }
+  userMoved=true; centerOn(z[0],z[1],true);
+  zoneBtns.forEach(x=>x.classList.toggle('active',x===b));
+});
+
+/* ===================== DRAG (pan + cards/photos) ===================== */
+let mode=null, curCard=null, moved=false;
+let start={x:0,y:0}, base={x:0,y:0};
+function onDown(e){
+  if(e.button===1||e.button===2) return;
+  moved=false;
+  if(e.target.closest('[data-nodrag]')) return;
+  const cardNode=e.target.closest('.draggable');
+  if(locked){ openGate(); return; }
+  userMoved=true;
+  start.x=e.clientX; start.y=e.clientY;
+  if(cardNode){
+    mode='card'; curCard=cardNode;
+    base.x=parseFloat(cardNode.style.left); base.y=parseFloat(cardNode.style.top);
+    cardNode.classList.add('dragging');
+  } else { mode='pan'; base.x=tx; base.y=ty; stage.classList.add('grabbing'); }
+  board.classList.remove('flying');
+  window.addEventListener('pointermove',onMove);
+  window.addEventListener('pointerup',onUp);
+  e.preventDefault();
+}
+function onMove(e){
+  const dx=e.clientX-start.x, dy=e.clientY-start.y;
+  if(Math.abs(dx)+Math.abs(dy)>3) moved=true;
+  if(mode==='pan'){ tx=base.x+dx; ty=base.y+dy; apply(); }
+  else if(mode==='card' && curCard){
+    curCard.style.left=(base.x+dx/scale)+'px';
+    curCard.style.top =(base.y+dy/scale)+'px';
+  }
+  hideHint();
+}
+function onUp(){
+  if(curCard) curCard.classList.remove('dragging');
+  stage.classList.remove('grabbing'); mode=null; curCard=null;
+  window.removeEventListener('pointermove',onMove);
+  window.removeEventListener('pointerup',onUp);
+}
+stage.addEventListener('pointerdown',onDown);
+board.addEventListener('click',e=>{ if(moved){ const a=e.target.closest('a'); if(a) e.preventDefault(); } },true);
+stage.addEventListener('wheel',e=>{
+  e.preventDefault();
+  if(locked){ openGate(); return; }
+  if(e.ctrlKey){ zoomBy(e.deltaY<0?1.08:1/1.08); return; }
+  tx-=e.deltaX; ty-=e.deltaY; apply();
+},{passive:false});
+
+/* ===================== cursor-follow eyes ===================== */
+const pupils=[...heroBuddy.querySelectorAll('.pupil')];
+if(!reduce){
+  window.addEventListener('pointermove',e=>{
+    pupils.forEach(pu=>{
+      const svg=pu.closest('svg').getBoundingClientRect();
+      const cx=svg.left+svg.width*((+pu.getAttribute('cx'))/120);
+      const cy=svg.top +svg.height*((+pu.getAttribute('cy'))/120);
+      const ang=Math.atan2(e.clientY-cy,e.clientX-cx);
+      pu.setAttribute('transform',`translate(${Math.cos(ang)*2.6},${Math.sin(ang)*2.6})`);
+    });
+  });
+}
+
+/* ===================== typewriter ===================== */
+const PHRASES=["biomedical engineer 🧬","founder & CTO 🚀","assistive-tech builder","wearables & haptics tinkerer","0 to 1 person ♡"];
+const tw=document.getElementById('tw');
+if(reduce){ tw.textContent=PHRASES[0]; }
+else{
+  let pi=0,ci=0,del=false;
+  (function tick(){
+    const p=PHRASES[pi];
+    if(!del){ ci++; if(ci>p.length){ del=true; tw.textContent=p; return setTimeout(tick,1500);} }
+    else{ ci--; if(ci<0){ del=false; pi=(pi+1)%PHRASES.length; ci=0; return setTimeout(tick,180);} }
+    tw.textContent=p.slice(0,Math.max(0,ci));
+    setTimeout(tick, del?42:78);
+  })();
+}
+
+/* ===================== gate lock (soft password) ===================== */
+let locked=false;
+try{ locked = sessionStorage.getItem('jc_unlocked')!=='1'; }catch(e){ locked=true; }
+const gate=document.getElementById('gate');
+const gateInput=document.getElementById('gateInput');
+const gateErr=document.getElementById('gateErr');
+function openGate(){ if(!locked || !gate.hidden) return; gate.hidden=false; gateErr.hidden=true; setTimeout(()=>gateInput.focus(),40); }
+function closeGate(){ gate.hidden=true; }
+function tryUnlock(){
+  if(gateInput.value.trim().toLowerCase()==='idk'){
+    locked=false; try{ sessionStorage.setItem('jc_unlocked','1'); }catch(e){}
+    gate.hidden=true; gateInput.value='';
+    hint.innerHTML='<span class="hand">👆</span><span>you’re in! drag anywhere to explore ♡</span>';
+    hint.onclick=null; hint.style.cursor=''; hint.style.opacity='1';
+    clearTimeout(hintTimer); hintTimer=setTimeout(hideHint,4200);
+  } else { gateErr.hidden=false; gateInput.select(); }
+}
+document.getElementById('gateGo').onclick=tryUnlock;
+gateInput.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key==='Return'){ e.preventDefault(); tryUnlock(); } });
+gate.addEventListener('click',e=>{ if(e.target===gate) closeGate(); });
+addEventListener('keydown',e=>{ if(e.key==='Escape' && !gate.hidden) closeGate(); });
+
+/* ===================== hint ===================== */
+const hint=document.getElementById('hint');
+let hintTimer;
+function hideHint(){ if(!hint) return; hint.style.opacity='0';
+  clearTimeout(hintTimer); setTimeout(()=>hint&&hint.remove(),600); }
+if(locked){
+  hint.innerHTML='<span class="hand">🔒</span><span>password-protected · tap to explore</span>';
+  hint.style.cursor='pointer'; hint.onclick=openGate;
+} else {
+  hintTimer=setTimeout(hideHint,6000);
+}
+
+/* ===================== project story modal ===================== */
+const modal=document.getElementById('modal');
+function openBuild(i){
+  const b=BUILDS[i]; if(!b) return;
+  const mi=document.getElementById('mImg');
+  if(b.img){ mi.src=b.img; mi.alt=b.title; mi.hidden=false; } else { mi.hidden=true; mi.removeAttribute('src'); }
+  document.getElementById('mSub').textContent=b.subtitle||b.tag||'';
+  document.getElementById('mTitle').textContent=b.title;
+  document.getElementById('mTag').textContent=b.blurb||'';
+  document.getElementById('mDetail').textContent=b.detail||'';
+  document.getElementById('mLinks').innerHTML=b.link
+    ? `<a class="pill-link" href="${esc(b.link)}" target="_blank" rel="noopener" style="background:${cv(b.accent)}">${esc(b.linkLabel||'learn more →')}</a>`
+    : '';
+  modal.hidden=false;
+}
+function closeModal(){ modal.hidden=true; }
+document.getElementById('modalX').onclick=closeModal;
+modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
+addEventListener('keydown',e=>{ if(e.key==='Escape' && !modal.hidden) closeModal(); });
+board.addEventListener('click',e=>{ const btn=e.target.closest('[data-build]'); if(btn){ e.preventDefault(); openBuild(+btn.dataset.build); } });
+
+/* ===================== theme toggle ===================== */
+const themeBtn=document.getElementById('themeBtn');
+function curTheme(){ const r=document.documentElement;
+  if(r.dataset.theme) return r.dataset.theme;
+  return matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'; }
+themeBtn.onclick=()=>{ const next=curTheme()==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=next; themeBtn.textContent=next==='dark'?'☀':'☾'; };
+themeBtn.textContent=curTheme()==='dark'?'☀':'☾';
+
+/* ===================== init ===================== */
+/* start more zoomed out on phones / small screens so more of the board is visible.
+   fall back to a desktop width if the viewport reports 0 (some embedded frames) so
+   desktop never accidentally loads at the phone zoom; real phones report correctly. */
+function fitScale(){
+  var w = window.innerWidth || document.documentElement.clientWidth || 1024;
+  return w < 620 ? 0.45 : w < 1000 ? 0.72 : 1;
+}
+let userMoved = false;
+scale = fitScale();
+centerOn(ZONES.home[0],ZONES.home[1],false);
+/* if the true viewport size only settles after full load, re-fit once (unless exploring) */
+addEventListener('load', function(){ if(!userMoved){ scale = fitScale(); centerOn(ZONES.home[0],ZONES.home[1],false); } });
+
+/* ===================== preloader ===================== */
+(function(){
+  const fill=document.getElementById('preFill'), pct=document.getElementById('prePct'), pre=document.getElementById('pre');
+  let p=0; const step=reduce?100:4, dur=reduce?300:1700;
+  const iv=setInterval(()=>{
+    p=Math.min(100,p+step+Math.round(Math.random()*3));
+    fill.style.width=p+'%'; pct.textContent=p+'%';
+    if(p>=100){ clearInterval(iv); setTimeout(done,260); }
+  }, dur/(100/step));
+  function done(){ pre.classList.add('gone'); setTimeout(()=>pre&&pre.remove(),650); }
+  document.getElementById('preSkip').onclick=()=>{ clearInterval(iv); done(); };
+})();
+</script>
+
+<!-- Cloudflare Web Analytics — replace PASTE_YOUR_TOKEN_HERE with the token from your Cloudflare dashboard.
+     Note: only records data on your live deployed site (not the local/artifact preview). -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "PASTE_YOUR_TOKEN_HERE"}'></script>
+<!-- End Cloudflare Web Analytics -->
