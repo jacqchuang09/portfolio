@@ -147,6 +147,10 @@
   @keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-9px) rotate(2deg)}}
   .spin{animation:spin 12s linear infinite;transform-origin:center}
   @keyframes spin{to{rotate:360deg}}
+  .sway{animation:sway 4.8s ease-in-out infinite;transform-origin:bottom center}
+  @keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+  .drift{animation:drift 6s ease-in-out infinite}
+  @keyframes drift{0%,100%{transform:translateX(0) rotate(0)}50%{transform:translateX(10px) rotate(1.5deg)}}
   .signpost{font-family:var(--font-hand);font-size:.85rem;color:var(--ink-soft);text-align:center}
 
   #dock{position:fixed;left:50%;bottom:18px;translate:-50% 0;z-index:200;display:flex;gap:8px;
@@ -293,6 +297,36 @@ function starSVG(fill,w){
     <path d="M54 70c3 3 9 3 12 0" stroke="#2C2620" stroke-width="2.6" fill="none" stroke-linecap="round"/>
   </svg>`;
 }
+/* ---------- crayon ocean critters ---------- */
+function fishSVG(fill,w,flip){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 140 100" aria-hidden="true">
+    <g${flip?' transform="translate(140,0) scale(-1,1)"':''}>
+      <path d="M108 50 L138 26 Q129 50 138 74 Z" fill="${cv(fill)}" filter="url(#rough2)"/>
+      <path d="M54 22 Q72 4 92 26 Z" fill="${cv(fill)}" filter="url(#rough2)"/>
+      <ellipse cx="68" cy="54" rx="48" ry="32" fill="${cv(fill)}" filter="url(#rough2)"/>
+      <ellipse cx="60" cy="83" rx="12" ry="6" fill="${cv(fill)}" filter="url(#rough2)"/>
+      <ellipse cx="30" cy="66" rx="7" ry="4" fill="var(--coral)" opacity=".45"/>
+      <circle cx="45" cy="50" r="15" fill="#fff"/>
+      <circle cx="42" cy="53" r="9" fill="#2C2620"/>
+      <circle cx="39" cy="49" r="2.6" fill="#fff"/>
+      <path d="M17 60 q8 6 16 1" stroke="#2C2620" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    </g>
+  </svg>`;
+}
+function seaweedSVG(fill,w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 70 150" aria-hidden="true">
+    <path d="M26 149 C6 121 44 105 22 75 C4 47 38 35 24 7" stroke="${cv(fill)}" stroke-width="11" fill="none" stroke-linecap="round" filter="url(#rough2)"/>
+    <path d="M46 149 C36 123 64 107 46 79 C34 55 58 41 48 17" stroke="${cv(fill)}" stroke-width="8" fill="none" stroke-linecap="round" filter="url(#rough2)"/>
+  </svg>`;
+}
+function bubblesSVG(fill,w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 80 120" aria-hidden="true">
+    <circle cx="30" cy="98" r="12" fill="none" stroke="${cv(fill)}" stroke-width="4" filter="url(#rough2)"/>
+    <circle cx="52" cy="64" r="8" fill="none" stroke="${cv(fill)}" stroke-width="3.5" filter="url(#rough2)"/>
+    <circle cx="34" cy="34" r="6" fill="none" stroke="${cv(fill)}" stroke-width="3" filter="url(#rough2)"/>
+    <circle cx="50" cy="12" r="4" fill="none" stroke="${cv(fill)}" stroke-width="2.6" filter="url(#rough2)"/>
+  </svg>`;
+}
 /* photo polaroid with graceful fallback if the image file is missing */
 function photo(x,y,rot,src,cap,color,emoji,w,ar,pos){
   return node(x,y,rot,'draggable',`
@@ -364,6 +398,20 @@ const VIEW = {
   home:0.92, about:0.82, work:0.7, research:0.66,
   awards:0.72, life:0.66, teaching:0.74, hi:0.92
 };
+
+/* ================= ocean reef behind home ================= */
+node(ZONES.home[0]-430, ZONES.home[1]-255, 0,'',`<div class="bob">${fishSVG('--orange',108)}</div>`);
+node(ZONES.home[0]+80,  ZONES.home[1]-320, 0,'',`<div class="bob fast">${fishSVG('--teal',92,true)}</div>`);
+node(ZONES.home[0]+560, ZONES.home[1]-40,  0,'',`<div class="drift">${fishSVG('--mustard',116)}</div>`);
+node(ZONES.home[0]-560, ZONES.home[1]+40,  0,'',`<div class="drift">${fishSVG('--orange-2',104,true)}</div>`);
+node(ZONES.home[0]+385, ZONES.home[1]+250, 0,'',`<div class="bob fast">${fishSVG('--red',92)}</div>`);
+node(ZONES.home[0]-360, ZONES.home[1]+265, 0,'',`<div class="bob slow">${fishSVG('--teal',98,true)}</div>`);
+node(ZONES.home[0]-610, ZONES.home[1]+245, 2,'',`<div class="sway">${seaweedSVG('--sage',118)}</div>`);
+node(ZONES.home[0]+650, ZONES.home[1]+170, -3,'',`<div class="sway">${seaweedSVG('--lime',128)}</div>`);
+node(ZONES.home[0]+470, ZONES.home[1]+285, 1,'',`<div class="sway">${seaweedSVG('--sage',108)}</div>`);
+node(ZONES.home[0]-650, ZONES.home[1]+110, -2,'',`<div class="sway">${seaweedSVG('--lime',114)}</div>`);
+node(ZONES.home[0]+445, ZONES.home[1]-190, 0,'',`<div class="bob slow">${bubblesSVG('--teal',58)}</div>`);
+node(ZONES.home[0]-485, ZONES.home[1]-110, 0,'',`<div class="bob">${bubblesSVG('--teal',54)}</div>`);
 
 /* ================= HERO ================= */
 node(ZONES.home[0], ZONES.home[1], -1.5, 'draggable', `
@@ -591,8 +639,7 @@ node(ZONES.hi[0], ZONES.hi[1], -1.5, 'draggable', `
 node(ZONES.hi[0]+300, ZONES.hi[1]-30, 5,'',`<div class="bob slow">${blobSVG('--orange','--red',110)}</div>`);
 
 /* ================= ambient doodles ================= */
-node(ZONES.home[0]-380, ZONES.home[1]-280, 0,'',`<div class="spin">${starSVG('--lime',54)}</div>`);
-node(ZONES.home[0]+60, ZONES.home[1]-320, 0,'',`<div class="bob fast">${starSVG('--coral',44)}</div>`);
+node(ZONES.home[0]-180, ZONES.home[1]-325, 0,'',`<div class="bob">${fishSVG('--pink',82)}</div>`);
 node(2750,2150,0,'',`<div class="bob">${blobSVG('--mustard','--red',70,'happy')}</div>`);
 node(2600,820,0,'',`<div class="spin">${starSVG('--sage',46)}</div>`);
 
