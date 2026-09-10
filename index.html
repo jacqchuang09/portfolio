@@ -691,7 +691,7 @@ const RESEARCH = [
     txt:"built Python visualization tools for an AI-acceleration platform; performance-estimation module for hardware latency." },
   { org:"Academia Sinica", role:"Research Intern", date:"2025", tape:"--lime", story:"academia",
     txt:"automated microfluidics plus scRNA-seq on 100k+ immune cells, cutting reagent waste 25% and lifting reproducibility 35%." },
-  { org:"Columbia Chem-Genomics", role:"Research Intern", date:"2023", tape:"--mustard",
+  { org:"Columbia Chem-Genomics", role:"Research Intern", date:"2023", tape:"--mustard", story:"columbia",
     txt:"computational scRNA-seq: dimensionality reduction & differential expression workflows." },
 ];
 const WINS = [
@@ -1183,6 +1183,11 @@ if(locked){
 /* ===================== project story modal ===================== */
 const modal=document.getElementById('modal');
 const STORIES = {
+  columbia: {
+    title:"Columbia Chem-Genomics", subtitle:"Research Intern · Chemical Genomics Lab, Columbia University · 2023", accent:"--mustard",
+    blurb:"computational single-cell genomics in the Chemical Genomics Lab, studying how tumor heterogeneity shapes glioblastoma's response to chemotherapy.",
+    detail:"i worked under graduate student Nicholas Hou, whose project used cell-type-specific CRISPR to repress tumor suppressor genes in the RTK pathway and study how glioblastoma develops resistance to chemotherapy. i shadowed the wet-lab side, from cloning protocols (Gibson reactions, transformation, Clonase, gel electrophoresis) to cell culture (passaging, freezing, thawing, counting), and learned the genomic technologies behind it: Sanger sequencing, flow cytometry, and single-cell sequencing. my own hands-on work was computational: in Google Colab i analyzed glioblastoma single-cell RNA-seq data, reading in barcodes, gene lists, and cell characteristics, running PCA and UMAP dimensionality reduction, clustering with the Leiden algorithm, and using differentially expressed gene analysis to annotate each cluster's cell type, then repeated the pipeline on pancreatic data. this was the internship where i realized i wanted to keep working at the intersection of genomics and computation in cancer research.",
+  },
   academia: {
     title:"Academia Sinica", subtitle:"Research Intern · Institute of Biomedical Sciences · Taipei 2025", accent:"--lime",
     blurb:"mapping the immune microenvironment of HPV+ vs HPV- head and neck cancer at both the RNA and protein level, in Dr. Shih-Yu Chen's lab.",
