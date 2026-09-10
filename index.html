@@ -222,6 +222,7 @@
   <div class="modal-card">
     <button class="modal-x" id="modalX" aria-label="close">✕</button>
     <img id="mImg" class="mImg" alt="" hidden>
+    <video id="mVid" class="mImg" controls playsinline preload="metadata" hidden></video>
     <p class="eyebrow" id="mSub"></p>
     <h2 id="mTitle"></h2>
     <p class="mTag" id="mTag"></p>
@@ -661,9 +662,11 @@ const BUILDS = [
     subtitle:"Washington University in St. Louis · 2025-2026",
     blurb:"a low-cost wearable that turns Parkinson's tremor from something a specialist eyeballs into an objective, numeric readout, for under $25 in parts.",
     detail:"Parkinson's hand tremor is usually assessed visually by a neurologist, which is subjective and hard to access outside major clinics. we built a wrist-worn device to quantify it in real time: a 6-axis IMU samples wrist motion at 500 Hz, and on an Arduino i wrote a zero-crossing algorithm that computes tremor frequency over a rolling 5-second window, showing it live on an LCD and lighting an LED when it lands in the 3-6 Hz Parkinson's range.",
-    c1:"--pink", c2:"--mustard", accent:"--teal", img:"photos/parkinson-tremor.jpg", imgFull:true },
+    c1:"--pink", c2:"--mustard", accent:"--teal", img:"photos/parkinson-tremor.jpg", imgCrop:true },
   { title:"Adaptive 3D-Printed Tools", tag:"Tikkun Olam Makers · Board",
+    subtitle:"Tikkun Olam Makers (TOM: WashU) · Executive Board",
     blurb:"user-driven accessibility devices from rapid make-a-thons, then designed, printed & donated to disability orgs.",
+    detail:"with Tikkun Olam Makers i help run rapid make-a-thons where we design accessibility devices with and for people with disabilities. we start from a real need someone brings us, prototype fast, then refine, 3D-print, and donate the finished tools. i've led an Assistive Tech Make-A-Thon and a Toddler Mobility Build Party, and our team donated printed adaptive tools to the Association on Aging with Developmental Disabilities — small, specific objects that make everyday tasks possible again.",
     c1:"--lime", c2:"--red-2", accent:"--orange", img:"photos/tom-prints.jpg" },
   { title:"In Tune", tag:"children's book · co-author & illustrator 🌸",
     subtitle:"self-published children's book · June 2025",
@@ -673,7 +676,7 @@ const BUILDS = [
     link:"https://www.amazon.com/dp/B0FK42L873?lv=shuf&channelId=500&plpRedirect=mhFallback", linkLabel:"get the ebook →" },
 ];
 const RESEARCH = [
-  { org:"Vena Vitals", role:"R&D Intern", date:"2026", tape:"--teal",
+  { org:"Vena Vitals", role:"R&D Intern", date:"2026", tape:"--teal", story:"vena",
     txt:"Python GUI workflows for actuator control, sensor calibration & real-time data on wearable cardiovascular monitors." },
   { org:"Gutmann Lab · WashU Med", role:"Research Assistant", date:"'25 to now", tape:"--pink",
     txt:"translational neuro-oncology on NF1 tumor models plus assistive tech for children with Neurofibromatosis Type 1." },
@@ -868,6 +871,7 @@ RESEARCH.forEach((r,i)=>{
       </div>
       <p class="eyebrow" style="margin:2px 0 6px;color:var(--red-2)">${esc(r.role)}</p>
       <p style="font-size:.9rem;line-height:1.4;color:var(--ink-soft);margin:0">${esc(r.txt)}</p>
+      ${r.story?`<button class="pill-link" data-nodrag data-story="${esc(r.story)}" style="margin-top:10px;background:${cv(r.tape)}">learn more →</button>`:''}
     </div>`);
 });
 photo(ZONES.research[0]-470, ZONES.research[1]-260, -4, "photos/vena-team.jpg",
@@ -1171,25 +1175,43 @@ if(locked){
 
 /* ===================== project story modal ===================== */
 const modal=document.getElementById('modal');
-function openBuild(i){
-  const b=BUILDS[i]; if(!b) return;
-  const mi=document.getElementById('mImg');
-  if(b.img){ mi.src=b.img; mi.alt=b.title; mi.hidden=false; } else { mi.hidden=true; mi.removeAttribute('src'); }
-  mi.style.maxHeight = b.imgFull ? 'none' : '';
+const STORIES = {
+  vena: {
+    title:"Vena Vitals", subtitle:"R&D Intern · cuffless blood-pressure wearable", accent:"--teal",
+    blurb:"the skin-interfaced capacitive pressure sensor behind a cuffless, continuous blood-pressure wearable — and the software i built to test it.",
+    detail:"Vena Vitals is building a Class II, 510(k)-pending wearable that reads blood pressure continuously from skin-interfaced capacitive pressure sensors instead of an inflating cuff. i built VeriTrack, the end-to-end Python app the team uses to characterize those sensors: actuator control, real-time data acquisition, and test modes for electromechanical, shear, fatigue, and calibration runs, all with safety systems and an analysis engine that pulls per-channel sensitivity, response, and hysteresis from synchronized force and 8-channel capacitance streams. i also rebuilt the iOS recording screen (Swift + BLE) into a live multi-channel grid for sensor QC, and ran the MATLAB pipeline that validated the wearable against the arterial-line reference across 300+ OR patients. the clip below is a quick setup demo of VeriTrack.",
+    video:"media/setup-veritrack.mp4" }
+};
+function showStory(b){
+  if(!b) return;
+  const mi=document.getElementById('mImg'), mv=document.getElementById('mVid');
+  if(b.video){
+    mv.src=b.video; mv.hidden=false;
+    mi.hidden=true; mi.removeAttribute('src');
+  } else {
+    mv.pause(); mv.hidden=true; mv.removeAttribute('src');
+    if(b.img){ mi.src=b.img; mi.alt=b.title||''; mi.hidden=false; } else { mi.hidden=true; mi.removeAttribute('src'); }
+  }
+  mi.style.objectFit = b.imgCrop ? 'cover' : '';
+  mi.style.height = b.imgCrop ? '340px' : '';
   document.getElementById('mSub').textContent=b.subtitle||b.tag||'';
-  document.getElementById('mTitle').textContent=b.title;
+  document.getElementById('mTitle').textContent=b.title||'';
   document.getElementById('mTag').textContent=b.blurb||'';
   document.getElementById('mDetail').textContent=b.detail||'';
   document.getElementById('mLinks').innerHTML=b.link
-    ? `<a class="pill-link" href="${esc(b.link)}" target="_blank" rel="noopener" style="background:${cv(b.accent)}">${esc(b.linkLabel||'learn more →')}</a>`
+    ? `<a class="pill-link" href="${esc(b.link)}" target="_blank" rel="noopener" style="background:${cv(b.accent||'--teal')}">${esc(b.linkLabel||'learn more →')}</a>`
     : '';
   modal.hidden=false;
 }
-function closeModal(){ modal.hidden=true; }
+function openBuild(i){ showStory(BUILDS[i]); }
+function closeModal(){ modal.hidden=true; const mv=document.getElementById('mVid'); if(mv) mv.pause(); }
 document.getElementById('modalX').onclick=closeModal;
 modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
 addEventListener('keydown',e=>{ if(e.key==='Escape' && !modal.hidden) closeModal(); });
-board.addEventListener('click',e=>{ const btn=e.target.closest('[data-build]'); if(btn){ e.preventDefault(); openBuild(+btn.dataset.build); } });
+board.addEventListener('click',e=>{
+  const btn=e.target.closest('[data-build]'); if(btn){ e.preventDefault(); openBuild(+btn.dataset.build); return; }
+  const sb=e.target.closest('[data-story]'); if(sb){ e.preventDefault(); showStory(STORIES[sb.dataset.story]); }
+});
 
 /* ===================== theme toggle ===================== */
 const themeBtn=document.getElementById('themeBtn');
