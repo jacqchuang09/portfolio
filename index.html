@@ -99,6 +99,12 @@
   .polaroid .ph.noimg::after{content:attr(data-emoji);font-size:2.6rem;opacity:.9}
   .polaroid figcaption{font-family:var(--font-hand);font-size:.92rem;color:var(--ink);
     padding:9px 4px 13px;text-align:center;line-height:1.2}
+  .polaroid.has-vid{cursor:pointer}
+  .polaroid.has-vid .playbadge{position:absolute;inset:0;margin:auto;width:52px;height:52px;
+    display:flex;align-items:center;justify-content:center;border-radius:50%;
+    background:rgba(44,38,32,.60);color:#fff;font-size:1.15rem;padding-left:4px;
+    border:2.5px solid #fff;pointer-events:none;box-shadow:2px 2px 0 rgba(0,0,0,.2)}
+  .polaroid.has-vid:hover .playbadge{background:rgba(44,38,32,.82)}
 
   .contact{max-width:360px}
   .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
@@ -639,12 +645,13 @@ function rocketSVG(w){
   </svg>`;
 }
 /* photo polaroid with graceful fallback if the image file is missing */
-function photo(x,y,rot,src,cap,color,emoji,w,ar,pos){
+function photo(x,y,rot,src,cap,color,emoji,w,ar,pos,story){
   return node(x,y,rot,'draggable',`
-    <figure class="polaroid" style="--pw:${w||220}px;--ar:${ar||'4/3'};--phc:${cv(color)}">
+    <figure class="polaroid${story?' has-vid':''}"${story?` data-story="${esc(story)}"`:''} style="--pw:${w||220}px;--ar:${ar||'4/3'};--phc:${cv(color)}">
       <div class="ph">
         <img src="${esc(src)}" alt="${esc(cap)}" decoding="async"${pos?` style="object-position:${pos}"`:''}
           onerror="var p=this.parentNode;this.remove();p.classList.add('noimg');p.setAttribute('data-emoji','${emoji||'📷'}')">
+        ${story?'<span class="playbadge">▶</span>':''}
       </div>
       <figcaption>${esc(cap)}</figcaption>
     </figure>`);
@@ -666,8 +673,8 @@ const BUILDS = [
   { title:"Adaptive 3D-Printed Tools", tag:"Tikkun Olam Makers · Board",
     subtitle:"Tikkun Olam Makers (TOM: WashU) · Executive Board",
     blurb:"user-driven accessibility devices from rapid make-a-thons, then designed, printed & donated to disability orgs.",
-    detail:"with Tikkun Olam Makers i help run rapid make-a-thons where we design accessibility devices with and for people with disabilities. we start from a real need someone brings us, prototype fast, then refine, 3D-print, and donate the finished tools. i've led an Assistive Tech Make-A-Thon and a Toddler Mobility Build Party, and our team donated printed adaptive tools to the Association on Aging with Developmental Disabilities — small, specific objects that make everyday tasks possible again.",
-    c1:"--lime", c2:"--red-2", accent:"--orange", img:"photos/tom-prints.jpg" },
+    detail:"with Tikkun Olam Makers i help run rapid make-a-thons where we design accessibility devices with and for people with disabilities. we start from a real need someone brings us, prototype fast, then refine, 3D-print, and donate the finished tools. i've led an Assistive Tech Make-A-Thon and a Toddler Mobility Build Party, and our team donated printed adaptive tools to the Association on Aging with Developmental Disabilities. this year i'll be spearheading a project bringing music to kids with disabilities, designing adaptive tools so they can play and make music too. we also submitted FOON to the Global Innovation Challenge this year.",
+    c1:"--lime", c2:"--red-2", accent:"--orange", img:"photos/tom-prints.jpg", imgCrop:true },
   { title:"In Tune", tag:"children's book · co-author & illustrator 🌸",
     subtitle:"self-published children's book · June 2025",
     blurb:"a children's book about twin Asian-American sisters learning to step into the spotlight as their own selves, made by a team of teenage AAPI girls 🌸",
@@ -678,11 +685,11 @@ const BUILDS = [
 const RESEARCH = [
   { org:"Vena Vitals", role:"R&D Intern", date:"2026", tape:"--teal", story:"vena",
     txt:"Python GUI workflows for actuator control, sensor calibration & real-time data on wearable cardiovascular monitors." },
-  { org:"Gutmann Lab · WashU Med", role:"Research Assistant", date:"'25 to now", tape:"--pink",
+  { org:"Gutmann Lab · WashU Med", role:"Research Assistant", date:"'25 to now", tape:"--pink", story:"gutmann",
     txt:"translational neuro-oncology on NF1 tumor models plus assistive tech for children with Neurofibromatosis Type 1." },
-  { org:"Expedera Inc.", role:"SWE Co-Op", date:"'22 to '24", tape:"--orange",
+  { org:"Expedera Inc.", role:"SWE Co-Op", date:"'22 to '24", tape:"--orange", story:"expedera",
     txt:"built Python visualization tools for an AI-acceleration platform; performance-estimation module for hardware latency." },
-  { org:"Academia Sinica", role:"Research Intern", date:"2025", tape:"--lime",
+  { org:"Academia Sinica", role:"Research Intern", date:"2025", tape:"--lime", story:"academia",
     txt:"automated microfluidics plus scRNA-seq on 100k+ immune cells, cutting reagent waste 25% and lifting reproducibility 35%." },
   { org:"Columbia Chem-Genomics", role:"Research Intern", date:"2023", tape:"--mustard",
     txt:"computational scRNA-seq: dimensionality reduction & differential expression workflows." },
@@ -906,9 +913,9 @@ node(ZONES.awards[0], ZONES.awards[1]-235, -1,'draggable',`
     <p class="eyebrow">the places this work took me ✈️</p>
     <h3 style="font-size:1.15rem">so blessed to travel 🌎</h3>
     <p style="font-size:.9rem;line-height:1.45;color:var(--ink-soft);margin:6px 0 0">
-      San Diego for the Biomedical Engineering Society annual meeting (and fresh sushi at SeaWorld… haha),
+      San Diego for the <a href="https://venturewell.org/debut-2026-winners/" target="_blank" rel="noopener" data-nodrag style="color:var(--red-2);font-weight:700">Biomedical Engineering Society annual meeting</a> (and fresh sushi at SeaWorld… haha),
       Boston for the <a href="https://venturewell.org/spring-2026-e-team/" target="_blank" rel="noopener" data-nodrag style="color:var(--red-2);font-weight:700">VentureWell E-Team Pioneer</a> program (and stuffed cannolis), and Louisiana for the Sling Health
-      National Demo Day — where we got to eat beignets sitting next to the lake in New Orleans. 💛</p>
+      National Demo Day, where we got to eat beignets sitting next to the lake in New Orleans. 💛</p>
   </div>`);
 const wPos=[[-320,-70],[10,-90],[320,-60],[-280,50],[40,40],[340,60]];
 WINS.forEach((w,i)=>{
@@ -934,7 +941,7 @@ photo(ZONES.awards[0]+180, ZONES.awards[1]+400, 3, "photos/venturewell2.jpg",
 photo(ZONES.awards[0]-330, ZONES.awards[1]+410, -3, "photos/sling-demoday.jpg",
   "1st @ Sling Health Demo Day, NOLA 🥇", "--pink", "🥇", 215, "4/3");
 photo(ZONES.awards[0]+430, ZONES.awards[1]+430, 3, "photos/skandy-win.jpg",
-  "Skandalaris funding winners 💰", "--sage", "💰", 235, "3/2");
+  "Skandalaris funding winners 💰", "--sage", "💰", 235, "3/2", null, "locuswin");
 
 /* ================= LIFE / hobbies — icy world ================= */
 node(ZONES.life[0]-700, ZONES.life[1]-70, 0,'',`<div class="bob slow">${foxSVG(150)}</div>`);
@@ -1176,10 +1183,29 @@ if(locked){
 /* ===================== project story modal ===================== */
 const modal=document.getElementById('modal');
 const STORIES = {
+  academia: {
+    title:"Academia Sinica", subtitle:"Research Intern · Taipei · 2025", accent:"--lime",
+    blurb:"automated microfluidics plus spatial multiplexed imaging and scRNA-seq on 100k+ immune cells in HNSCC tumors, cutting reagent waste 25% and lifting staining reproducibility 35%. a quick peek at the lab below.",
+    video:"media/academia-sinica.mp4" },
+  gutmann: {
+    title:"Gutmann Lab · WashU Med", subtitle:"Research Assistant · WashU School of Medicine · '25 to now", accent:"--pink",
+    img:"photos/gutmann-poster.jpg",
+    blurb:"translational neuro-oncology on NF1 tumor models, plus the assistive technology i want to build for children with Neurofibromatosis Type 1.",
+    detail:"in the lab i built a computational pipeline (Python/R) that maps neurotransmitter signaling from gene-expression data to predict where NF1 low-grade gliomas form: dopamine-rich brain regions resist tumors while glutamate-rich ones permit them, a pattern we're validating in mouse models with immunohistochemistry and Ki-67 staining. i presented this work as first author (\"Neurochemical Mapping of Brain Regions to Predict Pediatric Low-Grade Glioma Incidence\") and co-authored a related manuscript submitted to Nature. where i really want to grow is the assistive-tech side: building tools for kids with NF1 across the whole journey. on the clinical and diagnostic end, that means devices that make monitoring objective and accessible, like accelerometer-based gait and sleep sensing that a clinician can actually act on. on the daily-living end, it means ADL assisting tools like a cognitive step-breakdown device that helps kids move through everyday tasks more independently. the science tells us who is at risk and why; i want to build the things that help those kids live better right now.",
+  },
+  locuswin: {
+    title:"Locus Suit: the win 🎉", subtitle:"Skandalaris Disruptor Funding · $5,000, top 4 of 131", accent:"--sage",
+    blurb:"celebrating with the Locus Suit team after taking Skandalaris Disruptor funding.",
+    video:"media/locus-celebration.mp4" },
+  expedera: {
+    title:"Expedera Inc.", subtitle:"SWE Co-Op · Santa Clara + Taipei · '22 to '24", accent:"--orange",
+    img:"photos/expedera-team.jpg",
+    blurb:"a semiconductor startup building neural-network inference accelerators (NPU IP) for edge AI. i built the interactive visualization interface engineers used to explore and modify model graphs, plus a Python/Flask performance-estimation module for memory and hardware-latency analysis.",
+    detail:"Getting to work in Taiwan: Expedera's team operated primarily in Mandarin, and walking into that environment as the youngest person in the room was humbling in the best way. The startup culture was unlike anything I had experienced: people stayed overnight to meet delivery deadlines, debated fixes over late night UberEats, iterated until something worked. I threw myself into it. I asked questions after hours, sat with engineers to understand what they were building and why, picked up vocabulary specific to the work. The people I worked with were generous with their time and excited about what they were doing, and that energy was contagious. I built visualization and performance estimation tools that the team used directly, and watching something I wrote become part of someone else's workflow was one of the most rewarding feelings of the internship. What that summer gave me was not just independence in the logistical sense but an understanding of how to function with humility in an environment that was not built for you. Navigating a language gap at work and in daily life pushed me to be deliberate and resourceful. It taught me how to handle uncertainty when there is no one to defer to and how to ask for help when I am embarrassed to need it. I came back more confident, more adaptable, and with a clearer sense of who I am when nobody is watching." },
   vena: {
     title:"Vena Vitals", subtitle:"R&D Intern · cuffless blood-pressure wearable", accent:"--teal",
-    blurb:"the skin-interfaced capacitive pressure sensor behind a cuffless, continuous blood-pressure wearable — and the software i built to test it.",
-    detail:"Vena Vitals is building a Class II, 510(k)-pending wearable that reads blood pressure continuously from skin-interfaced capacitive pressure sensors instead of an inflating cuff. i built VeriTrack, the end-to-end Python app the team uses to characterize those sensors: actuator control, real-time data acquisition, and test modes for electromechanical, shear, fatigue, and calibration runs, all with safety systems and an analysis engine that pulls per-channel sensitivity, response, and hysteresis from synchronized force and 8-channel capacitance streams. i also rebuilt the iOS recording screen (Swift + BLE) into a live multi-channel grid for sensor QC, and ran the MATLAB pipeline that validated the wearable against the arterial-line reference across 300+ OR patients. the clip below is a quick setup demo of VeriTrack.",
+    blurb:"the skin-interfaced capacitive pressure sensor behind a cuffless, continuous blood-pressure wearable, and the software i built to test it.",
+    detail:"Vena Vitals is building a Class II, 510(k)-pending wearable that reads blood pressure continuously from skin-interfaced capacitive pressure sensors instead of an inflating cuff. i built the end-to-end Python app the team uses to characterize those sensors: actuator control, real-time data acquisition, and test modes for electromechanical, shear, fatigue, and calibration runs, all with safety systems and an analysis engine that pulls per-channel sensitivity, response, and hysteresis from synchronized force and 8-channel capacitance streams. i also rebuilt the iOS recording screen (Swift + BLE) into a live multi-channel grid for sensor QC, and ran the MATLAB pipeline that validated the wearable against the arterial-line reference across 300+ OR patients. the clip below is a quick demo of the sensor test app in action.",
     video:"media/setup-veritrack.mp4" }
 };
 function showStory(b){
@@ -1190,7 +1216,7 @@ function showStory(b){
     mi.hidden=true; mi.removeAttribute('src');
   } else {
     mv.pause(); mv.hidden=true; mv.removeAttribute('src');
-    if(b.img){ mi.src=b.img; mi.alt=b.title||''; mi.hidden=false; } else { mi.hidden=true; mi.removeAttribute('src'); }
+    if(b.img){ mi.onerror=function(){ mi.hidden=true; }; mi.src=b.img; mi.alt=b.title||''; mi.hidden=false; } else { mi.hidden=true; mi.removeAttribute('src'); }
   }
   mi.style.objectFit = b.imgCrop ? 'cover' : '';
   mi.style.height = b.imgCrop ? '340px' : '';
@@ -1210,7 +1236,7 @@ modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
 addEventListener('keydown',e=>{ if(e.key==='Escape' && !modal.hidden) closeModal(); });
 board.addEventListener('click',e=>{
   const btn=e.target.closest('[data-build]'); if(btn){ e.preventDefault(); openBuild(+btn.dataset.build); return; }
-  const sb=e.target.closest('[data-story]'); if(sb){ e.preventDefault(); showStory(STORIES[sb.dataset.story]); }
+  const sb=e.target.closest('[data-story]'); if(sb){ if(moved) return; e.preventDefault(); showStory(STORIES[sb.dataset.story]); }
 });
 
 /* ===================== theme toggle ===================== */
