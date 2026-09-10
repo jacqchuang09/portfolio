@@ -35,7 +35,7 @@
 
   #stage{position:fixed;inset:0;overflow:hidden;cursor:grab;background:var(--cream)}
   #stage.grabbing{cursor:grabbing}
-  #board{position:absolute;left:0;top:0;width:3900px;height:4300px;transform-origin:0 0;
+  #board{position:absolute;left:0;top:0;width:6100px;height:6150px;transform-origin:0 0;
     background-image:radial-gradient(var(--dot) 1.6px,transparent 1.6px);
     background-size:34px 34px;will-change:transform}
   #board.flying{transition:transform .85s cubic-bezier(.22,.61,.36,1)}
@@ -505,6 +505,101 @@ function barnSVG(w){
     <path d="M50 66 L65 79 L80 66" fill="none" stroke="#B0300A" stroke-width="2.5"/>
   </svg>`;
 }
+/* ---------- crayon icy critters ---------- */
+function foxSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 124 116" aria-hidden="true">
+    <path d="M22 12 L46 46 L12 50 Z" fill="var(--orange)" stroke="#2C2620" stroke-width="2.2" filter="url(#rough2)"/>
+    <path d="M102 12 L78 46 L112 50 Z" fill="var(--orange)" stroke="#2C2620" stroke-width="2.2" filter="url(#rough2)"/>
+    <path d="M26 20 L40 42 L22 45 Z" fill="#B0300A"/>
+    <path d="M98 20 L84 42 L102 45 Z" fill="#B0300A"/>
+    <path d="M62 22 C92 22 98 44 92 62 C87 82 74 94 62 102 C50 94 37 82 32 62 C26 44 32 22 62 22 Z" fill="var(--orange)" stroke="#2C2620" stroke-width="2.4" filter="url(#rough2)"/>
+    <path d="M62 60 C50 60 40 66 37 78 C44 90 54 98 62 102 C70 98 80 90 87 78 C84 66 74 60 62 60 Z" fill="#FCFAF4" filter="url(#rough2)"/>
+    <circle cx="46" cy="54" r="5.6" fill="#2C2620"/><circle cx="78" cy="54" r="5.6" fill="#2C2620"/>
+    <circle cx="44" cy="52" r="1.9" fill="#fff"/><circle cx="76" cy="52" r="1.9" fill="#fff"/>
+    <path d="M56 76 h12 l-6 7 Z" fill="#2C2620"/>
+    <path d="M62 83 q0 7 -7 9 M62 83 q0 7 7 9" stroke="#2C2620" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="35" cy="68" rx="6" ry="4" fill="var(--pink)" opacity=".4"/><ellipse cx="89" cy="68" rx="6" ry="4" fill="var(--pink)" opacity=".4"/>
+  </svg>`;
+}
+function penguinSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 104 130" aria-hidden="true">
+    <ellipse cx="52" cy="66" rx="38" ry="54" fill="#414B57" stroke="#2C2620" stroke-width="2.2" filter="url(#rough2)"/>
+    <ellipse cx="52" cy="76" rx="26" ry="44" fill="#FCFAF4" filter="url(#rough2)"/>
+    <path d="M15 60 q-11 22 1 42 q11 -6 12 -28 Z" fill="#414B57" filter="url(#rough2)"/>
+    <path d="M89 60 q11 22 -1 42 q-11 -6 -12 -28 Z" fill="#414B57" filter="url(#rough2)"/>
+    <ellipse cx="40" cy="48" rx="5" ry="6" fill="#2C2620"/><ellipse cx="64" cy="48" rx="5" ry="6" fill="#2C2620"/>
+    <circle cx="38" cy="46" r="1.8" fill="#fff"/><circle cx="62" cy="46" r="1.8" fill="#fff"/>
+    <path d="M46 57 L58 57 L52 67 Z" fill="var(--orange)" stroke="#B0300A" stroke-width="1" filter="url(#rough2)"/>
+    <ellipse cx="31" cy="74" rx="6" ry="4" fill="var(--pink)" opacity=".35"/><ellipse cx="73" cy="74" rx="6" ry="4" fill="var(--pink)" opacity=".35"/>
+    <path d="M40 118 q-7 8 -16 7 q1 -9 10 -14 Z" fill="var(--orange)" filter="url(#rough2)"/>
+    <path d="M64 118 q7 8 16 7 q-1 -9 -10 -14 Z" fill="var(--orange)" filter="url(#rough2)"/>
+  </svg>`;
+}
+function snowflakeSVG(fill,w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 100 100" aria-hidden="true">
+    <g stroke="${cv(fill)}" stroke-width="5" stroke-linecap="round" fill="none" filter="url(#rough2)">
+      <path d="M50 12 V88 M18 31 L82 69 M82 31 L18 69"/>
+      <path d="M50 26 l-9 -9 M50 26 l9 -9 M50 74 l-9 9 M50 74 l9 9"/>
+      <path d="M29 38 l-12 -3 M29 38 l3 -12 M71 62 l12 3 M71 62 l-3 12"/>
+      <path d="M71 38 l12 -3 M71 38 l-3 -12 M29 62 l-12 3 M29 62 l3 12"/>
+    </g>
+  </svg>`;
+}
+function icebergSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 140 100" aria-hidden="true">
+    <path d="M30 42 L58 12 L82 32 L112 46 L128 84 L12 84 Z" fill="#FCFAF4" stroke="var(--teal)" stroke-width="2.6" filter="url(#rough2)"/>
+    <path d="M58 12 L58 84 M82 32 L98 84 M58 42 L30 42" fill="none" stroke="var(--teal)" stroke-width="2" opacity=".5"/>
+    <path d="M12 84 q62 14 116 0" fill="none" stroke="var(--teal)" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+  </svg>`;
+}
+/* ---------- crayon grassland critters ---------- */
+function giraffeSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 132" aria-hidden="true">
+    <rect x="45" y="14" width="6" height="20" rx="3" fill="#C98A3E" filter="url(#rough2)"/>
+    <rect x="69" y="14" width="6" height="20" rx="3" fill="#C98A3E" filter="url(#rough2)"/>
+    <circle cx="48" cy="12" r="7" fill="#8A5A2B" filter="url(#rough2)"/>
+    <circle cx="72" cy="12" r="7" fill="#8A5A2B" filter="url(#rough2)"/>
+    <ellipse cx="22" cy="46" rx="13" ry="9" fill="#E3B25E" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
+    <ellipse cx="98" cy="46" rx="13" ry="9" fill="#E3B25E" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
+    <path d="M60 30 C90 30 96 54 92 78 C88 100 74 114 60 122 C46 114 32 100 28 78 C24 54 30 30 60 30 Z" fill="#E3B25E" stroke="#2C2620" stroke-width="2.4" filter="url(#rough2)"/>
+    <ellipse cx="60" cy="102" rx="26" ry="20" fill="#F2DCA9" filter="url(#rough2)"/>
+    <ellipse cx="40" cy="60" rx="8" ry="9" fill="#B5793A" opacity=".7"/><ellipse cx="82" cy="62" rx="7" ry="8" fill="#B5793A" opacity=".7"/>
+    <ellipse cx="46" cy="86" rx="6" ry="7" fill="#B5793A" opacity=".55"/><ellipse cx="78" cy="88" rx="6" ry="7" fill="#B5793A" opacity=".55"/>
+    <circle cx="48" cy="74" r="5.5" fill="#2C2620"/><circle cx="72" cy="74" r="5.5" fill="#2C2620"/>
+    <circle cx="46" cy="72" r="1.8" fill="#fff"/><circle cx="70" cy="72" r="1.8" fill="#fff"/>
+    <ellipse cx="53" cy="100" rx="2.4" ry="3.2" fill="#2C2620"/><ellipse cx="67" cy="100" rx="2.4" ry="3.2" fill="#2C2620"/>
+    <path d="M53 110 q7 5 14 0" stroke="#2C2620" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+function tigerSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 124 116" aria-hidden="true">
+    <circle cx="26" cy="30" r="15" fill="var(--orange)" stroke="#2C2620" stroke-width="2.2" filter="url(#rough2)"/>
+    <circle cx="98" cy="30" r="15" fill="var(--orange)" stroke="#2C2620" stroke-width="2.2" filter="url(#rough2)"/>
+    <circle cx="26" cy="30" r="6" fill="#F5CAE8"/><circle cx="98" cy="30" r="6" fill="#F5CAE8"/>
+    <ellipse cx="62" cy="66" rx="44" ry="42" fill="var(--orange)" stroke="#2C2620" stroke-width="2.4" filter="url(#rough2)"/>
+    <ellipse cx="62" cy="82" rx="28" ry="22" fill="#FCFAF4" filter="url(#rough2)"/>
+    <path d="M62 30 L58 46 M62 30 L66 46 M40 34 L44 50 M84 34 L80 50 M24 56 L38 60 M100 56 L86 60 M26 74 L40 74 M98 74 L84 74" stroke="#2C2620" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="47" cy="60" r="5.6" fill="#2C2620"/><circle cx="77" cy="60" r="5.6" fill="#2C2620"/>
+    <circle cx="45" cy="58" r="1.9" fill="#fff"/><circle cx="75" cy="58" r="1.9" fill="#fff"/>
+    <path d="M55 76 h14 l-7 7 Z" fill="#D2698C"/>
+    <path d="M62 83 q0 7 -7 9 M62 83 q0 7 7 9" stroke="#2C2620" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+function acaciaSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 140 116" aria-hidden="true">
+    <path d="M66 112 L66 60 M66 74 L44 58 M66 70 L92 54" fill="none" stroke="#8A5A2B" stroke-width="7" stroke-linecap="round" filter="url(#rough2)"/>
+    <path d="M18 50 q52 -30 104 0 q-6 10 -24 9 q-28 6 -56 0 q-18 1 -24 -9 Z" fill="var(--sage)" stroke="#7FA98A" stroke-width="2" filter="url(#rough2)"/>
+    <ellipse cx="46" cy="46" rx="10" ry="6" fill="var(--lime)" opacity=".5"/><ellipse cx="88" cy="44" rx="11" ry="6" fill="var(--lime)" opacity=".5"/>
+  </svg>`;
+}
+function grassSVG(fill,w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 80 60" aria-hidden="true">
+    <g fill="none" stroke="${cv(fill)}" stroke-width="6" stroke-linecap="round" filter="url(#rough2)">
+      <path d="M18 58 Q10 30 6 16"/><path d="M30 58 Q28 28 24 12"/><path d="M42 58 Q42 26 40 10"/>
+      <path d="M54 58 Q58 28 60 14"/><path d="M66 58 Q72 32 74 20"/>
+    </g>
+  </svg>`;
+}
 /* photo polaroid with graceful fallback if the image file is missing */
 function photo(x,y,rot,src,cap,color,emoji,w,ar,pos){
   return node(x,y,rot,'draggable',`
@@ -552,7 +647,7 @@ const RESEARCH = [
     txt:"computational scRNA-seq: dimensionality reduction & differential expression workflows." },
 ];
 const WINS = [
-  {t:"🥇 Sling Health Demo Day, 1st", c:"--orange"},
+  {t:"🥇 Sling Health National Demo Day, 1st", c:"--orange"},
   {t:"🥇 SAME Innovation Challenge, 1st", c:"--teal"},
   {t:"🎖️ NIH DEBUT, Honorable Mention", c:"--pink-lt"},
   {t:"🚀 VentureWell E-Team Pioneer '26", c:"--lime"},
@@ -566,9 +661,9 @@ const INTO = [
 ];
 
 const ZONES = {
-  home:[1900,1250], about:[640,1050], work:[3060,1200],
-  research:[600,2500], awards:[1990,2430], life:[3200,2490],
-  teaching:[1470,3660], hi:[3130,3690]
+  home:[3030,1270], about:[1014,950], work:[4886,1190],
+  research:[950,3270], awards:[3174,3158], life:[5110,3254],
+  teaching:[2342,5126], hi:[4998,5174]
 };
 /* per-zone "fit" zoom: denser clusters sit back a little so the whole group
    lands in frame when you fly to it (scaled down further on small screens). */
@@ -708,20 +803,20 @@ photo(ZONES.work[0]+0, ZONES.work[1]-345, -3, "photos/building-sew.jpg",
   "stitching a wearable 🧵", "--pink", "🧵", 185, "3/4");
 
 /* ================= fairytale behind research ================= */
-node(ZONES.research[0]-380, ZONES.research[1]-480, 0,'',`<div class="bob slow">${rainbowSVG(150)}</div>`);
-node(ZONES.research[0]-690, ZONES.research[1]-60, 0,'',`<div class="bob">${unicornSVG(150)}</div>`);
-node(ZONES.research[0]+700, ZONES.research[1]-60, 0,'',`<div class="bob slow">${dragonSVG(152)}</div>`);
-node(ZONES.research[0]+270, ZONES.research[1]-470, 0,'',`<div class="spin">${sparkleSVG('--mustard',46)}</div>`);
-node(ZONES.research[0]+560, ZONES.research[1]-330, 0,'',`<div class="bob fast">${sparkleSVG('--pink',40)}</div>`);
-node(ZONES.research[0]-560, ZONES.research[1]+300, 0,'',`<div class="bob">${sparkleSVG('--teal',44)}</div>`);
-node(ZONES.research[0]+520, ZONES.research[1]+330, 0,'',`<div class="spin">${sparkleSVG('--mustard',42)}</div>`);
-node(ZONES.research[0]-250, ZONES.research[1]+470, 0,'',`<div class="bob fast">${sparkleSVG('--pink',38)}</div>`);
+node(ZONES.research[0]-400, ZONES.research[1]-500, 0,'',`<div class="bob slow">${rainbowSVG(150)}</div>`);
+node(ZONES.research[0]-760, ZONES.research[1]-40, 0,'',`<div class="bob">${unicornSVG(150)}</div>`);
+node(ZONES.research[0]+800, ZONES.research[1]-30, 0,'',`<div class="bob slow">${dragonSVG(152)}</div>`);
+node(ZONES.research[0]+340, ZONES.research[1]-510, 0,'',`<div class="spin">${sparkleSVG('--mustard',46)}</div>`);
+node(ZONES.research[0]+760, ZONES.research[1]-430, 0,'',`<div class="bob fast">${sparkleSVG('--pink',40)}</div>`);
+node(ZONES.research[0]-680, ZONES.research[1]+340, 0,'',`<div class="bob">${sparkleSVG('--teal',44)}</div>`);
+node(ZONES.research[0]+770, ZONES.research[1]+300, 0,'',`<div class="spin">${sparkleSVG('--mustard',42)}</div>`);
+node(ZONES.research[0]-400, ZONES.research[1]+540, 0,'',`<div class="bob fast">${sparkleSVG('--pink',38)}</div>`);
 
 /* ================= RESEARCH ================= */
-node(ZONES.research[0]+120, ZONES.research[1]-340, -3,'',`
+node(ZONES.research[0]+150, ZONES.research[1]-430, -3,'',`
   <div class="signpost">${starSVG('--teal',64)}
     <div style="font-size:1.6rem;font-family:var(--font-hand);color:var(--ink);margin-top:2px">research & work 🔬</div></div>`);
-const rPos=[[-340,-150],[110,-200],[400,-30],[-170,150],[190,270]];
+const rPos=[[-340,-70],[300,-90],[-540,160],[40,210],[360,235]];
 RESEARCH.forEach((r,i)=>{
   const [dx,dy]=rPos[i%rPos.length];
   node(ZONES.research[0]+dx, ZONES.research[1]+dy, (i%2?1:-1)*(2+i%3),'draggable',`
@@ -735,20 +830,20 @@ RESEARCH.forEach((r,i)=>{
       <p style="font-size:.9rem;line-height:1.4;color:var(--ink-soft);margin:0">${esc(r.txt)}</p>
     </div>`);
 });
-photo(ZONES.research[0]-380, ZONES.research[1]+150, 3, "photos/research-poster.jpg",
-  "presenting my NF1 research 🧠", "--pink-lt", "🧠", 205, "3/4");
-photo(ZONES.research[0]+330, ZONES.research[1]+300, -3, "photos/lab-rig.jpg",
-  "my lab bench 🔬", "--teal", "🔬", 200, "4/3");
-photo(ZONES.research[0]+360, ZONES.research[1]-140, 4, "photos/vena-wearable.jpg",
-  "the Vena Vitals wearable 🫀", "--pink", "🫀", 190, "3/4");
-photo(ZONES.research[0]-330, ZONES.research[1]-250, -4, "photos/lab-group.jpg",
-  "my WashU lab family 🥼", "--mustard", "🥼", 215, "4/3");
-photo(ZONES.research[0]-340, ZONES.research[1]+350, 3, "photos/lab-imaging.jpg",
-  "imaging tumor tissue 🔬", "--red-2", "🔬", 205, "4/3");
-photo(ZONES.research[0]+170, ZONES.research[1]+400, -3, "photos/present-sinica.jpg",
-  "presenting @ Academia Sinica 🎤", "--teal", "🎤", 205, "4/3");
-photo(ZONES.research[0]-110, ZONES.research[1]+430, 4, "photos/vena-team.jpg",
+photo(ZONES.research[0]-470, ZONES.research[1]-260, -4, "photos/vena-team.jpg",
   "the Vena Vitals team 🫀", "--sage", "🫀", 195, "4/3");
+photo(ZONES.research[0]+60, ZONES.research[1]-300, 4, "photos/vena-wearable.jpg",
+  "the Vena Vitals wearable 🫀", "--pink", "🫀", 190, "3/4");
+photo(ZONES.research[0]+560, ZONES.research[1]-290, -3, "photos/lab-group.jpg",
+  "my WashU lab family 🥼", "--mustard", "🥼", 215, "4/3");
+photo(ZONES.research[0]+580, ZONES.research[1]+40, 3, "photos/research-poster.jpg",
+  "presenting my NF1 research 🧠", "--pink-lt", "🧠", 205, "3/4");
+photo(ZONES.research[0]-300, ZONES.research[1]+370, 3, "photos/present-sinica.jpg",
+  "presenting @ Academia Sinica 🎤", "--teal", "🎤", 205, "4/3");
+photo(ZONES.research[0]+10, ZONES.research[1]+440, -3, "photos/lab-imaging.jpg",
+  "imaging tumor tissue 🔬", "--red-2", "🔬", 205, "4/3");
+photo(ZONES.research[0]+600, ZONES.research[1]+410, -3, "photos/lab-rig.jpg",
+  "my lab bench 🔬", "--teal", "🔬", 200, "4/3");
 
 /* ================= farm behind celebrations ================= */
 node(ZONES.awards[0]-655, ZONES.awards[1]-295, 0,'',`<div class="bob slow">${barnSVG(150)}</div>`);
@@ -782,10 +877,19 @@ photo(ZONES.awards[0]+320, ZONES.awards[1]+200, -3, "photos/bmes.jpg",
   "BMES conf with my Locus team", "--teal", "🔬", 205, "4/3");
 photo(ZONES.awards[0]+180, ZONES.awards[1]+400, 3, "photos/venturewell2.jpg",
   "pitching @ VentureWell 🚀", "--orange", "🚀", 195, "3/4");
+photo(ZONES.awards[0]-330, ZONES.awards[1]+410, -3, "photos/sling-demoday.jpg",
+  "1st @ Sling Health Demo Day, NOLA 🥇", "--pink", "🥇", 215, "4/3");
 
-/* ================= LIFE / hobbies ================= */
+/* ================= LIFE / hobbies — icy world ================= */
+node(ZONES.life[0]-700, ZONES.life[1]-70, 0,'',`<div class="bob slow">${foxSVG(150)}</div>`);
+node(ZONES.life[0]+710, ZONES.life[1]-40, 0,'',`<div class="bob">${penguinSVG(140)}</div>`);
+node(ZONES.life[0]-560, ZONES.life[1]+340, 0,'',`<div class="bob slow">${icebergSVG(150)}</div>`);
+node(ZONES.life[0]+520, ZONES.life[1]-330, 0,'',`<div class="spin">${snowflakeSVG('--teal',60)}</div>`);
+node(ZONES.life[0]-330, ZONES.life[1]-360, 0,'',`<div class="spin">${snowflakeSVG('--sage',46)}</div>`);
+node(ZONES.life[0]+430, ZONES.life[1]+330, 0,'',`<div class="spin">${snowflakeSVG('--teal',50)}</div>`);
+node(ZONES.life[0]-640, ZONES.life[1]+40, 0,'',`<div class="spin">${snowflakeSVG('--sage',40)}</div>`);
 node(ZONES.life[0], ZONES.life[1]-260, 3,'',`
-  <div class="signpost">${starSVG('--pink',64)}
+  <div class="signpost">${starSVG('--teal',64)}
     <div style="font-size:1.6rem;font-family:var(--font-hand);color:var(--ink);margin-top:2px">life beyond the lab ♡</div></div>`);
 photo(ZONES.life[0]-300, ZONES.life[1]-40, -4, "photos/liondance-team.jpg",
   "WashU lion dance team 🦁", "--red", "🦁", 240, "4/3");
@@ -807,7 +911,14 @@ INTO.forEach((s,i)=>{
     `<div class="sticker" style="--c:${cv(s.c)}">${esc(s.t)}</div>`);
 });
 
-/* ================= TEACHING / New Gen Scientists ================= */
+/* ================= TEACHING / New Gen Scientists — grassland ================= */
+node(ZONES.teaching[0]-700, ZONES.teaching[1]-50, 0,'',`<div class="bob slow">${giraffeSVG(150)}</div>`);
+node(ZONES.teaching[0]+710, ZONES.teaching[1]-30, 0,'',`<div class="bob">${tigerSVG(150)}</div>`);
+node(ZONES.teaching[0]+560, ZONES.teaching[1]-320, 0,'',`<div class="bob slow">${acaciaSVG(158)}</div>`);
+node(ZONES.teaching[0]-560, ZONES.teaching[1]+330, 2,'',`<div class="sway">${grassSVG('--lime',120)}</div>`);
+node(ZONES.teaching[0]+250, ZONES.teaching[1]+430, -1,'',`<div class="sway">${grassSVG('--sage',104)}</div>`);
+node(ZONES.teaching[0]-330, ZONES.teaching[1]-360, 1,'',`<div class="sway">${grassSVG('--sage',92)}</div>`);
+node(ZONES.teaching[0]+640, ZONES.teaching[1]+300, 2,'',`<div class="sway">${grassSVG('--lime',100)}</div>`);
 node(ZONES.teaching[0], ZONES.teaching[1]-300, -2,'',`
   <div class="signpost">${starSVG('--lime',66)}
     <div style="font-size:1.6rem;font-family:var(--font-hand);color:var(--ink);margin-top:2px">teaching the tiny scientists 🌏</div></div>`);
