@@ -600,6 +600,43 @@ function grassSVG(fill,w){
     </g>
   </svg>`;
 }
+/* ---------- crayon outer-space critters ---------- */
+function astroDogSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 132 142" aria-hidden="true">
+    <rect x="42" y="112" width="48" height="18" rx="9" fill="#C7CDD4" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
+    <rect x="30" y="118" width="8" height="10" rx="3" fill="#9AA1A9" stroke="#2C2620" stroke-width="1.6"/>
+    <path d="M36 58 Q18 40 22 76 Q26 98 46 90 Z" fill="#C6894B" filter="url(#rough2)"/>
+    <path d="M96 58 Q114 40 110 76 Q106 98 86 90 Z" fill="#C6894B" filter="url(#rough2)"/>
+    <ellipse cx="66" cy="72" rx="33" ry="31" fill="#E0A867" filter="url(#rough2)"/>
+    <ellipse cx="66" cy="86" rx="19" ry="14" fill="#F2DCA9" filter="url(#rough2)"/>
+    <circle cx="55" cy="66" r="5" fill="#2C2620"/><circle cx="77" cy="66" r="5" fill="#2C2620"/>
+    <circle cx="53" cy="64" r="1.7" fill="#fff"/><circle cx="75" cy="64" r="1.7" fill="#fff"/>
+    <ellipse cx="66" cy="82" rx="6" ry="4.5" fill="#2C2620"/>
+    <path d="M66 87 v5 M66 92 q-6 0 -8 -3 M66 92 q6 0 8 -3" stroke="#2C2620" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M61 95 q5 6 10 0 Z" fill="#EE6A92"/>
+    <circle cx="66" cy="66" r="50" fill="#6DB8BE" opacity=".16" stroke="#2C2620" stroke-width="2.6" filter="url(#rough2)"/>
+    <path d="M40 44 q14 -14 33 -11" fill="none" stroke="#FCFAF4" stroke-width="5" stroke-linecap="round" opacity=".85"/>
+  </svg>`;
+}
+function planetSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 144 112" aria-hidden="true">
+    <ellipse cx="72" cy="58" rx="34" ry="34" fill="var(--orange)" filter="url(#rough2)"/>
+    <ellipse cx="60" cy="48" rx="9" ry="6" fill="#F7B54C" opacity=".6"/>
+    <ellipse cx="84" cy="66" rx="11" ry="8" fill="#D97B12" opacity=".5"/>
+    <ellipse cx="66" cy="70" rx="6" ry="4" fill="#D97B12" opacity=".5"/>
+    <ellipse cx="72" cy="58" rx="62" ry="18" fill="none" stroke="var(--mustard)" stroke-width="7" filter="url(#rough2)" transform="rotate(-16 72 58)"/>
+  </svg>`;
+}
+function rocketSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 92 134" aria-hidden="true">
+    <path d="M46 8 C66 26 66 62 60 86 L32 86 C26 62 26 26 46 8 Z" fill="#FCFAF4" stroke="#2C2620" stroke-width="2.4" filter="url(#rough2)"/>
+    <circle cx="46" cy="48" r="10" fill="var(--teal)" stroke="#2C2620" stroke-width="2"/>
+    <path d="M32 76 L14 94 L32 90 Z" fill="var(--red)" filter="url(#rough2)"/>
+    <path d="M60 76 L78 94 L60 90 Z" fill="var(--red)" filter="url(#rough2)"/>
+    <path d="M34 86 L58 86 L53 100 L39 100 Z" fill="var(--orange-2)" filter="url(#rough2)"/>
+    <path d="M39 104 q7 16 14 0" fill="var(--orange)"/><path d="M44 106 q2 9 5 0" fill="var(--red)"/>
+  </svg>`;
+}
 /* photo polaroid with graceful fallback if the image file is missing */
 function photo(x,y,rot,src,cap,color,emoji,w,ar,pos){
   return node(x,y,rot,'draggable',`
@@ -748,15 +785,16 @@ photo(ZONES.about[0]+360, ZONES.about[1]+235, 4, "photos/tom-crew.jpg",
 photo(ZONES.about[0]-385, ZONES.about[1]-125, -4, "photos/taiwan-kid.jpg",
   "growing up in Taiwan 🇹🇼", "--pink-lt", "🇹🇼", 185, "4/3");
 
-/* ================= jungle behind builds ================= */
-node(ZONES.work[0]-300, ZONES.work[1]-430, 6,'',`<div class="sway">${leafSVG(120,'--lime')}</div>`);
-node(ZONES.work[0]+320, ZONES.work[1]-430, -6,'',`<div class="sway">${leafSVG(124,'--sage')}</div>`);
-node(ZONES.work[0]-845, ZONES.work[1]+130, 12,'',`<div class="sway">${leafSVG(140,'--sage')}</div>`);
-node(ZONES.work[0]+850, ZONES.work[1]+150, -12,'',`<div class="sway">${leafSVG(140,'--lime')}</div>`);
-node(ZONES.work[0]-760, ZONES.work[1]+395, 5,'',`<div class="sway">${leafSVG(120,'--lime')}</div>`);
-node(ZONES.work[0]+790, ZONES.work[1]+400, -5,'',`<div class="sway">${leafSVG(118,'--sage')}</div>`);
-node(ZONES.work[0]-700, ZONES.work[1]-315, 0,'',`<div class="bob">${monkeySVG(138)}</div>`);
-node(ZONES.work[0]+700, ZONES.work[1]-315, 0,'',`<div class="bob slow">${macawSVG(140,true)}</div>`);
+/* ================= outer space behind builds ================= */
+node(ZONES.work[0]-720, ZONES.work[1]-280, 0,'',`<div class="bob slow">${astroDogSVG(162)}</div>`);
+node(ZONES.work[0]+745, ZONES.work[1]-300, 0,'',`<div class="bob">${planetSVG(152)}</div>`);
+node(ZONES.work[0]-810, ZONES.work[1]+290, -8,'',`<div class="bob slow">${rocketSVG(122)}</div>`);
+node(ZONES.work[0]+825, ZONES.work[1]+280, 0,'',`<div class="spin">${sparkleSVG('--mustard',52)}</div>`);
+node(ZONES.work[0]-300, ZONES.work[1]-465, 0,'',`<div class="spin">${sparkleSVG('--teal',44)}</div>`);
+node(ZONES.work[0]+320, ZONES.work[1]-465, 0,'',`<div class="bob fast">${sparkleSVG('--pink',40)}</div>`);
+node(ZONES.work[0]-830, ZONES.work[1]-110, 0,'',`<div class="bob fast">${sparkleSVG('--pink',38)}</div>`);
+node(ZONES.work[0]+300, ZONES.work[1]+470, 0,'',`<div class="spin">${sparkleSVG('--teal',42)}</div>`);
+node(ZONES.work[0]-320, ZONES.work[1]+480, 0,'',`<div class="bob">${sparkleSVG('--mustard',40)}</div>`);
 
 /* ================= WORK: Locus flagship (centered) + build cards fanned to corners ================= */
 node(ZONES.work[0], ZONES.work[1], -2.5,'draggable',`
@@ -849,7 +887,7 @@ photo(ZONES.research[0]+600, ZONES.research[1]+410, -3, "photos/lab-rig.jpg",
 node(ZONES.awards[0]-655, ZONES.awards[1]-295, 0,'',`<div class="bob slow">${barnSVG(150)}</div>`);
 node(ZONES.awards[0]-710, ZONES.awards[1]+165, 0,'',`<div class="bob">${cowSVG(140)}</div>`);
 node(ZONES.awards[0]+715, ZONES.awards[1]+110, 0,'',`<div class="bob slow">${sheepSVG(152)}</div>`);
-node(ZONES.awards[0]+590, ZONES.awards[1]+375, 0,'',`<div class="bob fast">${pigSVG(128)}</div>`);
+node(ZONES.awards[0]+720, ZONES.awards[1]+430, 0,'',`<div class="bob fast">${pigSVG(128)}</div>`);
 node(ZONES.awards[0]+250, ZONES.awards[1]-320, 0,'',`<div class="bob">${sheepSVG(96)}</div>`);
 
 /* ================= AWARDS / trophy shelf + startup life ================= */
@@ -879,6 +917,8 @@ photo(ZONES.awards[0]+180, ZONES.awards[1]+400, 3, "photos/venturewell2.jpg",
   "pitching @ VentureWell 🚀", "--orange", "🚀", 195, "3/4");
 photo(ZONES.awards[0]-330, ZONES.awards[1]+410, -3, "photos/sling-demoday.jpg",
   "1st @ Sling Health Demo Day, NOLA 🥇", "--pink", "🥇", 215, "4/3");
+photo(ZONES.awards[0]+430, ZONES.awards[1]+430, 3, "photos/skandy-win.jpg",
+  "Skandalaris funding winners 💰", "--sage", "💰", 235, "3/2");
 
 /* ================= LIFE / hobbies — icy world ================= */
 node(ZONES.life[0]-700, ZONES.life[1]-70, 0,'',`<div class="bob slow">${foxSVG(150)}</div>`);
