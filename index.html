@@ -661,7 +661,7 @@ const BUILDS = [
     subtitle:"Washington University in St. Louis · 2025-2026",
     blurb:"a low-cost wearable that turns Parkinson's tremor from something a specialist eyeballs into an objective, numeric readout, for under $25 in parts.",
     detail:"Parkinson's hand tremor is usually assessed visually by a neurologist, which is subjective and hard to access outside major clinics. we built a wrist-worn device to quantify it in real time: a 6-axis IMU samples wrist motion at 500 Hz, and on an Arduino i wrote a zero-crossing algorithm that computes tremor frequency over a rolling 5-second window, showing it live on an LCD and lighting an LED when it lands in the 3-6 Hz Parkinson's range.",
-    c1:"--pink", c2:"--mustard", accent:"--teal", img:"photos/parkinson-tremor.jpg" },
+    c1:"--pink", c2:"--mustard", accent:"--teal", img:"photos/parkinson-tremor.jpg", imgFull:true },
   { title:"Adaptive 3D-Printed Tools", tag:"Tikkun Olam Makers · Board",
     blurb:"user-driven accessibility devices from rapid make-a-thons, then designed, printed & donated to disability orgs.",
     c1:"--lime", c2:"--red-2", accent:"--orange", img:"photos/tom-prints.jpg" },
@@ -669,7 +669,8 @@ const BUILDS = [
     subtitle:"self-published children's book · June 2025",
     blurb:"a children's book about twin Asian-American sisters learning to step into the spotlight as their own selves, made by a team of teenage AAPI girls 🌸",
     detail:"In Tune brings Angela and Celeste to life as the kind of Asian-American leads rarely seen in children's books, ones who break the mold instead of fitting the 'quiet, straight-A' stereotype. published in June 2025, every dollar of profit goes to the SF Asian Women's Shelter, which supports survivors of domestic abuse. so far: 560+ copies sold, about $2,500 raised, plus read-alouds and free copies for kids through Bay Area libraries and bilingual literacy programs.",
-    c1:"--coral", c2:"--pink-lt", accent:"--pink", img:"photos/in-tune.jpg" },
+    c1:"--coral", c2:"--pink-lt", accent:"--pink", img:"photos/in-tune.jpg",
+    link:"https://www.amazon.com/dp/B0FK42L873?lv=shuf&channelId=500&plpRedirect=mhFallback", linkLabel:"get the ebook →" },
 ];
 const RESEARCH = [
   { org:"Vena Vitals", role:"R&D Intern", date:"2026", tape:"--teal",
@@ -706,7 +707,7 @@ const ZONES = {
    lands in frame when you fly to it (scaled down further on small screens). */
 const VIEW = {
   home:0.92, about:0.82, work:0.64, research:0.66,
-  awards:0.72, life:0.66, teaching:0.74, hi:0.8
+  awards:0.6, life:0.66, teaching:0.74, hi:0.8
 };
 
 /* ================= ocean reef behind home ================= */
@@ -810,6 +811,7 @@ node(ZONES.work[0], ZONES.work[1], -2.5,'draggable',`
       <a class="pill-link" href="https://www.youtube.com/watch?v=IDM4owhf4fY" target="_blank" rel="noopener" data-nodrag style="background:var(--mustard)">▶ watch the demo</a>
       <a class="pill-link" href="https://locussuit.com/" target="_blank" rel="noopener" data-nodrag style="background:var(--teal)">🌐 locussuit.com</a>
       <a class="pill-link" href="https://canva.link/locussuitpresentation" target="_blank" rel="noopener" data-nodrag style="background:var(--pink-lt)">📊 pitch deck</a>
+      <a class="pill-link" href="https://engineering.washu.edu/news/2026/McKelvey-Engineering-students-design-device-tailored-to-fit-needs-of-visually-impaired.html" target="_blank" rel="noopener" data-nodrag style="background:var(--sage)">📰 read the article</a>
     </div>
   </div>`);
 
@@ -891,9 +893,19 @@ node(ZONES.awards[0]+720, ZONES.awards[1]+430, 0,'',`<div class="bob fast">${pig
 node(ZONES.awards[0]+250, ZONES.awards[1]-320, 0,'',`<div class="bob">${sheepSVG(96)}</div>`);
 
 /* ================= AWARDS / trophy shelf + startup life ================= */
-node(ZONES.awards[0], ZONES.awards[1]-240, 2,'',`
+node(ZONES.awards[0], ZONES.awards[1]-465, 2,'',`
   <div class="signpost">${starSVG('--mustard',68)}
     <div style="font-size:1.6rem;font-family:var(--font-hand);color:var(--ink);margin-top:2px">little celebrations ✨</div></div>`);
+node(ZONES.awards[0], ZONES.awards[1]-235, -1,'draggable',`
+  <div class="card" style="--tape:var(--teal);max-width:330px">
+    <span class="tape"></span>
+    <p class="eyebrow">the places this work took me ✈️</p>
+    <h3 style="font-size:1.15rem">so blessed to travel 🌎</h3>
+    <p style="font-size:.9rem;line-height:1.45;color:var(--ink-soft);margin:6px 0 0">
+      San Diego for the Biomedical Engineering Society annual meeting (and fresh sushi at SeaWorld… haha),
+      Boston for the <a href="https://venturewell.org/spring-2026-e-team/" target="_blank" rel="noopener" data-nodrag style="color:var(--red-2);font-weight:700">VentureWell E-Team Pioneer</a> program (and stuffed cannolis), and Louisiana for the Sling Health
+      National Demo Day — where we got to eat beignets sitting next to the lake in New Orleans. 💛</p>
+  </div>`);
 const wPos=[[-320,-70],[10,-90],[320,-60],[-280,50],[40,40],[340,60]];
 WINS.forEach((w,i)=>{
   const [dx,dy]=wPos[i%wPos.length];
@@ -1163,6 +1175,7 @@ function openBuild(i){
   const b=BUILDS[i]; if(!b) return;
   const mi=document.getElementById('mImg');
   if(b.img){ mi.src=b.img; mi.alt=b.title; mi.hidden=false; } else { mi.hidden=true; mi.removeAttribute('src'); }
+  mi.style.maxHeight = b.imgFull ? 'none' : '';
   document.getElementById('mSub').textContent=b.subtitle||b.tag||'';
   document.getElementById('mTitle').textContent=b.title;
   document.getElementById('mTag').textContent=b.blurb||'';
