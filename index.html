@@ -1112,8 +1112,7 @@ else{
 }
 
 /* ===================== gate lock (soft password) ===================== */
-let locked=false;
-try{ locked = sessionStorage.getItem('jc_unlocked')!=='1'; }catch(e){ locked=true; }
+let locked=false; /* password protection removed — always unlocked */
 const gate=document.getElementById('gate');
 const gateInput=document.getElementById('gateInput');
 const gateErr=document.getElementById('gateErr');
