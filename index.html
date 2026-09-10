@@ -705,7 +705,7 @@ const ZONES = {
 /* per-zone "fit" zoom: denser clusters sit back a little so the whole group
    lands in frame when you fly to it (scaled down further on small screens). */
 const VIEW = {
-  home:0.92, about:0.82, work:0.7, research:0.66,
+  home:0.92, about:0.82, work:0.64, research:0.66,
   awards:0.72, life:0.66, teaching:0.74, hi:0.92
 };
 
@@ -786,15 +786,15 @@ photo(ZONES.about[0]-385, ZONES.about[1]-125, -4, "photos/taiwan-kid.jpg",
   "growing up in Taiwan 🇹🇼", "--pink-lt", "🇹🇼", 185, "4/3");
 
 /* ================= outer space behind builds ================= */
-node(ZONES.work[0]-720, ZONES.work[1]-280, 0,'',`<div class="bob slow">${astroDogSVG(162)}</div>`);
-node(ZONES.work[0]+745, ZONES.work[1]-300, 0,'',`<div class="bob">${planetSVG(152)}</div>`);
-node(ZONES.work[0]-810, ZONES.work[1]+290, -8,'',`<div class="bob slow">${rocketSVG(122)}</div>`);
-node(ZONES.work[0]+825, ZONES.work[1]+280, 0,'',`<div class="spin">${sparkleSVG('--mustard',52)}</div>`);
-node(ZONES.work[0]-300, ZONES.work[1]-465, 0,'',`<div class="spin">${sparkleSVG('--teal',44)}</div>`);
-node(ZONES.work[0]+320, ZONES.work[1]-465, 0,'',`<div class="bob fast">${sparkleSVG('--pink',40)}</div>`);
-node(ZONES.work[0]-830, ZONES.work[1]-110, 0,'',`<div class="bob fast">${sparkleSVG('--pink',38)}</div>`);
-node(ZONES.work[0]+300, ZONES.work[1]+470, 0,'',`<div class="spin">${sparkleSVG('--teal',42)}</div>`);
-node(ZONES.work[0]-320, ZONES.work[1]+480, 0,'',`<div class="bob">${sparkleSVG('--mustard',40)}</div>`);
+node(ZONES.work[0]-700, ZONES.work[1]-250, 0,'',`<div class="bob slow">${astroDogSVG(164)}</div>`);
+node(ZONES.work[0]+710, ZONES.work[1]-260, 0,'',`<div class="bob">${planetSVG(156)}</div>`);
+node(ZONES.work[0]+700, ZONES.work[1]+300, -8,'',`<div class="bob slow">${rocketSVG(124)}</div>`);
+node(ZONES.work[0]-690, ZONES.work[1]+300, 0,'',`<div class="spin">${sparkleSVG('--mustard',52)}</div>`);
+node(ZONES.work[0]-300, ZONES.work[1]-430, 0,'',`<div class="spin">${sparkleSVG('--teal',44)}</div>`);
+node(ZONES.work[0]+300, ZONES.work[1]-430, 0,'',`<div class="bob fast">${sparkleSVG('--pink',40)}</div>`);
+node(ZONES.work[0]-720, ZONES.work[1]+40, 0,'',`<div class="bob fast">${sparkleSVG('--pink',38)}</div>`);
+node(ZONES.work[0]+300, ZONES.work[1]+440, 0,'',`<div class="spin">${sparkleSVG('--teal',42)}</div>`);
+node(ZONES.work[0]-320, ZONES.work[1]+450, 0,'',`<div class="bob">${sparkleSVG('--mustard',40)}</div>`);
 
 /* ================= WORK: Locus flagship (centered) + build cards fanned to corners ================= */
 node(ZONES.work[0], ZONES.work[1], -2.5,'draggable',`
