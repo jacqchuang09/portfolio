@@ -706,7 +706,7 @@ const ZONES = {
    lands in frame when you fly to it (scaled down further on small screens). */
 const VIEW = {
   home:0.92, about:0.82, work:0.64, research:0.66,
-  awards:0.72, life:0.66, teaching:0.74, hi:0.92
+  awards:0.72, life:0.66, teaching:0.74, hi:0.8
 };
 
 /* ================= ocean reef behind home ================= */
@@ -979,6 +979,14 @@ const ngPhotos=[
   ["photos/newgen-cart.jpg","they built a whole cart! 🛠️","--coral","🛠️",[380,240],-4,"4/3",210],
 ];
 ngPhotos.forEach(p=>photo(ZONES.teaching[0]+p[4][0], ZONES.teaching[1]+p[4][1], p[5], p[0], p[1], p[2], p[3], p[7], p[6], p[8]));
+
+/* ================= jungle around say hi ================= */
+node(ZONES.hi[0]-430, ZONES.hi[1]-340, 6,'',`<div class="sway">${leafSVG(120,'--lime')}</div>`);
+node(ZONES.hi[0]+440, ZONES.hi[1]-340, -6,'',`<div class="sway">${leafSVG(124,'--sage')}</div>`);
+node(ZONES.hi[0]-520, ZONES.hi[1]+300, 10,'',`<div class="sway">${leafSVG(132,'--sage')}</div>`);
+node(ZONES.hi[0]+520, ZONES.hi[1]+300, -10,'',`<div class="sway">${leafSVG(130,'--lime')}</div>`);
+node(ZONES.hi[0]-480, ZONES.hi[1]-40, 0,'',`<div class="bob">${monkeySVG(140)}</div>`);
+node(ZONES.hi[0]+480, ZONES.hi[1]-40, 0,'',`<div class="bob slow">${macawSVG(142,true)}</div>`);
 
 /* ================= SAY HI ================= */
 node(ZONES.hi[0], ZONES.hi[1], -1.5, 'draggable', `
