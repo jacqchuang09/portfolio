@@ -406,33 +406,38 @@ function leafSVG(w,fill){
   </svg>`;
 }
 /* ---------- crayon fairytale critters ---------- */
-function unicornSVG(w,flip){
+function unicornSVG(w){
   return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 130" aria-hidden="true">
-    <g${flip?' transform="translate(120,0) scale(-1,1)"':''}>
-      <path d="M60 6 L70 44 L50 44 Z" fill="var(--mustard)" filter="url(#rough2)"/>
-      <path d="M56 14 L66 40 M56 24 L64 40 M57 32 L62 40" stroke="#B89A2E" stroke-width="1.6" fill="none"/>
-      <path d="M78 42 q30 -8 30 30 q-20 -12 -32 4 Z" fill="var(--pink-lt)" filter="url(#rough2)"/>
-      <path d="M80 56 q26 6 22 42 q-16 -14 -28 0 Z" fill="var(--teal)" filter="url(#rough2)"/>
-      <ellipse cx="56" cy="80" rx="40" ry="36" fill="#FCFAF4" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
-      <path d="M82 44 L98 32 L93 56 Z" fill="#FCFAF4" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
-      <path d="M40 76 q5 -6 11 0" stroke="#2C2620" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="28" cy="92" rx="3" ry="4" fill="#2C2620"/>
-      <ellipse cx="36" cy="102" rx="6" ry="4" fill="var(--pink)" opacity=".4"/>
-    </g>
+    <circle cx="26" cy="70" r="15" fill="var(--pink-lt)" filter="url(#rough2)"/>
+    <circle cx="22" cy="92" r="12" fill="var(--teal)" filter="url(#rough2)"/>
+    <circle cx="96" cy="70" r="15" fill="var(--pink)" filter="url(#rough2)"/>
+    <circle cx="100" cy="92" r="12" fill="var(--lime)" filter="url(#rough2)"/>
+    <path d="M60 2 L70 46 L50 46 Z" fill="var(--mustard)" filter="url(#rough2)"/>
+    <path d="M54 16 L66 20 M55 27 L65 31 M56 38 L64 42" stroke="#B89A2E" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M36 46 L29 27 L49 42 Z" fill="#FCFAF4" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
+    <path d="M84 46 L91 27 L71 42 Z" fill="#FCFAF4" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
+    <ellipse cx="60" cy="82" rx="42" ry="40" fill="#FCFAF4" stroke="#2C2620" stroke-width="2.4" filter="url(#rough2)"/>
+    <path d="M40 80 q7 -7 14 0" stroke="#2C2620" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M66 80 q7 -7 14 0" stroke="#2C2620" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <ellipse cx="38" cy="94" rx="7" ry="4.5" fill="var(--pink)" opacity=".45"/>
+    <ellipse cx="82" cy="94" rx="7" ry="4.5" fill="var(--pink)" opacity=".45"/>
+    <ellipse cx="55" cy="104" rx="2.4" ry="3" fill="#2C2620"/><ellipse cx="65" cy="104" rx="2.4" ry="3" fill="#2C2620"/>
+    <path d="M54 110 q6 5 12 0" stroke="#2C2620" stroke-width="2.2" fill="none" stroke-linecap="round"/>
   </svg>`;
 }
-function dragonSVG(w,flip){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 130 120" aria-hidden="true">
-    <g${flip?' transform="translate(130,0) scale(-1,1)"':''}>
-      <path d="M96 62 q34 -4 34 34 q-20 -14 -34 2 Z" fill="var(--teal)" filter="url(#rough2)"/>
-      <path d="M78 34 L92 12 L96 38 Z" fill="var(--lime)" filter="url(#rough2)"/>
-      <path d="M60 36 L72 14 L82 40 Z" fill="var(--lime)" filter="url(#rough2)"/>
-      <ellipse cx="62" cy="72" rx="44" ry="38" fill="var(--sage)" filter="url(#rough2)"/>
-      <ellipse cx="30" cy="84" rx="22" ry="17" fill="var(--lime)" filter="url(#rough2)"/>
-      <ellipse cx="20" cy="80" rx="3" ry="2.5" fill="#2C2620"/>
-      <circle cx="52" cy="64" r="6" fill="#2C2620"/><circle cx="50" cy="62" r="2" fill="#fff"/>
-      <path d="M16 92 q11 6 22 1" stroke="#2C2620" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    </g>
+function dragonSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 120" aria-hidden="true">
+    <path d="M34 34 L26 8 L52 30 Z" fill="var(--lime)" filter="url(#rough2)"/>
+    <path d="M86 34 L94 8 L68 30 Z" fill="var(--lime)" filter="url(#rough2)"/>
+    <path d="M14 60 L2 52 L18 45 Z" fill="var(--teal)" filter="url(#rough2)"/>
+    <path d="M106 60 L118 52 L102 45 Z" fill="var(--teal)" filter="url(#rough2)"/>
+    <ellipse cx="60" cy="66" rx="44" ry="40" fill="var(--sage)" filter="url(#rough2)"/>
+    <ellipse cx="60" cy="84" rx="24" ry="18" fill="var(--lime)" filter="url(#rough2)"/>
+    <circle cx="46" cy="58" r="6.5" fill="#2C2620"/><circle cx="74" cy="58" r="6.5" fill="#2C2620"/>
+    <circle cx="44" cy="55" r="2.2" fill="#fff"/><circle cx="72" cy="55" r="2.2" fill="#fff"/>
+    <ellipse cx="52" cy="82" rx="2.6" ry="3.4" fill="#2C2620"/><ellipse cx="68" cy="82" rx="2.6" ry="3.4" fill="#2C2620"/>
+    <path d="M50 92 q10 7 20 0" stroke="#2C2620" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M50 92 l3 7 4 -4" fill="#FCFAF4"/>
   </svg>`;
 }
 function rainbowSVG(w){
@@ -447,6 +452,57 @@ function rainbowSVG(w){
 function sparkleSVG(fill,w){
   return `<svg class="blob" style="--w:${w}px" viewBox="0 0 60 60" aria-hidden="true">
     <path d="M30 2 Q34 26 58 30 Q34 34 30 58 Q26 34 2 30 Q26 26 30 2 Z" fill="${cv(fill)}" filter="url(#rough2)"/>
+  </svg>`;
+}
+/* ---------- crayon farm critters ---------- */
+function sheepSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 130 110" aria-hidden="true">
+    <g fill="#FCFAF4" stroke="#E0D8C6" stroke-width="1.5" filter="url(#rough2)">
+      <circle cx="56" cy="52" r="26"/><circle cx="82" cy="46" r="23"/><circle cx="100" cy="60" r="21"/>
+      <circle cx="72" cy="72" r="24"/><circle cx="48" cy="70" r="20"/><circle cx="94" cy="78" r="17"/>
+    </g>
+    <rect x="54" y="86" width="7" height="18" rx="3" fill="#7A6E62"/><rect x="88" y="88" width="7" height="18" rx="3" fill="#7A6E62"/>
+    <ellipse cx="30" cy="56" rx="18" ry="20" fill="#4A4038" filter="url(#rough2)"/>
+    <ellipse cx="13" cy="52" rx="8" ry="6" fill="#4A4038" filter="url(#rough2)"/>
+    <path d="M26 36 q7 -3 12 4" stroke="#FCFAF4" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <circle cx="27" cy="55" r="3.6" fill="#fff"/><circle cx="27" cy="55" r="1.8" fill="#2C2620"/>
+    <ellipse cx="34" cy="64" rx="5" ry="3" fill="var(--pink)" opacity=".4"/>
+  </svg>`;
+}
+function cowSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 118" aria-hidden="true">
+    <path d="M22 34 q-7 -15 8 -15 q11 0 12 13 Z" fill="#C6894B" filter="url(#rough2)"/>
+    <path d="M98 34 q7 -15 -8 -15 q-11 0 -12 13 Z" fill="#C6894B" filter="url(#rough2)"/>
+    <ellipse cx="16" cy="52" rx="14" ry="10" fill="#FCFAF4" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
+    <ellipse cx="104" cy="52" rx="14" ry="10" fill="#FCFAF4" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
+    <ellipse cx="60" cy="60" rx="42" ry="40" fill="#FCFAF4" stroke="#2C2620" stroke-width="2.4" filter="url(#rough2)"/>
+    <ellipse cx="40" cy="42" rx="12" ry="14" fill="#2C2620" filter="url(#rough2)"/>
+    <ellipse cx="84" cy="50" rx="10" ry="12" fill="#2C2620" filter="url(#rough2)"/>
+    <circle cx="46" cy="58" r="5" fill="#2C2620"/><circle cx="74" cy="58" r="5" fill="#2C2620"/>
+    <circle cx="44" cy="56" r="1.6" fill="#fff"/><circle cx="72" cy="56" r="1.6" fill="#fff"/>
+    <ellipse cx="60" cy="88" rx="26" ry="18" fill="var(--pink-lt)" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
+    <ellipse cx="51" cy="88" rx="3" ry="4" fill="#2C2620"/><ellipse cx="69" cy="88" rx="3" ry="4" fill="#2C2620"/>
+  </svg>`;
+}
+function pigSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 110" aria-hidden="true">
+    <path d="M28 40 L20 18 L46 34 Z" fill="var(--pink)" filter="url(#rough2)"/>
+    <path d="M92 40 L100 18 L74 34 Z" fill="var(--pink)" filter="url(#rough2)"/>
+    <ellipse cx="60" cy="62" rx="44" ry="40" fill="var(--pink)" filter="url(#rough2)"/>
+    <circle cx="46" cy="56" r="5.5" fill="#2C2620"/><circle cx="74" cy="56" r="5.5" fill="#2C2620"/>
+    <circle cx="44" cy="54" r="1.8" fill="#fff"/><circle cx="72" cy="54" r="1.8" fill="#fff"/>
+    <ellipse cx="60" cy="77" rx="20" ry="15" fill="#E88AA6" stroke="#C25E7E" stroke-width="1.6" filter="url(#rough2)"/>
+    <ellipse cx="53" cy="77" rx="3" ry="4.5" fill="#2C2620"/><ellipse cx="67" cy="77" rx="3" ry="4.5" fill="#2C2620"/>
+    <ellipse cx="32" cy="72" rx="6" ry="4" fill="#C25E7E" opacity=".4"/><ellipse cx="88" cy="72" rx="6" ry="4" fill="#C25E7E" opacity=".4"/>
+  </svg>`;
+}
+function barnSVG(w){
+  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 130 120" aria-hidden="true">
+    <path d="M12 50 L65 14 L118 50 L118 112 L12 112 Z" fill="var(--red)" filter="url(#rough2)"/>
+    <path d="M12 50 L65 14 L118 50" fill="none" stroke="#B0300A" stroke-width="4" stroke-linecap="round"/>
+    <rect x="50" y="66" width="30" height="46" fill="#F0E6CE" filter="url(#rough2)"/>
+    <path d="M65 66 L65 112 M50 79 L80 79" stroke="var(--red)" stroke-width="3"/>
+    <path d="M50 66 L65 79 L80 66" fill="none" stroke="#B0300A" stroke-width="2.5"/>
   </svg>`;
 }
 /* photo polaroid with graceful fallback if the image file is missing */
@@ -549,9 +605,6 @@ node(ZONES.home[0], ZONES.home[1], -1.5, 'draggable', `
       <span class="scrawl">freeform sketchbook</span>, drag it around & poke at stuff.</p>
   </div>`);
 
-const heroBuddy = node(ZONES.home[0]+330, ZONES.home[1]+50, 4, '',
-  `<div class="bob">${blobSVG('--teal','--pink',150,'happy')}</div>`);
-
 /* a few memories scattered around home */
 photo(ZONES.home[0]-470, ZONES.home[1]+320, -4, "photos/liondance-team.jpg",
   "WashU lion dance team 🦁", "--red", "🦁", 205, "4/3");
@@ -599,7 +652,6 @@ photo(ZONES.about[0]+360, ZONES.about[1]+235, 4, "photos/tom-crew.jpg",
   "me + my Tikkun Olam Makers crew ♿", "--sage", "♿", 205, "4/3");
 photo(ZONES.about[0]-385, ZONES.about[1]-125, -4, "photos/taiwan-kid.jpg",
   "growing up in Taiwan 🇹🇼", "--pink-lt", "🇹🇼", 185, "4/3");
-node(ZONES.about[0]-335, ZONES.about[1]+235, 0,'',`<div class="bob slow">${blobSVG('--pink','--red',82,'happy')}</div>`);
 
 /* ================= jungle behind builds ================= */
 node(ZONES.work[0]-300, ZONES.work[1]-430, 6,'',`<div class="sway">${leafSVG(120,'--lime')}</div>`);
@@ -654,11 +706,10 @@ photo(ZONES.work[0]+0, ZONES.work[1]+350, -3, "photos/tom-build.jpg",
   "Tikkun Olam Makers build 🛠️", "--lime", "🛠️", 195, "4/3");
 photo(ZONES.work[0]+0, ZONES.work[1]-345, -3, "photos/building-sew.jpg",
   "stitching a wearable 🧵", "--pink", "🧵", 185, "3/4");
-node(ZONES.work[0]+610, ZONES.work[1]+0, 0,'',`<div class="bob fast">${starSVG('--pink',54)}</div>`);
 
 /* ================= fairytale behind research ================= */
 node(ZONES.research[0]-380, ZONES.research[1]-480, 0,'',`<div class="bob slow">${rainbowSVG(150)}</div>`);
-node(ZONES.research[0]-690, ZONES.research[1]-60, 0,'',`<div class="bob">${unicornSVG(146,true)}</div>`);
+node(ZONES.research[0]-690, ZONES.research[1]-60, 0,'',`<div class="bob">${unicornSVG(150)}</div>`);
 node(ZONES.research[0]+700, ZONES.research[1]-60, 0,'',`<div class="bob slow">${dragonSVG(152)}</div>`);
 node(ZONES.research[0]+270, ZONES.research[1]-470, 0,'',`<div class="spin">${sparkleSVG('--mustard',46)}</div>`);
 node(ZONES.research[0]+560, ZONES.research[1]-330, 0,'',`<div class="bob fast">${sparkleSVG('--pink',40)}</div>`);
@@ -699,6 +750,13 @@ photo(ZONES.research[0]+170, ZONES.research[1]+400, -3, "photos/present-sinica.j
 photo(ZONES.research[0]-110, ZONES.research[1]+430, 4, "photos/vena-team.jpg",
   "the Vena Vitals team 🫀", "--sage", "🫀", 195, "4/3");
 
+/* ================= farm behind celebrations ================= */
+node(ZONES.awards[0]-655, ZONES.awards[1]-295, 0,'',`<div class="bob slow">${barnSVG(150)}</div>`);
+node(ZONES.awards[0]-710, ZONES.awards[1]+165, 0,'',`<div class="bob">${cowSVG(140)}</div>`);
+node(ZONES.awards[0]+715, ZONES.awards[1]+110, 0,'',`<div class="bob slow">${sheepSVG(152)}</div>`);
+node(ZONES.awards[0]+590, ZONES.awards[1]+375, 0,'',`<div class="bob fast">${pigSVG(128)}</div>`);
+node(ZONES.awards[0]+250, ZONES.awards[1]-320, 0,'',`<div class="bob">${sheepSVG(96)}</div>`);
+
 /* ================= AWARDS / trophy shelf + startup life ================= */
 node(ZONES.awards[0], ZONES.awards[1]-240, 2,'',`
   <div class="signpost">${starSVG('--mustard',68)}
@@ -724,7 +782,6 @@ photo(ZONES.awards[0]+320, ZONES.awards[1]+200, -3, "photos/bmes.jpg",
   "BMES conf with my Locus team", "--teal", "🔬", 205, "4/3");
 photo(ZONES.awards[0]+180, ZONES.awards[1]+400, 3, "photos/venturewell2.jpg",
   "pitching @ VentureWell 🚀", "--orange", "🚀", 195, "3/4");
-node(ZONES.awards[0]-490, ZONES.awards[1]+30, 0,'',`<div class="bob slow">${blobSVG('--orange','--red',82)}</div>`);
 
 /* ================= LIFE / hobbies ================= */
 node(ZONES.life[0], ZONES.life[1]-260, 3,'',`
@@ -749,7 +806,6 @@ INTO.forEach((s,i)=>{
   node(ZONES.life[0]+dx, ZONES.life[1]+dy,(i%2?1:-1)*4,'draggable',
     `<div class="sticker" style="--c:${cv(s.c)}">${esc(s.t)}</div>`);
 });
-node(ZONES.life[0]+430, ZONES.life[1]+60, 0,'',`<div class="bob fast">${starSVG('--teal',52)}</div>`);
 
 /* ================= TEACHING / New Gen Scientists ================= */
 node(ZONES.teaching[0], ZONES.teaching[1]-300, -2,'',`
@@ -772,7 +828,6 @@ const ngPhotos=[
   ["photos/newgen-cart.jpg","they built a whole cart! 🛠️","--coral","🛠️",[380,240],-4,"4/3",210],
 ];
 ngPhotos.forEach(p=>photo(ZONES.teaching[0]+p[4][0], ZONES.teaching[1]+p[4][1], p[5], p[0], p[1], p[2], p[3], p[7], p[6], p[8]));
-node(ZONES.teaching[0]+30, ZONES.teaching[1]+120, 0,'',`<div class="bob">${blobSVG('--lime','--red',72,'happy')}</div>`);
 
 /* ================= SAY HI ================= */
 node(ZONES.hi[0], ZONES.hi[1], -1.5, 'draggable', `
@@ -788,12 +843,9 @@ node(ZONES.hi[0], ZONES.hi[1], -1.5, 'draggable', `
       <a href="https://locussuit.com/" target="_blank" rel="noopener" data-nodrag>🌐 locus suit</a>
     </div>
   </div>`);
-node(ZONES.hi[0]+300, ZONES.hi[1]-30, 5,'',`<div class="bob slow">${blobSVG('--orange','--red',110)}</div>`);
 
 /* ================= ambient doodles ================= */
 node(ZONES.home[0]-180, ZONES.home[1]-325, 0,'',`<div class="bob">${fishSVG('--pink',82)}</div>`);
-node(2750,2150,0,'',`<div class="bob">${blobSVG('--mustard','--red',70,'happy')}</div>`);
-node(2600,820,0,'',`<div class="spin">${starSVG('--sage',46)}</div>`);
 
 /* ===================== PAN / ZOOM ===================== */
 let tx=0, ty=0, scale=1;
@@ -880,7 +932,7 @@ stage.addEventListener('wheel',e=>{
 },{passive:false});
 
 /* ===================== cursor-follow eyes ===================== */
-const pupils=[...heroBuddy.querySelectorAll('.pupil')];
+const pupils=[];
 if(!reduce){
   window.addEventListener('pointermove',e=>{
     pupils.forEach(pu=>{
