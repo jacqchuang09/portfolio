@@ -1384,15 +1384,10 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
   #duck.idle img{animation:breathe 1.8s ease-in-out infinite}
   @keyframes waddle{from{transform:rotate(-6deg) translateY(0)}to{transform:rotate(6deg) translateY(-4px)}}
   @keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.03,.97)}}
-  #duck .say{position:absolute;left:50%;bottom:100%;translate:-50% -8px;white-space:nowrap;font-family:var(--font-hand);font-size:.85rem;
-    color:var(--ink);background:var(--paper,#fffdf6);border:2px solid var(--line,#2C2620);border-radius:999px;padding:2px 10px;
-    box-shadow:2px 3px 0 var(--shadow,rgba(0,0,0,.2));opacity:0;transition:opacity .3s;pointer-events:none}
-  #duck.talk .say,#duck:hover .say,#duck:focus-visible .say{opacity:1}
-  #duck.edge-l .say{left:0;translate:0 -8px} #duck.edge-r .say{left:auto;right:0;translate:0 -8px}
   @media (max-width:620px){#duck img{height:62px}}
 </style>
-<button id="duck" type="button" class="idle" aria-label="duck: it follows your cursor, and the arrow keys walk it around">
-  <span class="say">arrow keys walk me ✨</span><span class="flip"><img src="critters/walk1.png" alt=""></span>
+<button id="duck" type="button" class="idle" aria-label="duck: it follows your cursor">
+  <span class="flip"><img src="critters/walk1.png" alt=""></span>
 </button>
 <script>
 (function(){
@@ -1523,16 +1518,13 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
   function overlayOpen(){ return [...document.querySelectorAll('.modal,#gate')].some(m=>!m.hidden && getComputedStyle(m).display!=='none'); }
   addEventListener('keydown',e=>{
     if(!e.key.startsWith('Arrow') || typing() || overlayOpen()) return;
-    e.preventDefault(); held.add(e.key); mode='keys'; mouseSince=0; duck.classList.remove('talk');
+    e.preventDefault(); held.add(e.key); mode='keys'; mouseSince=0;
   });
   addEventListener('keyup',e=>held.delete(e.key));
   addEventListener('blur',()=>held.clear());
   duck.addEventListener('click',()=>{ sfx.voice('chick'); hop(duck); });
   duck.addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); sfx.voice('chick'); hop(duck); } });
   addEventListener('resize',()=>{ x=clampX(x); y=clampY(y); tx=clampX(tx); ty=clampY(ty); });
-  if(matchMedia('(hover:none)').matches) duck.querySelector('.say').textContent='tap anywhere, i\'ll follow ✨';
-  /* say hi once, a moment after the page loads */
-  setTimeout(()=>{ duck.classList.add('talk'); setTimeout(()=>duck.classList.remove('talk'),5000); }, 2600);
 
   let last=performance.now();
   function tick(now){
