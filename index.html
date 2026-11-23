@@ -273,8 +273,6 @@
   <button data-zone="teaching">teaching</button>
   <button data-zone="hi">say hi</button>
   <span class="sep"></span>
-  <button class="icon" id="zoomOut" aria-label="zoom out">−</button>
-  <button class="icon" id="zoomIn" aria-label="zoom in">+</button>
   <button class="icon" id="soundBtn" aria-label="turn sound effects off" aria-pressed="true">🔊</button>
 </nav>
 
@@ -1158,8 +1156,6 @@ function zoomBy(factor){
   zoomBy._t=setTimeout(()=>board.classList.remove('flying'),300);
   apply();
 }
-document.getElementById('zoomIn').onclick=()=>zoomBy(1.18);
-document.getElementById('zoomOut').onclick=()=>zoomBy(1/1.18);
 const zoneBtns=[...document.querySelectorAll('#dock [data-zone]')];
 zoneBtns.forEach(b=>b.onclick=()=>{
   const z=ZONES[b.dataset.zone]; if(!z) return;
