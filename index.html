@@ -1051,7 +1051,8 @@ const hiCard = node(ZONES.hi[0], ZONES.hi[1], -1.5, 'draggable', `
       <a href="https://www.linkedin.com/in/jacquelinec07" target="_blank" rel="noopener" data-nodrag>💼 linkedin</a>
     </div>
   </div>`);
-grid(ZONES.hi[0], ZONES.hi[1], [[hiCard]], 0, 0);
+const sfxCredit = node(ZONES.hi[0], ZONES.hi[1], 0,'',`<p class="sfx-credit">sound effects: <a href="https://developers.google.com/actions/tools/sound-library/cartoon" target="_blank" rel="noopener" data-nodrag>Google Sound Library</a> (CC BY 4.0) · pig oinks by Mike Koenig, <a href="https://soundbible.com/1221-Pig-Oink.html" target="_blank" rel="noopener" data-nodrag>SoundBible</a> (CC BY 3.0)</p>`);
+grid(ZONES.hi[0], ZONES.hi[1], [[hiCard],[sfxCredit]], 0, 26, {center:true, noEqual:true});
 
 /* ================= ambient doodles ================= */
 node(ZONES.home[0]-560, ZONES.home[1]-440, 0,'',`<div class="bob">${fishSVG('--pink',82)}</div>`);
@@ -1343,6 +1344,8 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
 
 <!-- ===================== little guys: one on (almost) every page, swaying in place; one duck follows you around ===================== -->
 <style>
+  .sfx-credit{margin:0;max-width:360px;text-align:center;font-size:.72rem;line-height:1.45;color:var(--ink-soft)}
+  .sfx-credit a{color:inherit}
   .zc{cursor:pointer}
   .zc .zc-in{display:block;transform-origin:50% 100%}
   .zc img{display:block;height:var(--h);width:auto;pointer-events:none;user-select:none;-webkit-user-drag:none;transform-origin:50% 100%}
@@ -1381,60 +1384,73 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
 
   /* ---------- tiny synthesized sound effects (no audio files); they only play when you interact ---------- */
   const sfx=(()=>{
-    let ctx=null, master=null, on=true;
+    /* real recorded cartoon sounds (see sounds/CREDITS.md), played through Web Audio so they can overlap and vary in pitch */
+    const NAMES=['squeak1','squeak2','squeak3','oink1','oink2','tip1','tip2','tip3','tip4','boing','pop','slap','plunger','whistle'];
+    let ctx=null, master=null, on=true, loading=null; const buf={};
     try{ on = localStorage.getItem('critterSound')!=='off'; }catch(e){}
     function ac(){
       if(!on) return null;
       if(!ctx){ const A=window.AudioContext||window.webkitAudioContext; if(!A) return null;
-        ctx=new A(); master=ctx.createGain(); master.gain.value=0.16; master.connect(ctx.destination); }
+        ctx=new A(); master=ctx.createGain(); master.gain.value=0.55; master.connect(ctx.destination); load(); }
       if(ctx.state==='suspended') ctx.resume();
       return ctx;
     }
-    function tone(o){
-      const c=ac(); if(!c) return;
-      const t=c.currentTime+(o.delay||0), dur=o.dur||0.12;
-      const osc=c.createOscillator(), g=c.createGain();
-      osc.type=o.type||'sine'; osc.frequency.setValueAtTime(o.f0,t);
-      if(o.f1) osc.frequency.exponentialRampToValueAtTime(o.f1,t+dur);
-      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(o.vol||0.5,t+0.012); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-      if(o.lp){ const f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=o.lp; osc.connect(f); f.connect(g); } else osc.connect(g);
-      g.connect(master); osc.start(t); osc.stop(t+dur+0.03);
+    function load(){
+      if(loading) return loading;
+      loading=Promise.all(NAMES.map(n=>fetch('sounds/'+n+'.mp3').then(r=>r.arrayBuffer())
+        .then(a=>new Promise((res,rej)=>ctx.decodeAudioData(a,res,rej))).then(b=>{ buf[n]=b; }).catch(()=>{})));
+      return loading;
     }
+    function play(n,o){
+      o=o||{}; const c=ac(); if(!c) return;
+      const go=()=>{ const b=buf[n]; if(!b) return;
+        const s=c.createBufferSource(), g=c.createGain(); s.buffer=b; s.playbackRate.value=o.rate||1; g.gain.value=o.vol==null?1:o.vol;
+        s.connect(g); g.connect(master); s.start(); };
+      buf[n] ? go() : load().then(go);
+    }
+    const pick=a=>a[Math.floor(Math.random()*a.length)], j=(a,b)=>a+Math.random()*(b-a);
+    let note=0;
     return {
+      warm(){ ac(); },
       voice(kind){
-        if(kind==='pig'){ tone({type:'sawtooth',f0:270,f1:175,dur:0.12,vol:0.45,lp:900}); tone({type:'sawtooth',f0:250,f1:160,dur:0.15,vol:0.4,lp:900,delay:0.15}); }
-        else if(kind==='balloon'){ tone({f0:420,f1:880,dur:0.32,vol:0.35}); tone({type:'triangle',f0:880,f1:1320,dur:0.16,vol:0.2,delay:0.26}); }
-        else { tone({type:'triangle',f0:1300,f1:1900,dur:0.08,vol:0.45}); tone({type:'triangle',f0:1500,f1:2300,dur:0.09,vol:0.4,delay:0.1}); }
+        if(kind==='pig') play(pick(['oink1','oink2']),{rate:j(0.92,1.12)});
+        else if(kind==='balloon') play('whistle',{vol:0.8});
+        else if(kind==='box') play('slap',{rate:j(0.95,1.1)});
+        else if(kind==='potty') play('plunger');
+        else play(pick(['squeak1','squeak2','squeak3']),{rate:j(0.95,1.25)});
       },
-      boing(){ tone({f0:170,f1:640,dur:0.15,vol:0.55}); tone({f0:640,f1:300,dur:0.2,vol:0.3,delay:0.14}); },
-      step(alt){ const f=alt?760:640; tone({type:'triangle',f0:f,f1:f*0.6,dur:0.05,vol:0.3}); },
+      boing(){ play('boing',{vol:0.8,rate:j(0.95,1.08)}); },
+      step(){ play('tip'+(note%4+1),{vol:0.5,rate:j(0.98,1.03)}); note++; },
+      pop(){ play('pop'); },
       get on(){ return on; },
       set on(v){ on=v; try{ localStorage.setItem('critterSound', v?'on':'off'); }catch(e){} if(!v && ctx) ctx.suspend(); }
     };
   })();
+  /* decode the clips on the first tap or key press, so the first sound isn't late */
+  ['pointerdown','keydown'].forEach(t=>addEventListener(t,()=>sfx.on&&sfx.warm(),{once:true,passive:true}));
   const soundBtn=document.getElementById('soundBtn');
   function paintSound(){ soundBtn.textContent=sfx.on?'🔊':'🔇'; soundBtn.setAttribute('aria-pressed', sfx.on?'true':'false');
     soundBtn.setAttribute('aria-label', sfx.on?'turn sound effects off':'turn sound effects on'); }
-  if(soundBtn){ paintSound(); soundBtn.addEventListener('click',()=>{ sfx.on=!sfx.on; paintSound(); if(sfx.on) sfx.boing(); }); }
+  if(soundBtn){ paintSound(); soundBtn.addEventListener('click',()=>{ sfx.on=!sfx.on; paintSound(); if(sfx.on) sfx.pop(); }); }
 
   function hop(el){ el.classList.remove('hop'); void el.offsetWidth; el.classList.add('hop'); setTimeout(()=>el.classList.remove('hop'),480); }
 
   /* ---------- the ones that live on a page: each sits by a corner of that page's grid ---------- */
   const SPOTS=[
-    {zone:'home',     src:'chick-wave.png',  h:120, at:'bl', anim:'bounce', kind:'chick', name:'waving chick'},
-    {zone:'home',     src:'pig-balloon.png', h:170, at:'tr', anim:'float',  kind:'balloon', name:'balloon pig'},
-    {zone:'about',    src:'chick-cheer.png', h:112, at:'br', anim:'bounce', kind:'chick', name:'cheering chick'},
-    {zone:'work',     src:'chick-box.png',   h:128, at:'br', anim:'bounce', kind:'chick', name:'boxing chicks'},
-    {zone:'research', src:'pig-shock.png',   h:116, at:'bl', anim:'sway',   kind:'pig',   name:'shocked pig'},
-    {zone:'awards',   src:'pig-hula.png',    h:120, at:'br', anim:'sway',   kind:'pig',   name:'hula pig'},
-    {zone:'life',     src:'pig-eat.png',     h:110, at:'br', anim:'bounce', kind:'pig',   name:'snacking pig'},
-    {zone:'teaching', src:'chick-potty.png', h:118, at:'br', anim:'sway',   kind:'chick', name:'chick on the potty'},
-    {zone:'hi',       src:'pig-thanks.png',  h:124, at:'r',  anim:'bounce', kind:'pig',   name:'thank-you pig'}
+    {zone:'home',     src:'chick-wave.png',  px:84,  at:'bl', anim:'bounce', kind:'chick',   name:'waving chick'},
+    {zone:'home',     src:'pig-balloon.png', px:118, at:'tr', anim:'float',  kind:'balloon', name:'balloon pig'},
+    {zone:'about',    src:'chick-cheer.png', px:80,  at:'br', anim:'bounce', kind:'chick',   name:'cheering chick'},
+    {zone:'work',     src:'chick-box.png',   px:92,  at:'br', anim:'bounce', kind:'box',     name:'boxing chicks'},
+    {zone:'research', src:'pig-shock.png',   px:84,  at:'bl', anim:'sway',   kind:'pig',     name:'shocked pig'},
+    {zone:'awards',   src:'pig-hula.png',    px:86,  at:'br', anim:'sway',   kind:'pig',     name:'hula pig'},
+    {zone:'life',     src:'pig-eat.png',     px:78,  at:'br', anim:'bounce', kind:'pig',     name:'snacking pig'},
+    {zone:'teaching', src:'chick-potty.png', px:86,  at:'br', anim:'sway',   kind:'potty',   name:'chick on the potty'},
+    {zone:'hi',       src:'pig-thanks.png',  px:84,  at:'r',  anim:'bounce', kind:'pig',     name:'thank-you pig'}
   ];
   const spots=SPOTS.map((s,i)=>{
     const z=ZONES[s.zone];
     const n=node(z[0], z[1], 0, 'zc '+s.anim, `<button type="button" class="zc-btn" aria-label="${s.name}" style="all:unset;display:block;cursor:pointer">
-      <span class="zc-in" style="animation-delay:${-(i*0.37)%2}s"><img src="critters/${s.src}" alt="" style="--h:${s.h}px"></span></button>`);
+      <span class="zc-in" style="animation-delay:${-(i*0.37)%2}s"><img src="critters/${s.src}" alt="" style="--h:${s.px}px"></span></button>`);
     n.querySelector('button').addEventListener('click',()=>{ if(typeof moved!=='undefined' && moved) return; sfx.voice(s.kind); hop(n); });
     return {...s, n};
   });
@@ -1444,9 +1460,11 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
       let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
       g.rows.flat().forEach(n=>{ const cx=parseFloat(n.style.left), cy=parseFloat(n.style.top), hw=n.offsetWidth/2, hh=n.offsetHeight/2;
         x0=Math.min(x0,cx-hw); x1=Math.max(x1,cx+hw); y0=Math.min(y0,cy-hh); y1=Math.max(y1,cy+hh); });
-      const w=s.n.offsetWidth||s.h, h=s.n.offsetHeight||s.h;
-      const p = s.at==='bl' ? [x0-w*0.35, y1-h/2]
-              : s.at==='br' ? [x1+w*0.35, y1-h/2]
+      const f=(typeof zoneFit==='function')?zoneFit(z[0],z[1]):null, k=f?f.s:1;
+      s.n.querySelector('img').style.setProperty('--h', Math.round(s.px/k)+'px');
+      const w=s.n.offsetWidth||s.px, h=s.n.offsetHeight||s.px;
+      const p = s.at==='bl' ? [x0-w/2-14, y1-h/2]
+              : s.at==='br' ? [x1+w/2+14, y1-h/2]
               : s.at==='tr' ? [x1+w*0.3,  y0+h/2-30]
               :               [x1+w/2+36, (y0+y1)/2];
       s.n.style.left=p[0]+'px'; s.n.style.top=p[1]+'px';
@@ -1496,7 +1514,7 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
       if(held.has('ArrowLeft')) dx-=1; if(held.has('ArrowRight')) dx+=1;
       if(held.has('ArrowUp')) dy-=1;   if(held.has('ArrowDown')) dy+=1;
       if(dx||dy){ const n=Math.hypot(dx,dy); x=clampX(x+dx/n*240*dt); y=clampY(y+dy/n*240*dt); if(dx) dir=dx<0?-1:1; moving=true;
-        st+=dt; if(st>=0.18){ st=0; sfx.step(alt=!alt); } }
+        st+=dt; if(st>=0.22){ st=0; sfx.step(); } }
       tx=x; ty=y;
     } else if(!reduce){
       const dx=tx-x, dy=ty-y, d=Math.hypot(dx,dy);
