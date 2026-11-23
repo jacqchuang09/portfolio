@@ -1278,7 +1278,8 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
   function hop(el){ el.classList.remove('hop'); void el.offsetWidth; el.classList.add('hop'); setTimeout(()=>el.classList.remove('hop'),480); }
 
   /* ---------- the ones that live on a page: each sits by a corner of that page's grid ---------- */
-  const SPOTS=[
+  /* the chick + pig stickers are parked for now (files kept in critters/); add entries back to SPOTS to show them again */
+  const SPOTS_PARKED=[
     {zone:'home',     src:'chick-wave.png',  px:84,  at:'bl', anim:'bounce', kind:'chick',   name:'waving chick'},
     {zone:'home',     src:'pig-balloon.png', px:118, at:'tr', anim:'float',  kind:'balloon', name:'balloon pig'},
     {zone:'about',    src:'chick-cheer.png', px:80,  at:'br', anim:'bounce', kind:'chick',   name:'cheering chick'},
@@ -1289,6 +1290,7 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
     {zone:'teaching', src:'chick-potty.png', px:86,  at:'br', anim:'sway',   kind:'potty',   name:'chick on the potty'},
     {zone:'hi',       src:'pig-thanks.png',  px:84,  at:'r',  anim:'bounce', kind:'pig',     name:'thank-you pig'}
   ];
+  const SPOTS=[];
   const spots=SPOTS.map((s,i)=>{
     const z=ZONES[s.zone];
     const n=node(z[0], z[1], 0, 'zc '+s.anim, `<button type="button" class="zc-btn" aria-label="${s.name}" style="all:unset;display:block;cursor:pointer">
