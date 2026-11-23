@@ -15,31 +15,24 @@
     --font-body:ui-rounded,"Nunito","Segoe UI",system-ui,-apple-system,sans-serif;
     --font-type:"Courier New",ui-monospace,"SFMono-Regular",monospace;
   }
-  :root[data-theme="dark"]{
-    --cream:#241F1A; --cream-2:#2B251F; --paper:#332C25;
-    --ink:#F3EEE4; --ink-soft:#B9AC9C; --line:#F3EEE4;
-    --dot:rgba(243,238,228,.10); --shadow:rgba(0,0,0,.45);
-  }
-  @media (prefers-color-scheme:dark){
-    :root:not([data-theme="light"]){
-      --cream:#241F1A; --cream-2:#2B251F; --paper:#332C25;
-      --ink:#F3EEE4; --ink-soft:#B9AC9C; --line:#F3EEE4;
-      --dot:rgba(243,238,228,.10); --shadow:rgba(0,0,0,.45);
-    }
-  }
+  :root{color-scheme:light}
 
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;overflow:hidden}
   body{font-family:var(--font-body);color:var(--ink);background:var(--cream);
     -webkit-font-smoothing:antialiased;touch-action:none}
 
-  #stage{position:fixed;inset:0;overflow:hidden;cursor:grab;background:var(--cream)}
+  #stage{position:fixed;inset:0;overflow:hidden;cursor:grab;background:var(--desk,#d8cfbf);
+    background-image:radial-gradient(rgba(44,38,32,.08) 1.4px,transparent 1.4px);background-size:22px 22px}
   #stage.grabbing{cursor:grabbing}
   /* ---------- terrain: each page sits on its own ground (ocean, woods, space, ...) that fades into the next ---------- */
-  .terrain{position:absolute;width:3800px;height:3200px;translate:-50% -50%;pointer-events:none;z-index:0;
-    -webkit-mask-image:radial-gradient(closest-side,#000 66%,transparent 100%);mask-image:radial-gradient(closest-side,#000 66%,transparent 100%);
-    transition:opacity .5s}
+  .terrain{position:absolute;pointer-events:none;z-index:0}
   .terrain.on{z-index:1}
+  .zone-label{all:unset;position:absolute;translate:-50% -50%;z-index:5;cursor:pointer;font-family:var(--font-hand);font-size:150px;line-height:1;
+    color:var(--ink);background:var(--paper);border:12px solid var(--line);border-radius:999px;padding:24px 70px;box-shadow:16px 18px 0 var(--shadow);
+    white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .35s}
+  #board.far .zone-label{opacity:1;pointer-events:auto}
+  #board.far .zone-label:hover{translate:-50% -52%}
   #board > .node{z-index:2}
   .t-ocean{background:radial-gradient(circle,rgba(255,255,255,.55) 0 3px,transparent 4px) 0 0/96px 96px,
     radial-gradient(circle,rgba(255,255,255,.35) 0 2px,transparent 3px) 40px 55px/64px 64px,linear-gradient(180deg,#d4f0f1,#a7d9df)}
@@ -57,12 +50,11 @@
     radial-gradient(ellipse 3px 6px,rgba(150,120,40,.16) 0 98%,transparent) 35px 30px/70px 60px,linear-gradient(180deg,#f6e7bd,#ecd79b)}
   .t-jungle{background:radial-gradient(ellipse 22px 12px,rgba(40,110,60,.16) 0 98%,transparent) 0 0/120px 110px,
     radial-gradient(ellipse 16px 9px,rgba(40,110,60,.12) 0 98%,transparent) 60px 55px/120px 110px,linear-gradient(180deg,#d6ead0,#b3d6a6)}
-  :root[data-theme="dark"] .terrain:not(.t-space){filter:brightness(.42) saturate(.9)}
-  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .terrain:not(.t-space){filter:brightness(.42) saturate(.9)}}
   /* words that sit straight on the night sky need to stay readable */
   .on-space .signpost div{color:#fff!important}
 
-  #board{position:absolute;left:0;top:0;width:6100px;height:6150px;transform-origin:0 0;
+  #board{position:absolute;left:0;top:0;width:6100px;height:6150px;transform-origin:0 0;overflow:hidden;border-radius:90px;
+    box-shadow:0 0 0 10px var(--line),0 40px 120px rgba(0,0,0,.28);
     background-image:radial-gradient(var(--dot) 1.6px,transparent 1.6px);
     background-size:34px 34px;will-change:transform}
   #board.flying{transition:transform .85s cubic-bezier(.22,.61,.36,1)}
@@ -283,9 +275,9 @@
   <button data-zone="teaching">teaching</button>
   <button data-zone="hi">say hi</button>
   <span class="sep"></span>
+  <button class="icon" id="mapBtn" aria-label="see the whole map" title="see the whole map">🗺️</button>
   <button class="icon" id="zoomOut" aria-label="zoom out">−</button>
   <button class="icon" id="zoomIn" aria-label="zoom in">+</button>
-  <button class="icon" id="themeBtn" aria-label="toggle light or dark">☾</button>
   <button class="icon" id="soundBtn" aria-label="turn sound effects off" aria-pressed="true">🔊</button>
 </nav>
 
@@ -771,10 +763,20 @@ const ZONES = {
 };
 
 /* ---------- terrain under each page; the one you're looking at sits on top so its ground fills the window ---------- */
+const WORLD_W=6100, WORLD_H=6150;
 const TERRAIN={home:'ocean',about:'woods',work:'space',research:'fairy',awards:'farm',life:'ice',teaching:'savanna',hi:'jungle'};
+/* each page owns a region of the map; neighbouring regions overlap 260px and fade into each other, the outer edge stays crisp */
+const CELLS={"about": [0, 0, 2000, 2200], "home": [2000, 0, 4000, 2200], "work": [4000, 0, 6100, 2200], "research": [0, 2200, 2000, 4200], "awards": [2000, 2200, 4000, 4200], "life": [4000, 2200, 6100, 4200], "teaching": [0, 4200, 3700, 6150], "hi": [3700, 4200, 6100, 6150]};
 const terrainEls={};
-Object.keys(TERRAIN).forEach(z=>{ const d=document.createElement('div'); d.className='terrain t-'+TERRAIN[z];
-  d.style.left=ZONES[z][0]+'px'; d.style.top=ZONES[z][1]+'px'; board.prepend(d); terrainEls[z]=d; });
+Object.keys(TERRAIN).forEach(z=>{
+  const [x0,y0,x1,y1]=CELLS[z], F=260, l=x0>0, r=x1<WORLD_W, t=y0>0, b=y1<WORLD_H;
+  const L=x0-(l?F:0), T=y0-(t?F:0), W=x1+(r?F:0)-L, H=y1+(b?F:0)-T;
+  const d=document.createElement('div'); d.className='terrain t-'+TERRAIN[z];
+  d.style.cssText=`left:${L}px;top:${T}px;width:${W}px;height:${H}px`;
+  const g=(dir,a,b2)=>`linear-gradient(${dir},${a?'transparent':'#000'} 0,#000 ${a?2*F:0}px,#000 calc(100% - ${b2?2*F:0}px),${b2?'transparent':'#000'} 100%)`;
+  const m=g('to right',l,r)+','+g('to bottom',t,b);
+  d.style.webkitMaskImage=m; d.style.maskImage=m; d.style.webkitMaskComposite='source-in'; d.style.maskComposite='intersect';
+  board.prepend(d); terrainEls[z]=d; });
 let terrainOn=null;
 function updateTerrain(){
   const w=(typeof vpW==='function'?vpW():innerWidth), hh=(typeof vpH==='function'?vpH():innerHeight);
@@ -1093,15 +1095,25 @@ node(ZONES.home[0]-560, ZONES.home[1]-440, 0,'',`<div class="bob">${fishSVG('--p
 
 /* ===================== PAN / ZOOM ===================== */
 let tx=0, ty=0, scale=1;
-const MINS=0.25, MAXS=1.4;
-function apply(){ board.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`; updateTerrain(); }
+const MAXS=1.4;
+/* the most you can zoom out is "the whole map fits in the window" */
+function minScale(){ const w=vpW(), h=vpH(); return Math.min((w-48)/WORLD_W, (h-150)/WORLD_H); }
+/* keep the map from sliding off: once it is bigger than the window you can pan only to its edges; smaller, it sits centred */
+function clampView(){
+  const w=vpW(), h=vpH(), top=64, bot=100, side=24;
+  scale=Math.min(MAXS, Math.max(minScale(), scale));
+  const bw=WORLD_W*scale, bh=WORLD_H*scale;
+  tx = bw <= w-2*side ? (w-bw)/2 : Math.min(side, Math.max(w-side-bw, tx));
+  ty = bh <= h-top-bot ? top+(h-top-bot-bh)/2 : Math.min(top, Math.max(h-bot-bh, ty));
+}
+function apply(){ clampView(); board.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`; board.classList.toggle('far', scale<0.3); updateTerrain(); }
 function vpW(){ return window.innerWidth || document.documentElement.clientWidth || 1024; }
 function vpH(){ return window.innerHeight || document.documentElement.clientHeight || 768; }
 function centerOn(zx,zy,animate,vs){
   var w = vpW(), h = vpH();
   if(vs){
     var mul = w < 620 ? 0.62 : w < 1000 ? 0.82 : 1;
-    scale = Math.min(MAXS, Math.max(MINS, vs*mul));
+    scale = Math.min(MAXS, Math.max(minScale(), vs*mul));
   }
   tx = w/2 - zx*scale; ty = h/2 - zy*scale;
   if(animate){ board.classList.add('flying'); clearTimeout(centerOn._t);
@@ -1128,7 +1140,7 @@ function zoneFit(zx,zy){
   });
   if(x0>x1) return null;
   const top=62, bot=96, side=40;
-  const s=Math.min(1.05, Math.max(MINS, Math.min((w-2*side)/(x1-x0), (h-top-bot)/(y1-y0))));
+  const s=Math.min(1.05, Math.max(minScale(), Math.min((w-2*side)/(x1-x0), (h-top-bot)/(y1-y0))));
   return { s, tx: w/2-(x0+x1)/2*s, ty: top+(h-top-bot)/2-(y0+y1)/2*s };
 }
 function flyTo(name,animate){
@@ -1144,7 +1156,7 @@ function zoomBy(factor){
   if(locked){ openGate(); return; }
   userMoved=true;
   const wx=(innerWidth/2 - tx)/scale, wy=(innerHeight/2 - ty)/scale;
-  scale=Math.min(MAXS,Math.max(MINS, scale*factor));
+  scale=Math.min(MAXS,Math.max(minScale(), scale*factor));
   tx=innerWidth/2 - wx*scale; ty=innerHeight/2 - wy*scale;
   board.classList.add('flying'); clearTimeout(zoomBy._t);
   zoomBy._t=setTimeout(()=>board.classList.remove('flying'),300);
@@ -1152,6 +1164,9 @@ function zoomBy(factor){
 }
 document.getElementById('zoomIn').onclick=()=>zoomBy(1.18);
 document.getElementById('zoomOut').onclick=()=>zoomBy(1/1.18);
+document.getElementById('mapBtn').onclick=()=>{ if(locked){ openGate(); return; } userMoved=true; scale=minScale();
+  board.classList.add('flying'); clearTimeout(centerOn._t); centerOn._t=setTimeout(()=>board.classList.remove('flying'),900); apply();
+  zoneBtns.forEach(x=>x.classList.remove('active')); };
 
 const zoneBtns=[...document.querySelectorAll('#dock [data-zone]')];
 zoneBtns.forEach(b=>b.onclick=()=>{
@@ -1335,14 +1350,7 @@ board.addEventListener('click',e=>{
   const sb=e.target.closest('[data-story]'); if(sb){ if(moved) return; e.preventDefault(); showStory(STORIES[sb.dataset.story]); }
 });
 
-/* ===================== theme toggle ===================== */
-const themeBtn=document.getElementById('themeBtn');
-function curTheme(){ const r=document.documentElement;
-  if(r.dataset.theme) return r.dataset.theme;
-  return matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'; }
-themeBtn.onclick=()=>{ const next=curTheme()==='dark'?'light':'dark';
-  document.documentElement.dataset.theme=next; themeBtn.textContent=next==='dark'?'☀':'☾'; };
-themeBtn.textContent=curTheme()==='dark'?'☀':'☾';
+
 
 /* ===================== init ===================== */
 /* start more zoomed out on phones / small screens so more of the board is visible.
@@ -1421,13 +1429,13 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
   /* ---------- tiny synthesized sound effects (no audio files); they only play when you interact ---------- */
   const sfx=(()=>{
     /* real recorded cartoon sounds (see sounds/CREDITS.md), played through Web Audio so they can overlap and vary in pitch */
-    const NAMES=['squeak1','squeak2','squeak3','oink1','oink2','tip1','tip2','tip3','tip4','boing','pop','slap','plunger','whistle'];
+    const NAMES=['oink1','oink2','tip1','tip2','tip3','tip4','pop','wood'];
     let ctx=null, master=null, on=true, loading=null; const buf={};
     try{ on = localStorage.getItem('critterSound')!=='off'; }catch(e){}
     function ac(){
       if(!on) return null;
       if(!ctx){ const A=window.AudioContext||window.webkitAudioContext; if(!A) return null;
-        ctx=new A(); master=ctx.createGain(); master.gain.value=0.55; master.connect(ctx.destination); load(); }
+        ctx=new A(); master=ctx.createGain(); master.gain.value=0.3; master.connect(ctx.destination); load(); }
       if(ctx.state==='suspended') ctx.resume();
       return ctx;
     }
@@ -1448,15 +1456,16 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
     let note=0;
     return {
       warm(){ ac(); },
+      /* soft, rounded sounds: bubbly pops for the chicks, gentle oinks for the pigs, a little xylophone run for the balloon */
       voice(kind){
-        if(kind==='pig') play(pick(['oink1','oink2']),{rate:j(0.92,1.12)});
-        else if(kind==='balloon') play('whistle',{vol:0.8});
-        else if(kind==='box') play('slap',{rate:j(0.95,1.1)});
-        else if(kind==='potty') play('plunger');
-        else play(pick(['squeak1','squeak2','squeak3']),{rate:j(0.95,1.25)});
+        if(kind==='pig') play(pick(['oink1','oink2']),{rate:j(1.0,1.12),vol:0.7});
+        else if(kind==='balloon'){ [1,2,3,4].forEach((n,i)=>setTimeout(()=>play('tip'+n,{vol:0.6}),i*90)); }
+        else if(kind==='box') play('wood',{rate:j(0.95,1.08),vol:0.8});
+        else if(kind==='potty') play('pop',{rate:0.7,vol:0.8});
+        else { play('pop',{rate:j(1.1,1.4),vol:0.8}); setTimeout(()=>play('pop',{rate:j(1.4,1.7),vol:0.5}),90); }
       },
-      boing(){ play('boing',{vol:0.8,rate:j(0.95,1.08)}); },
-      step(){ play('tip'+(note%4+1),{vol:0.5,rate:j(0.98,1.03)}); note++; },
+      boing(){ play('wood',{vol:0.7}); },
+      step(){ play('tip'+(note%4+1),{vol:0.35,rate:j(0.98,1.03)}); note++; },
       pop(){ play('pop'); },
       get on(){ return on; },
       set on(v){ on=v; try{ localStorage.setItem('critterSound', v?'on':'off'); }catch(e){} if(!v && ctx) ctx.suspend(); }
@@ -1506,9 +1515,21 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
       s.n.style.left=p[0]+'px'; s.n.style.top=p[1]+'px';
     });
   }
+  /* big name tags that show up only when you zoom out to the whole map; tap one to fly there */
+  const LABELS={home:'🌊 home',about:'🌲 about me',work:'🚀 builds',research:'🦄 research',awards:'🌾 celebrations',life:'❄️ life',teaching:'🦒 teaching',hi:'🌴 say hi'};
+  const labels=Object.keys(LABELS).map(z=>{ const b=document.createElement('button'); b.type='button'; b.className='zone-label'; b.textContent=LABELS[z];
+    b.setAttribute('aria-label','go to '+LABELS[z].replace(/^\S+\s/,''));
+    b.addEventListener('click',()=>{ const d=document.querySelector('#dock [data-zone="'+z+'"]'); if(d) d.click(); });
+    board.appendChild(b); return {z,b}; });
+  function placeLabels(){ labels.forEach(({z,b})=>{ const g=GRIDS.find(g=>g.cx===ZONES[z][0]&&g.cy===ZONES[z][1]);
+    let cx=ZONES[z][0], cy=ZONES[z][1];
+    if(g){ let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9; g.rows.flat().forEach(n=>{ const x=parseFloat(n.style.left), y=parseFloat(n.style.top);
+      x0=Math.min(x0,x-n.offsetWidth/2); x1=Math.max(x1,x+n.offsetWidth/2); y0=Math.min(y0,y-n.offsetHeight/2); y1=Math.max(y1,y+n.offsetHeight/2); });
+      cx=(x0+x1)/2; cy=(y0+y1)/2; }
+    b.style.left=cx+'px'; b.style.top=cy+'px'; }); }
   const _layout=layoutGrids;
-  layoutGrids=function(){ _layout(); placeSpots(); };
-  placeSpots();
+  layoutGrids=function(){ _layout(); placeSpots(); placeLabels(); };
+  placeSpots(); placeLabels();
   addEventListener('load',()=>{ layoutGrids(); });
 
   /* ---------- the duck: follows your cursor (or your taps); the arrow keys take over until you move the mouse again ---------- */
