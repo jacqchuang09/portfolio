@@ -192,11 +192,6 @@
   #dock .icon{font-size:1rem;padding:6px 11px}
   :focus-visible{outline:3px dashed var(--pink);outline-offset:3px;border-radius:6px}
 
-  #hint{position:fixed;top:16px;left:50%;translate:-50% 0;z-index:150;font-family:var(--font-hand);
-    color:var(--ink-soft);font-size:.9rem;background:var(--paper);border:2px solid var(--line);
-    border-radius:30px;padding:6px 15px;box-shadow:3px 3px 0 var(--shadow);
-    display:flex;gap:8px;align-items:center;transition:opacity .5s}
-  #hint .hand{animation:point 1.4s ease-in-out infinite}
   @keyframes point{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
 
   #pre{position:fixed;inset:0;z-index:1000;background:var(--cream);display:flex;flex-direction:column;
@@ -1252,9 +1247,6 @@ function tryUnlock(){
   if(gateInput.value.trim().toLowerCase()==='idk'){
     locked=false; try{ sessionStorage.setItem('jc_unlocked','1'); }catch(e){}
     gate.hidden=true; gateInput.value='';
-    hint.innerHTML='<span class="hand">👆</span><span>you’re in! drag anywhere to explore ♡</span>';
-    hint.onclick=null; hint.style.cursor=''; hint.style.opacity='1';
-    clearTimeout(hintTimer); hintTimer=setTimeout(hideHint,4200);
   } else { gateErr.hidden=false; gateInput.select(); }
 }
 document.getElementById('gateGo').onclick=tryUnlock;
@@ -1262,17 +1254,7 @@ gateInput.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key==='Return'){
 gate.addEventListener('click',e=>{ if(e.target===gate) closeGate(); });
 addEventListener('keydown',e=>{ if(e.key==='Escape' && !gate.hidden) closeGate(); });
 
-/* ===================== hint ===================== */
-const hint=document.getElementById('hint');
-let hintTimer;
-function hideHint(){ if(!hint) return; hint.style.opacity='0';
-  clearTimeout(hintTimer); setTimeout(()=>hint&&hint.remove(),600); }
-if(locked){
-  hint.innerHTML='<span class="hand">🔒</span><span>password-protected · tap to explore</span>';
-  hint.style.cursor='pointer'; hint.onclick=openGate;
-} else {
-  hintTimer=setTimeout(hideHint,6000);
-}
+function hideHint(){}
 
 /* ===================== project story modal ===================== */
 const modal=document.getElementById('modal');
