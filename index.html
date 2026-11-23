@@ -314,6 +314,211 @@ function layoutGrids(){
 }
 function cv(v){return v.startsWith('--')?`var(${v})`:v;}
 
+/* ---------- doodle animals, drawn to match the chick + pig stickers: one round body, thick dark outline, dot eyes, blush, stubby feet ---------- */
+const ST='stroke="#2B2622" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"';
+const LN='stroke="#2B2622" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"';
+function eyes(x1,x2,y,r){ r=r||3.6; return `<circle cx="${x1}" cy="${y}" r="${r}" fill="#2B2622"/><circle cx="${x2}" cy="${y}" r="${r}" fill="#2B2622"/>`; }
+function happyEyes(x1,x2,y){ return `<path d="M${x1-5} ${y+1} q5 -6 10 0 M${x2-5} ${y+1} q5 -6 10 0" ${LN}/>`; }
+function blush(x1,x2,y){ return `<ellipse cx="${x1}" cy="${y}" rx="7" ry="4.5" fill="#F4878F" opacity=".55"/><ellipse cx="${x2}" cy="${y}" rx="7" ry="4.5" fill="#F4878F" opacity=".55"/>`; }
+function feet(x1,x2,y,c){ return `<ellipse cx="${x1}" cy="${y}" rx="11" ry="7" fill="${c}" ${ST}/><ellipse cx="${x2}" cy="${y}" rx="11" ry="7" fill="${c}" ${ST}/>`; }
+function nubs(x1,x2,y,c){ return `<path d="M${x1} ${y} q-9 3 -7 12 q4 3 9 -2" fill="${c}" ${ST}/><path d="M${x2} ${y} q9 3 7 12 q-4 3 -9 -2" fill="${c}" ${ST}/>`; }
+function svgWrap(w,vb,inner,flip){ const W=+vb.split(' ')[2];
+  return `<svg class="blob" style="--w:${w}px" viewBox="${vb}" aria-hidden="true"><g${flip?` transform="translate(${W},0) scale(-1,1)"`:''}>${inner}</g></svg>`; }
+
+function fishSVG(fill,w,flip){
+  const c=cv(fill);
+  return svgWrap(w,'0 0 140 100',`
+    <path d="M100 50 Q118 30 132 28 Q124 50 132 72 Q118 70 100 50 Z" fill="${c}" ${ST}/>
+    <path d="M52 24 Q66 8 84 22" fill="${c}" ${ST}/>
+    <ellipse cx="62" cy="52" rx="44" ry="32" fill="${c}" ${ST}/>
+    <ellipse cx="50" cy="40" rx="12" ry="6" fill="#fff" opacity=".45" transform="rotate(-20 50 40)"/>
+    ${eyes(36,36,48,4.2)}
+    <ellipse cx="38" cy="62" rx="7" ry="4.5" fill="#F4878F" opacity=".55"/>
+    <path d="M20 56 q5 4 10 0" ${LN}/>
+    <path d="M70 52 q6 6 0 12" ${LN} opacity=".5"/>`,flip);
+}
+function bearSVG(w){
+  return svgWrap(w,'0 0 120 124',`
+    <circle cx="30" cy="30" r="14" fill="#D9A06A" ${ST}/><circle cx="90" cy="30" r="14" fill="#D9A06A" ${ST}/>
+    <circle cx="30" cy="30" r="6.5" fill="#F3CFA6"/><circle cx="90" cy="30" r="6.5" fill="#F3CFA6"/>
+    ${feet(44,76,112,'#C98A52')}
+    <ellipse cx="60" cy="70" rx="44" ry="42" fill="#D9A06A" ${ST}/>
+    ${nubs(20,100,78,'#D9A06A')}
+    <ellipse cx="60" cy="80" rx="15" ry="11" fill="#F3CFA6" ${ST}/>
+    <ellipse cx="60" cy="76" rx="5" ry="3.6" fill="#2B2622"/>
+    <path d="M55 84 q5 4 10 0" ${LN}/>
+    ${eyes(44,76,64)} ${blush(36,84,78)}`);
+}
+function pandaSVG(w){
+  return svgWrap(w,'0 0 120 124',`
+    <circle cx="30" cy="30" r="14" fill="#3A3434" ${ST}/><circle cx="90" cy="30" r="14" fill="#3A3434" ${ST}/>
+    ${feet(44,76,112,'#3A3434')}
+    <ellipse cx="60" cy="70" rx="44" ry="42" fill="#FBF8F2" ${ST}/>
+    ${nubs(20,100,78,'#3A3434')}
+    <ellipse cx="43" cy="64" rx="9" ry="11" fill="#3A3434" transform="rotate(25 43 64)"/>
+    <ellipse cx="77" cy="64" rx="9" ry="11" fill="#3A3434" transform="rotate(-25 77 64)"/>
+    <circle cx="44" cy="63" r="3" fill="#fff"/><circle cx="76" cy="63" r="3" fill="#fff"/>
+    <ellipse cx="60" cy="78" rx="5" ry="3.6" fill="#2B2622"/>
+    <path d="M55 85 q5 4 10 0" ${LN}/>
+    ${blush(34,86,80)}`);
+}
+function monkeySVG(w){
+  return svgWrap(w,'0 0 130 124',`
+    <circle cx="20" cy="62" r="13" fill="#B87A4B" ${ST}/><circle cx="110" cy="62" r="13" fill="#B87A4B" ${ST}/>
+    <circle cx="20" cy="62" r="6" fill="#F1CFA4"/><circle cx="110" cy="62" r="6" fill="#F1CFA4"/>
+    ${feet(49,81,112,'#A56A3E')}
+    <ellipse cx="65" cy="68" rx="44" ry="44" fill="#B87A4B" ${ST}/>
+    <path d="M65 48 C52 38 34 46 38 64 C40 76 46 92 65 94 C84 92 90 76 92 64 C96 46 78 38 65 48 Z" fill="#F1CFA4" ${ST}/>
+    ${eyes(53,77,62)}
+    <circle cx="61" cy="74" r="1.8" fill="#2B2622"/><circle cx="69" cy="74" r="1.8" fill="#2B2622"/>
+    <path d="M57 81 q8 7 16 0" ${LN}/>
+    ${blush(46,84,76)}`);
+}
+function macawSVG(w,flip){
+  return svgWrap(w,'0 0 124 126',`
+    <path d="M86 92 q20 10 26 28 q-18 -4 -30 -18 Z" fill="#5FB3C4" ${ST}/>
+    <path d="M76 98 q12 14 12 26 q-14 -8 -20 -20 Z" fill="#F2C744" ${ST}/>
+    ${feet(50,76,114,'#F29D52')}
+    <path d="M48 20 q4 -14 14 -10 q-2 6 -6 10" fill="#EF5A43" ${ST}/>
+    <ellipse cx="64" cy="66" rx="42" ry="44" fill="#EF5A43" ${ST}/>
+    <path d="M84 60 q20 6 16 30 q-16 2 -24 -14 Z" fill="#5FB3C4" ${ST}/>
+    <path d="M30 56 C18 54 12 64 16 74 C20 80 28 78 32 72 Z" fill="#F7E3B0" ${ST}/>
+    <path d="M30 70 q-6 4 -12 2" ${LN}/>
+    ${eyes(48,48,54,4)}
+    <ellipse cx="54" cy="72" rx="7" ry="4.5" fill="#F4878F" opacity=".55"/>`,!flip);
+}
+function unicornSVG(w){
+  return svgWrap(w,'0 0 124 130',`
+    <path d="M62 6 L70 34 L54 34 Z" fill="#F7D774" ${ST}/>
+    <path d="M57 26 l9 -3 M59 18 l7 -2" stroke="#E0A93A" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M30 32 l-6 -18 l18 10 Z" fill="#FBF8F2" ${ST}/><path d="M94 32 l6 -18 l-18 10 Z" fill="#FBF8F2" ${ST}/>
+    ${feet(46,78,118,'#C9B6EE')}
+    <ellipse cx="62" cy="74" rx="44" ry="44" fill="#FBF8F2" ${ST}/>
+    <path d="M26 54 C24 36 40 26 56 32 C50 40 40 44 34 60 C32 66 28 66 26 54 Z" fill="#F5A8CF" ${ST}/>
+    <path d="M60 32 C74 24 92 30 96 44 C86 40 76 40 66 40 Z" fill="#B9A6F0" ${ST}/>
+    ${happyEyes(48,76,70)} ${blush(40,84,82)}
+    <path d="M56 86 q6 5 12 0" ${LN}/>`);
+}
+function dragonSVG(w){
+  return svgWrap(w,'0 0 128 128',`
+    <path d="M14 66 q-6 -24 18 -26 q-4 14 6 22 Z" fill="#7FCBB0" ${ST}/>
+    <path d="M114 66 q6 -24 -18 -26 q4 14 -6 22 Z" fill="#7FCBB0" ${ST}/>
+    <path d="M44 30 l6 -14 l8 12 Z M60 26 l6 -16 l8 14 Z M76 30 l7 -12 l6 14 Z" fill="#F2C744" ${ST}/>
+    ${feet(48,80,116,'#5FB394')}
+    <ellipse cx="64" cy="72" rx="44" ry="44" fill="#A6E0C5" ${ST}/>
+    <ellipse cx="64" cy="92" rx="22" ry="17" fill="#E9F7EE" ${ST}/>
+    <path d="M52 88 h24 M54 97 h20" stroke="#2B2622" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+    ${eyes(48,80,64)} ${blush(40,88,76)}
+    <circle cx="60" cy="72" r="1.6" fill="#2B2622"/><circle cx="68" cy="72" r="1.6" fill="#2B2622"/>
+    <path d="M58 78 q6 5 12 0" ${LN}/>`);
+}
+function sheepSVG(w){
+  const puffs=[[30,56,18],[50,40,20],[74,40,20],[94,56,18],[98,80,18],[82,98,18],[56,100,19],[32,90,18],[24,72,16]];
+  const ring=puffs.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="${p[2]+1.7}" fill="#2B2622"/>`).join('');
+  const fill=puffs.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="${p[2]-1.7}" fill="#FBF8F2"/>`).join('');
+  return svgWrap(w,'0 0 124 128',`
+    ${feet(46,78,118,'#4A4040')}
+    ${ring}<ellipse cx="62" cy="70" rx="34" ry="32" fill="#2B2622"/>
+    ${fill}<ellipse cx="62" cy="70" rx="32" ry="30" fill="#FBF8F2"/>
+    <ellipse cx="38" cy="62" rx="11" ry="6" fill="#E9CFC0" ${ST} transform="rotate(-25 38 62)"/>
+    <ellipse cx="86" cy="62" rx="11" ry="6" fill="#E9CFC0" ${ST} transform="rotate(25 86 62)"/>
+    <ellipse cx="62" cy="72" rx="20" ry="22" fill="#F3DDD0" ${ST}/>
+    ${eyes(54,70,68,3.2)} <path d="M57 80 q5 4 10 0" ${LN}/>
+    ${blush(48,76,78)}`);
+}
+function cowSVG(w){
+  return svgWrap(w,'0 0 124 126',`
+    <path d="M36 28 q-10 -16 -2 -18 q6 6 8 14 Z M88 28 q10 -16 2 -18 q-6 6 -8 14 Z" fill="#F7E3B0" ${ST}/>
+    <ellipse cx="22" cy="44" rx="13" ry="7" fill="#FBF8F2" ${ST} transform="rotate(20 22 44)"/>
+    <ellipse cx="102" cy="44" rx="13" ry="7" fill="#FBF8F2" ${ST} transform="rotate(-20 102 44)"/>
+    ${feet(46,78,114,'#4A4040')}
+    <clipPath id="cowclip"><ellipse cx="62" cy="68" rx="44" ry="43"/></clipPath>
+    <ellipse cx="62" cy="68" rx="44" ry="43" fill="#FBF8F2"/>
+    <g clip-path="url(#cowclip)" fill="#3A3434"><path d="M14 48 q14 -10 24 4 q-4 16 -20 12 Z"/><path d="M86 30 q20 0 22 20 q-14 6 -22 -4 Z"/><path d="M92 96 q16 -6 18 10 l-20 6 Z"/></g>
+    <ellipse cx="62" cy="68" rx="44" ry="43" fill="none" ${ST}/>
+    <ellipse cx="62" cy="86" rx="22" ry="14" fill="#F7B8C4" ${ST}/>
+    <ellipse cx="54" cy="86" rx="3" ry="4" fill="#2B2622"/><ellipse cx="70" cy="86" rx="3" ry="4" fill="#2B2622"/>
+    ${eyes(46,78,62)} ${blush(36,88,74)}`);
+}
+function pigSVG(w){
+  return svgWrap(w,'0 0 124 124',`
+    <path d="M30 34 l-6 -20 l20 10 Z M94 34 l6 -20 l-20 10 Z" fill="#F7B8C4" ${ST}/>
+    <path d="M104 80 q14 -2 10 8 q-6 4 -4 -4" ${LN}/>
+    ${feet(46,78,112,'#F29EB0')}
+    <ellipse cx="62" cy="68" rx="44" ry="42" fill="#F7B8C4" ${ST}/>
+    <ellipse cx="62" cy="74" rx="15" ry="11" fill="#F29EB0" ${ST}/>
+    <ellipse cx="57" cy="74" rx="2.6" ry="3.6" fill="#2B2622"/><ellipse cx="67" cy="74" rx="2.6" ry="3.6" fill="#2B2622"/>
+    ${eyes(44,80,60)} ${blush(34,90,76)}
+    <path d="M56 90 q6 4 12 0" ${LN}/>`);
+}
+function foxSVG(w){
+  return svgWrap(w,'0 0 134 124',`
+    <path d="M106 96 C130 92 132 62 116 54 C112 72 100 82 92 90 Z" fill="#F29044" ${ST}/>
+    <path d="M118 60 C126 70 126 86 114 92 C114 80 116 70 118 60 Z" fill="#FBF8F2"/>
+    <path d="M30 40 l-4 -28 l24 16 Z M90 40 l4 -28 l-24 16 Z" fill="#F29044" ${ST}/>
+    <path d="M28 22 l-2 -10 l9 6 Z M92 22 l2 -10 l-9 6 Z" fill="#3A3434"/>
+    ${feet(44,76,112,'#3A3434')}
+    <ellipse cx="60" cy="68" rx="44" ry="42" fill="#F29044" ${ST}/>
+    <path d="M60 62 C44 62 26 70 30 84 C38 102 82 102 90 84 C94 70 76 62 60 62 Z" fill="#FBF8F2" ${ST}/>
+    <ellipse cx="60" cy="74" rx="5" ry="3.6" fill="#2B2622"/>
+    <path d="M55 81 q5 4 10 0" ${LN}/>
+    ${eyes(44,76,58)} ${blush(36,84,74)}`);
+}
+function penguinSVG(w){
+  return svgWrap(w,'0 0 120 130',`
+    ${feet(46,74,120,'#F29D52')}
+    <ellipse cx="60" cy="68" rx="42" ry="50" fill="#3B4A6B" ${ST}/>
+    <path d="M18 70 q-12 10 -6 26 q8 0 12 -10" fill="#3B4A6B" ${ST}/>
+    <path d="M102 70 q12 10 6 26 q-8 0 -12 -10" fill="#3B4A6B" ${ST}/>
+    <path d="M60 40 C40 36 26 52 30 76 C34 100 46 112 60 112 C74 112 86 100 90 76 C94 52 80 36 60 40 Z" fill="#FBF8F2" ${ST}/>
+    ${eyes(48,72,60)}
+    <path d="M52 68 q8 -4 16 0 q-8 9 -16 0 Z" fill="#F7B24A" ${ST}/>
+    ${blush(40,80,74)}`);
+}
+function giraffeSVG(w){
+  return svgWrap(w,'0 0 120 140',`
+    <path d="M44 34 v-16 M76 34 v-16" stroke="#2B2622" stroke-width="5" stroke-linecap="round"/>
+    <path d="M44 34 v-16 M76 34 v-16" stroke="#E7B14E" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="44" cy="16" r="6" fill="#B87A4B" ${ST}/><circle cx="76" cy="16" r="6" fill="#B87A4B" ${ST}/>
+    <ellipse cx="24" cy="46" rx="12" ry="6" fill="#F7D774" ${ST} transform="rotate(25 24 46)"/>
+    <ellipse cx="96" cy="46" rx="12" ry="6" fill="#F7D774" ${ST} transform="rotate(-25 96 46)"/>
+    ${feet(44,76,128,'#B87A4B')}
+    <clipPath id="girclip"><ellipse cx="60" cy="78" rx="40" ry="50"/></clipPath>
+    <ellipse cx="60" cy="78" rx="40" ry="50" fill="#F7D774"/>
+    <g clip-path="url(#girclip)" fill="#E3A24B"><circle cx="26" cy="90" r="9"/><circle cx="92" cy="96" r="10"/><circle cx="40" cy="116" r="8"/><circle cx="80" cy="120" r="8"/><circle cx="92" cy="60" r="7"/><circle cx="28" cy="58" r="6"/></g>
+    <ellipse cx="60" cy="78" rx="40" ry="50" fill="none" ${ST}/>
+    <ellipse cx="60" cy="86" rx="20" ry="13" fill="#F6E3B4" ${ST}/>
+    <circle cx="54" cy="84" r="1.8" fill="#2B2622"/><circle cx="66" cy="84" r="1.8" fill="#2B2622"/>
+    <path d="M55 92 q5 4 10 0" ${LN}/>
+    ${eyes(46,74,66)} ${blush(36,84,80)}`);
+}
+function tigerSVG(w){
+  return svgWrap(w,'0 0 120 124',`
+    <circle cx="28" cy="32" r="13" fill="#F29044" ${ST}/><circle cx="92" cy="32" r="13" fill="#F29044" ${ST}/>
+    <circle cx="28" cy="32" r="6" fill="#FBF8F2"/><circle cx="92" cy="32" r="6" fill="#FBF8F2"/>
+    ${feet(44,76,112,'#F29044')}
+    <ellipse cx="60" cy="68" rx="44" ry="42" fill="#F29044" ${ST}/>
+    <path d="M52 30 q8 8 0 14 M60 28 v14 M68 30 q-8 8 0 14 M18 64 q10 2 14 8 M18 78 q10 0 13 4 M102 64 q-10 2 -14 8 M102 78 q-10 0 -13 4" stroke="#2B2622" stroke-width="3.6" fill="none" stroke-linecap="round"/>
+    <path d="M60 66 C46 66 34 74 38 86 C44 100 76 100 82 86 C86 74 74 66 60 66 Z" fill="#FBF8F2" ${ST}/>
+    <path d="M55 74 h10 l-5 5 Z" fill="#F4878F" ${ST}/>
+    <path d="M60 79 v4 M60 83 q-5 4 -9 1 M60 83 q5 4 9 1" ${LN}/>
+    ${eyes(44,76,60)} ${blush(34,86,78)}`);
+}
+function astroDogSVG(w){
+  return svgWrap(w,'0 0 132 142',`
+    ${feet(50,82,132,'#E5E8EC')}
+    <rect x="34" y="96" width="64" height="34" rx="16" fill="#E5E8EC" ${ST}/>
+    <circle cx="66" cy="112" r="6" fill="#EF5A43" ${ST}/>
+    <circle cx="66" cy="62" r="50" fill="#CFE9EE" ${ST}/>
+    <path d="M38 52 q-14 -2 -12 18 q2 12 12 10 Z M94 52 q14 -2 12 18 q-2 12 -12 10 Z" fill="#B87A4B" ${ST}/>
+    <ellipse cx="66" cy="66" rx="30" ry="28" fill="#E3B27A" ${ST}/>
+    <ellipse cx="66" cy="76" rx="13" ry="9" fill="#F6E3B4" ${ST}/>
+    <ellipse cx="66" cy="72" rx="4.6" ry="3.4" fill="#2B2622"/>
+    <path d="M61 79 q5 4 10 0" ${LN}/>
+    ${eyes(54,78,62)} ${blush(46,86,74)}
+    <path d="M36 40 q12 -16 30 -16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".85"/>`);
+}
+
 function blobSVG(fill,blush,w,eyes){
   const eyeMk = eyes==='happy'
     ? `<path d="M40 56c3-4 9-4 12 0" stroke="#2C2620" stroke-width="3.5" fill="none" stroke-linecap="round"/>
@@ -336,21 +541,6 @@ function starSVG(fill,w){
   </svg>`;
 }
 /* ---------- crayon ocean critters ---------- */
-function fishSVG(fill,w,flip){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 140 100" aria-hidden="true">
-    <g${flip?' transform="translate(140,0) scale(-1,1)"':''}>
-      <path d="M108 50 L138 26 Q129 50 138 74 Z" fill="${cv(fill)}" filter="url(#rough2)"/>
-      <path d="M54 22 Q72 4 92 26 Z" fill="${cv(fill)}" filter="url(#rough2)"/>
-      <ellipse cx="68" cy="54" rx="48" ry="32" fill="${cv(fill)}" filter="url(#rough2)"/>
-      <ellipse cx="60" cy="83" rx="12" ry="6" fill="${cv(fill)}" filter="url(#rough2)"/>
-      <ellipse cx="30" cy="66" rx="7" ry="4" fill="var(--coral)" opacity=".45"/>
-      <circle cx="45" cy="50" r="15" fill="#fff"/>
-      <circle cx="42" cy="53" r="9" fill="#2C2620"/>
-      <circle cx="39" cy="49" r="2.6" fill="#fff"/>
-      <path d="M17 60 q8 6 16 1" stroke="#2C2620" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    </g>
-  </svg>`;
-}
 function seaweedSVG(fill,w){
   return `<svg class="blob" style="--w:${w}px" viewBox="0 0 70 150" aria-hidden="true">
     <path d="M26 149 C6 121 44 105 22 75 C4 47 38 35 24 7" stroke="${cv(fill)}" stroke-width="11" fill="none" stroke-linecap="round" filter="url(#rough2)"/>
@@ -366,33 +556,6 @@ function bubblesSVG(fill,w){
   </svg>`;
 }
 /* ---------- crayon woods critters ---------- */
-function bearSVG(w){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 120" aria-hidden="true">
-    <circle cx="30" cy="32" r="17" fill="#C6894B" filter="url(#rough2)"/>
-    <circle cx="90" cy="32" r="17" fill="#C6894B" filter="url(#rough2)"/>
-    <circle cx="30" cy="32" r="8" fill="#8A5A2B"/><circle cx="90" cy="32" r="8" fill="#8A5A2B"/>
-    <ellipse cx="60" cy="68" rx="45" ry="41" fill="#C6894B" filter="url(#rough2)"/>
-    <ellipse cx="60" cy="84" rx="24" ry="17" fill="#E4C79A" filter="url(#rough2)"/>
-    <ellipse cx="60" cy="76" rx="7" ry="5" fill="#2C2620"/>
-    <path d="M60 81 q0 8 -8 10 M60 81 q0 8 8 10" stroke="#2C2620" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    <circle cx="43" cy="62" r="5.5" fill="#2C2620"/><circle cx="77" cy="62" r="5.5" fill="#2C2620"/>
-    <circle cx="41" cy="60" r="1.8" fill="#fff"/><circle cx="75" cy="60" r="1.8" fill="#fff"/>
-    <ellipse cx="34" cy="78" rx="6" ry="4" fill="var(--pink)" opacity=".45"/>
-    <ellipse cx="86" cy="78" rx="6" ry="4" fill="var(--pink)" opacity=".45"/>
-  </svg>`;
-}
-function pandaSVG(w){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 120" aria-hidden="true">
-    <circle cx="30" cy="30" r="16" fill="#2C2620" filter="url(#rough2)"/>
-    <circle cx="90" cy="30" r="16" fill="#2C2620" filter="url(#rough2)"/>
-    <ellipse cx="60" cy="68" rx="45" ry="41" fill="#FCFAF4" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
-    <ellipse cx="44" cy="64" rx="11" ry="14" fill="#2C2620" transform="rotate(-18 44 64)" filter="url(#rough2)"/>
-    <ellipse cx="76" cy="64" rx="11" ry="14" fill="#2C2620" transform="rotate(18 76 64)" filter="url(#rough2)"/>
-    <circle cx="45" cy="63" r="4" fill="#fff"/><circle cx="75" cy="63" r="4" fill="#fff"/>
-    <ellipse cx="60" cy="80" rx="6" ry="4.5" fill="#2C2620"/>
-    <path d="M60 85 q0 7 -7 8 M60 85 q0 7 7 8" stroke="#2C2620" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-  </svg>`;
-}
 function treeSVG(w,fill){
   return `<svg class="blob" style="--w:${w}px" viewBox="0 0 90 150" aria-hidden="true">
     <rect x="38" y="120" width="14" height="28" rx="3" fill="#8A5A2B" filter="url(#rough2)"/>
@@ -409,33 +572,6 @@ function mushroomSVG(w){
   </svg>`;
 }
 /* ---------- crayon jungle critters ---------- */
-function monkeySVG(w){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 120" aria-hidden="true">
-    <circle cx="22" cy="54" r="18" fill="#A9743F" filter="url(#rough2)"/>
-    <circle cx="98" cy="54" r="18" fill="#A9743F" filter="url(#rough2)"/>
-    <circle cx="22" cy="54" r="9" fill="#D9A96A"/><circle cx="98" cy="54" r="9" fill="#D9A96A"/>
-    <ellipse cx="60" cy="60" rx="42" ry="40" fill="#A9743F" filter="url(#rough2)"/>
-    <ellipse cx="60" cy="70" rx="30" ry="31" fill="#E4C79A" filter="url(#rough2)"/>
-    <circle cx="47" cy="58" r="6" fill="#2C2620"/><circle cx="73" cy="58" r="6" fill="#2C2620"/>
-    <circle cx="45" cy="56" r="2" fill="#fff"/><circle cx="71" cy="56" r="2" fill="#fff"/>
-    <ellipse cx="55" cy="79" rx="2.3" ry="3" fill="#2C2620"/><ellipse cx="65" cy="79" rx="2.3" ry="3" fill="#2C2620"/>
-    <path d="M50 86 q10 8 20 0" stroke="#2C2620" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-  </svg>`;
-}
-function macawSVG(w,flip){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 140" aria-hidden="true">
-    <g${flip?' transform="translate(120,0) scale(-1,1)"':''}>
-      <path d="M64 72 Q98 86 110 134 Q82 118 60 110 Z" fill="var(--mustard)" filter="url(#rough2)"/>
-      <ellipse cx="58" cy="74" rx="34" ry="40" fill="var(--red)" filter="url(#rough2)"/>
-      <path d="M62 60 Q92 68 86 106 Q70 94 58 94 Z" fill="var(--teal)" filter="url(#rough2)"/>
-      <circle cx="48" cy="40" r="26" fill="var(--red)" filter="url(#rough2)"/>
-      <path d="M36 16 Q48 4 60 18" fill="var(--mustard)" filter="url(#rough2)"/>
-      <ellipse cx="40" cy="43" rx="12" ry="10" fill="#FCFAF4"/>
-      <circle cx="43" cy="38" r="5.5" fill="#2C2620"/><circle cx="41" cy="36" r="1.8" fill="#fff"/>
-      <path d="M31 45 Q13 41 23 58 Q29 53 35 53 Z" fill="#2C2620" filter="url(#rough2)"/>
-    </g>
-  </svg>`;
-}
 function leafSVG(w,fill){
   return `<svg class="blob" style="--w:${w}px" viewBox="0 0 110 130" aria-hidden="true">
     <path d="M55 128 C10 96 8 34 55 6 C102 34 100 96 55 128 Z" fill="${cv(fill||'--lime')}" filter="url(#rough2)"/>
@@ -444,40 +580,6 @@ function leafSVG(w,fill){
   </svg>`;
 }
 /* ---------- crayon fairytale critters ---------- */
-function unicornSVG(w){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 130" aria-hidden="true">
-    <circle cx="26" cy="70" r="15" fill="var(--pink-lt)" filter="url(#rough2)"/>
-    <circle cx="22" cy="92" r="12" fill="var(--teal)" filter="url(#rough2)"/>
-    <circle cx="96" cy="70" r="15" fill="var(--pink)" filter="url(#rough2)"/>
-    <circle cx="100" cy="92" r="12" fill="var(--lime)" filter="url(#rough2)"/>
-    <path d="M60 2 L70 46 L50 46 Z" fill="var(--mustard)" filter="url(#rough2)"/>
-    <path d="M54 16 L66 20 M55 27 L65 31 M56 38 L64 42" stroke="#B89A2E" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <path d="M36 46 L29 27 L49 42 Z" fill="#FCFAF4" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
-    <path d="M84 46 L91 27 L71 42 Z" fill="#FCFAF4" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
-    <ellipse cx="60" cy="82" rx="42" ry="40" fill="#FCFAF4" stroke="#2C2620" stroke-width="2.4" filter="url(#rough2)"/>
-    <path d="M40 80 q7 -7 14 0" stroke="#2C2620" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <path d="M66 80 q7 -7 14 0" stroke="#2C2620" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <ellipse cx="38" cy="94" rx="7" ry="4.5" fill="var(--pink)" opacity=".45"/>
-    <ellipse cx="82" cy="94" rx="7" ry="4.5" fill="var(--pink)" opacity=".45"/>
-    <ellipse cx="55" cy="104" rx="2.4" ry="3" fill="#2C2620"/><ellipse cx="65" cy="104" rx="2.4" ry="3" fill="#2C2620"/>
-    <path d="M54 110 q6 5 12 0" stroke="#2C2620" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-  </svg>`;
-}
-function dragonSVG(w){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 120" aria-hidden="true">
-    <path d="M34 34 L26 8 L52 30 Z" fill="var(--lime)" filter="url(#rough2)"/>
-    <path d="M86 34 L94 8 L68 30 Z" fill="var(--lime)" filter="url(#rough2)"/>
-    <path d="M14 60 L2 52 L18 45 Z" fill="var(--teal)" filter="url(#rough2)"/>
-    <path d="M106 60 L118 52 L102 45 Z" fill="var(--teal)" filter="url(#rough2)"/>
-    <ellipse cx="60" cy="66" rx="44" ry="40" fill="var(--sage)" filter="url(#rough2)"/>
-    <ellipse cx="60" cy="84" rx="24" ry="18" fill="var(--lime)" filter="url(#rough2)"/>
-    <circle cx="46" cy="58" r="6.5" fill="#2C2620"/><circle cx="74" cy="58" r="6.5" fill="#2C2620"/>
-    <circle cx="44" cy="55" r="2.2" fill="#fff"/><circle cx="72" cy="55" r="2.2" fill="#fff"/>
-    <ellipse cx="52" cy="82" rx="2.6" ry="3.4" fill="#2C2620"/><ellipse cx="68" cy="82" rx="2.6" ry="3.4" fill="#2C2620"/>
-    <path d="M50 92 q10 7 20 0" stroke="#2C2620" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    <path d="M50 92 l3 7 4 -4" fill="#FCFAF4"/>
-  </svg>`;
-}
 function rainbowSVG(w){
   return `<svg class="blob" style="--w:${w}px" viewBox="0 0 150 92" aria-hidden="true">
     <path d="M14 88 A61 61 0 0 1 136 88" fill="none" stroke="var(--red)" stroke-width="9" stroke-linecap="round" filter="url(#rough2)"/>
@@ -493,47 +595,6 @@ function sparkleSVG(fill,w){
   </svg>`;
 }
 /* ---------- crayon farm critters ---------- */
-function sheepSVG(w){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 130 110" aria-hidden="true">
-    <g fill="#FCFAF4" stroke="#E0D8C6" stroke-width="1.5" filter="url(#rough2)">
-      <circle cx="56" cy="52" r="26"/><circle cx="82" cy="46" r="23"/><circle cx="100" cy="60" r="21"/>
-      <circle cx="72" cy="72" r="24"/><circle cx="48" cy="70" r="20"/><circle cx="94" cy="78" r="17"/>
-    </g>
-    <rect x="54" y="86" width="7" height="18" rx="3" fill="#7A6E62"/><rect x="88" y="88" width="7" height="18" rx="3" fill="#7A6E62"/>
-    <ellipse cx="30" cy="56" rx="18" ry="20" fill="#4A4038" filter="url(#rough2)"/>
-    <ellipse cx="13" cy="52" rx="8" ry="6" fill="#4A4038" filter="url(#rough2)"/>
-    <path d="M26 36 q7 -3 12 4" stroke="#FCFAF4" stroke-width="6" fill="none" stroke-linecap="round"/>
-    <circle cx="27" cy="55" r="3.6" fill="#fff"/><circle cx="27" cy="55" r="1.8" fill="#2C2620"/>
-    <ellipse cx="34" cy="64" rx="5" ry="3" fill="var(--pink)" opacity=".4"/>
-  </svg>`;
-}
-function cowSVG(w){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 118" aria-hidden="true">
-    <path d="M22 34 q-7 -15 8 -15 q11 0 12 13 Z" fill="#C6894B" filter="url(#rough2)"/>
-    <path d="M98 34 q7 -15 -8 -15 q-11 0 -12 13 Z" fill="#C6894B" filter="url(#rough2)"/>
-    <ellipse cx="16" cy="52" rx="14" ry="10" fill="#FCFAF4" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
-    <ellipse cx="104" cy="52" rx="14" ry="10" fill="#FCFAF4" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
-    <ellipse cx="60" cy="60" rx="42" ry="40" fill="#FCFAF4" stroke="#2C2620" stroke-width="2.4" filter="url(#rough2)"/>
-    <ellipse cx="40" cy="42" rx="12" ry="14" fill="#2C2620" filter="url(#rough2)"/>
-    <ellipse cx="84" cy="50" rx="10" ry="12" fill="#2C2620" filter="url(#rough2)"/>
-    <circle cx="46" cy="58" r="5" fill="#2C2620"/><circle cx="74" cy="58" r="5" fill="#2C2620"/>
-    <circle cx="44" cy="56" r="1.6" fill="#fff"/><circle cx="72" cy="56" r="1.6" fill="#fff"/>
-    <ellipse cx="60" cy="88" rx="26" ry="18" fill="var(--pink-lt)" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
-    <ellipse cx="51" cy="88" rx="3" ry="4" fill="#2C2620"/><ellipse cx="69" cy="88" rx="3" ry="4" fill="#2C2620"/>
-  </svg>`;
-}
-function pigSVG(w){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 110" aria-hidden="true">
-    <path d="M28 40 L20 18 L46 34 Z" fill="var(--pink)" filter="url(#rough2)"/>
-    <path d="M92 40 L100 18 L74 34 Z" fill="var(--pink)" filter="url(#rough2)"/>
-    <ellipse cx="60" cy="62" rx="44" ry="40" fill="var(--pink)" filter="url(#rough2)"/>
-    <circle cx="46" cy="56" r="5.5" fill="#2C2620"/><circle cx="74" cy="56" r="5.5" fill="#2C2620"/>
-    <circle cx="44" cy="54" r="1.8" fill="#fff"/><circle cx="72" cy="54" r="1.8" fill="#fff"/>
-    <ellipse cx="60" cy="77" rx="20" ry="15" fill="#E88AA6" stroke="#C25E7E" stroke-width="1.6" filter="url(#rough2)"/>
-    <ellipse cx="53" cy="77" rx="3" ry="4.5" fill="#2C2620"/><ellipse cx="67" cy="77" rx="3" ry="4.5" fill="#2C2620"/>
-    <ellipse cx="32" cy="72" rx="6" ry="4" fill="#C25E7E" opacity=".4"/><ellipse cx="88" cy="72" rx="6" ry="4" fill="#C25E7E" opacity=".4"/>
-  </svg>`;
-}
 function barnSVG(w){
   return `<svg class="blob" style="--w:${w}px" viewBox="0 0 130 120" aria-hidden="true">
     <path d="M12 50 L65 14 L118 50 L118 112 L12 112 Z" fill="var(--red)" filter="url(#rough2)"/>
@@ -544,35 +605,6 @@ function barnSVG(w){
   </svg>`;
 }
 /* ---------- crayon icy critters ---------- */
-function foxSVG(w){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 124 116" aria-hidden="true">
-    <path d="M22 12 L46 46 L12 50 Z" fill="var(--orange)" stroke="#2C2620" stroke-width="2.2" filter="url(#rough2)"/>
-    <path d="M102 12 L78 46 L112 50 Z" fill="var(--orange)" stroke="#2C2620" stroke-width="2.2" filter="url(#rough2)"/>
-    <path d="M26 20 L40 42 L22 45 Z" fill="#B0300A"/>
-    <path d="M98 20 L84 42 L102 45 Z" fill="#B0300A"/>
-    <path d="M62 22 C92 22 98 44 92 62 C87 82 74 94 62 102 C50 94 37 82 32 62 C26 44 32 22 62 22 Z" fill="var(--orange)" stroke="#2C2620" stroke-width="2.4" filter="url(#rough2)"/>
-    <path d="M62 60 C50 60 40 66 37 78 C44 90 54 98 62 102 C70 98 80 90 87 78 C84 66 74 60 62 60 Z" fill="#FCFAF4" filter="url(#rough2)"/>
-    <circle cx="46" cy="54" r="5.6" fill="#2C2620"/><circle cx="78" cy="54" r="5.6" fill="#2C2620"/>
-    <circle cx="44" cy="52" r="1.9" fill="#fff"/><circle cx="76" cy="52" r="1.9" fill="#fff"/>
-    <path d="M56 76 h12 l-6 7 Z" fill="#2C2620"/>
-    <path d="M62 83 q0 7 -7 9 M62 83 q0 7 7 9" stroke="#2C2620" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-    <ellipse cx="35" cy="68" rx="6" ry="4" fill="var(--pink)" opacity=".4"/><ellipse cx="89" cy="68" rx="6" ry="4" fill="var(--pink)" opacity=".4"/>
-  </svg>`;
-}
-function penguinSVG(w){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 104 130" aria-hidden="true">
-    <ellipse cx="52" cy="66" rx="38" ry="54" fill="#414B57" stroke="#2C2620" stroke-width="2.2" filter="url(#rough2)"/>
-    <ellipse cx="52" cy="76" rx="26" ry="44" fill="#FCFAF4" filter="url(#rough2)"/>
-    <path d="M15 60 q-11 22 1 42 q11 -6 12 -28 Z" fill="#414B57" filter="url(#rough2)"/>
-    <path d="M89 60 q11 22 -1 42 q-11 -6 -12 -28 Z" fill="#414B57" filter="url(#rough2)"/>
-    <ellipse cx="40" cy="48" rx="5" ry="6" fill="#2C2620"/><ellipse cx="64" cy="48" rx="5" ry="6" fill="#2C2620"/>
-    <circle cx="38" cy="46" r="1.8" fill="#fff"/><circle cx="62" cy="46" r="1.8" fill="#fff"/>
-    <path d="M46 57 L58 57 L52 67 Z" fill="var(--orange)" stroke="#B0300A" stroke-width="1" filter="url(#rough2)"/>
-    <ellipse cx="31" cy="74" rx="6" ry="4" fill="var(--pink)" opacity=".35"/><ellipse cx="73" cy="74" rx="6" ry="4" fill="var(--pink)" opacity=".35"/>
-    <path d="M40 118 q-7 8 -16 7 q1 -9 10 -14 Z" fill="var(--orange)" filter="url(#rough2)"/>
-    <path d="M64 118 q7 8 16 7 q-1 -9 -10 -14 Z" fill="var(--orange)" filter="url(#rough2)"/>
-  </svg>`;
-}
 function snowflakeSVG(fill,w){
   return `<svg class="blob" style="--w:${w}px" viewBox="0 0 100 100" aria-hidden="true">
     <g stroke="${cv(fill)}" stroke-width="5" stroke-linecap="round" fill="none" filter="url(#rough2)">
@@ -591,38 +623,6 @@ function icebergSVG(w){
   </svg>`;
 }
 /* ---------- crayon grassland critters ---------- */
-function giraffeSVG(w){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 120 132" aria-hidden="true">
-    <rect x="45" y="14" width="6" height="20" rx="3" fill="#C98A3E" filter="url(#rough2)"/>
-    <rect x="69" y="14" width="6" height="20" rx="3" fill="#C98A3E" filter="url(#rough2)"/>
-    <circle cx="48" cy="12" r="7" fill="#8A5A2B" filter="url(#rough2)"/>
-    <circle cx="72" cy="12" r="7" fill="#8A5A2B" filter="url(#rough2)"/>
-    <ellipse cx="22" cy="46" rx="13" ry="9" fill="#E3B25E" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
-    <ellipse cx="98" cy="46" rx="13" ry="9" fill="#E3B25E" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
-    <path d="M60 30 C90 30 96 54 92 78 C88 100 74 114 60 122 C46 114 32 100 28 78 C24 54 30 30 60 30 Z" fill="#E3B25E" stroke="#2C2620" stroke-width="2.4" filter="url(#rough2)"/>
-    <ellipse cx="60" cy="102" rx="26" ry="20" fill="#F2DCA9" filter="url(#rough2)"/>
-    <ellipse cx="40" cy="60" rx="8" ry="9" fill="#B5793A" opacity=".7"/><ellipse cx="82" cy="62" rx="7" ry="8" fill="#B5793A" opacity=".7"/>
-    <ellipse cx="46" cy="86" rx="6" ry="7" fill="#B5793A" opacity=".55"/><ellipse cx="78" cy="88" rx="6" ry="7" fill="#B5793A" opacity=".55"/>
-    <circle cx="48" cy="74" r="5.5" fill="#2C2620"/><circle cx="72" cy="74" r="5.5" fill="#2C2620"/>
-    <circle cx="46" cy="72" r="1.8" fill="#fff"/><circle cx="70" cy="72" r="1.8" fill="#fff"/>
-    <ellipse cx="53" cy="100" rx="2.4" ry="3.2" fill="#2C2620"/><ellipse cx="67" cy="100" rx="2.4" ry="3.2" fill="#2C2620"/>
-    <path d="M53 110 q7 5 14 0" stroke="#2C2620" stroke-width="2" fill="none" stroke-linecap="round"/>
-  </svg>`;
-}
-function tigerSVG(w){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 124 116" aria-hidden="true">
-    <circle cx="26" cy="30" r="15" fill="var(--orange)" stroke="#2C2620" stroke-width="2.2" filter="url(#rough2)"/>
-    <circle cx="98" cy="30" r="15" fill="var(--orange)" stroke="#2C2620" stroke-width="2.2" filter="url(#rough2)"/>
-    <circle cx="26" cy="30" r="6" fill="#F5CAE8"/><circle cx="98" cy="30" r="6" fill="#F5CAE8"/>
-    <ellipse cx="62" cy="66" rx="44" ry="42" fill="var(--orange)" stroke="#2C2620" stroke-width="2.4" filter="url(#rough2)"/>
-    <ellipse cx="62" cy="82" rx="28" ry="22" fill="#FCFAF4" filter="url(#rough2)"/>
-    <path d="M62 30 L58 46 M62 30 L66 46 M40 34 L44 50 M84 34 L80 50 M24 56 L38 60 M100 56 L86 60 M26 74 L40 74 M98 74 L84 74" stroke="#2C2620" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <circle cx="47" cy="60" r="5.6" fill="#2C2620"/><circle cx="77" cy="60" r="5.6" fill="#2C2620"/>
-    <circle cx="45" cy="58" r="1.9" fill="#fff"/><circle cx="75" cy="58" r="1.9" fill="#fff"/>
-    <path d="M55 76 h14 l-7 7 Z" fill="#D2698C"/>
-    <path d="M62 83 q0 7 -7 9 M62 83 q0 7 7 9" stroke="#2C2620" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-  </svg>`;
-}
 function acaciaSVG(w){
   return `<svg class="blob" style="--w:${w}px" viewBox="0 0 140 116" aria-hidden="true">
     <path d="M66 112 L66 60 M66 74 L44 58 M66 70 L92 54" fill="none" stroke="#8A5A2B" stroke-width="7" stroke-linecap="round" filter="url(#rough2)"/>
@@ -639,23 +639,6 @@ function grassSVG(fill,w){
   </svg>`;
 }
 /* ---------- crayon outer-space critters ---------- */
-function astroDogSVG(w){
-  return `<svg class="blob" style="--w:${w}px" viewBox="0 0 132 142" aria-hidden="true">
-    <rect x="42" y="112" width="48" height="18" rx="9" fill="#C7CDD4" stroke="#2C2620" stroke-width="2" filter="url(#rough2)"/>
-    <rect x="30" y="118" width="8" height="10" rx="3" fill="#9AA1A9" stroke="#2C2620" stroke-width="1.6"/>
-    <path d="M36 58 Q18 40 22 76 Q26 98 46 90 Z" fill="#C6894B" filter="url(#rough2)"/>
-    <path d="M96 58 Q114 40 110 76 Q106 98 86 90 Z" fill="#C6894B" filter="url(#rough2)"/>
-    <ellipse cx="66" cy="72" rx="33" ry="31" fill="#E0A867" filter="url(#rough2)"/>
-    <ellipse cx="66" cy="86" rx="19" ry="14" fill="#F2DCA9" filter="url(#rough2)"/>
-    <circle cx="55" cy="66" r="5" fill="#2C2620"/><circle cx="77" cy="66" r="5" fill="#2C2620"/>
-    <circle cx="53" cy="64" r="1.7" fill="#fff"/><circle cx="75" cy="64" r="1.7" fill="#fff"/>
-    <ellipse cx="66" cy="82" rx="6" ry="4.5" fill="#2C2620"/>
-    <path d="M66 87 v5 M66 92 q-6 0 -8 -3 M66 92 q6 0 8 -3" stroke="#2C2620" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <path d="M61 95 q5 6 10 0 Z" fill="#EE6A92"/>
-    <circle cx="66" cy="66" r="50" fill="#6DB8BE" opacity=".16" stroke="#2C2620" stroke-width="2.6" filter="url(#rough2)"/>
-    <path d="M40 44 q14 -14 33 -11" fill="none" stroke="#FCFAF4" stroke-width="5" stroke-linecap="round" opacity=".85"/>
-  </svg>`;
-}
 function planetSVG(w){
   return `<svg class="blob" style="--w:${w}px" viewBox="0 0 144 112" aria-hidden="true">
     <ellipse cx="72" cy="58" rx="34" ry="34" fill="var(--orange)" filter="url(#rough2)"/>
