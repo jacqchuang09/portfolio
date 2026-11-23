@@ -747,17 +747,17 @@ const INTO = [
 
 const ZONES = {
   /* laid out in nav order as a snake, so each page borders the next:
-     home → about → builds, down to research → celebrations → life, down to teaching → say hi */
+     home → about → builds, down to research → celebrations → life, down to teaching → say hi (teaching sits right under life, say hi right beside it) */
   home:[1000,1150], about:[3000,1100], work:[5050,1150],
   research:[5050,3200], awards:[3000,3200], life:[1000,3200],
-  teaching:[1850,5150], hi:[4650,5150]
+  teaching:[1000,5000], hi:[3000,5000]
 };
 
 /* ---------- terrain under each page; the one you're looking at sits on top so its ground fills the window ---------- */
 const WORLD_W=6100, WORLD_H=6150;
 const TERRAIN={home:'ocean',about:'woods',work:'space',research:'fairy',awards:'farm',life:'ice',teaching:'savanna',hi:'jungle'};
 /* each page owns a region of the map; neighbouring regions overlap 260px and fade into each other, the outer edge stays crisp */
-const CELLS={"home": [0, 0, 2000, 2200], "about": [2000, 0, 4000, 2200], "work": [4000, 0, 6100, 2200], "life": [0, 2200, 2000, 4200], "awards": [2000, 2200, 4000, 4200], "research": [4000, 2200, 6100, 4200], "teaching": [0, 4200, 3700, 6150], "hi": [3700, 4200, 6100, 6150]};
+const CELLS={"home": [0, 0, 2000, 2200], "about": [2000, 0, 4000, 2200], "work": [4000, 0, 6100, 2200], "life": [0, 2200, 2000, 4200], "awards": [2000, 2200, 4000, 4200], "research": [4000, 2200, 6100, 4200], "teaching": [0, 4200, 2000, 6150], "hi": [2000, 4200, 6100, 6150]};
 const terrainEls={};
 Object.keys(TERRAIN).forEach(z=>{
   const [x0,y0,x1,y1]=CELLS[z], F=260, l=x0>0, r=x1<WORLD_W, t=y0>0, b=y1<WORLD_H;
