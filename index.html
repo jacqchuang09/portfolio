@@ -273,7 +273,6 @@
   <button data-zone="teaching">teaching</button>
   <button data-zone="hi">say hi</button>
   <span class="sep"></span>
-  <button class="icon" id="mapBtn" aria-label="zoom all the way out" title="zoom all the way out">🗺️</button>
   <button class="icon" id="zoomOut" aria-label="zoom out">−</button>
   <button class="icon" id="zoomIn" aria-label="zoom in">+</button>
   <button class="icon" id="soundBtn" aria-label="turn sound effects off" aria-pressed="true">🔊</button>
@@ -1161,10 +1160,6 @@ function zoomBy(factor){
 }
 document.getElementById('zoomIn').onclick=()=>zoomBy(1.18);
 document.getElementById('zoomOut').onclick=()=>zoomBy(1/1.18);
-document.getElementById('mapBtn').onclick=()=>{ if(locked){ openGate(); return; } userMoved=true; scale=minScale();
-  board.classList.add('flying'); clearTimeout(centerOn._t); centerOn._t=setTimeout(()=>board.classList.remove('flying'),900); apply();
-  zoneBtns.forEach(x=>x.classList.remove('active')); };
-
 const zoneBtns=[...document.querySelectorAll('#dock [data-zone]')];
 zoneBtns.forEach(b=>b.onclick=()=>{
   const z=ZONES[b.dataset.zone]; if(!z) return;
@@ -1211,11 +1206,14 @@ function onUp(){
   window.removeEventListener('pointerup',onUp);
 }
 stage.addEventListener('pointerdown',onDown);
+/* Safari's trackpad pinch and two-finger touch pinch shouldn't zoom the page either */
+['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
+document.addEventListener('touchmove',e=>{ if(e.touches.length>1) e.preventDefault(); },{passive:false});
 board.addEventListener('click',e=>{ if(moved){ const a=e.target.closest('a'); if(a) e.preventDefault(); } },true);
 stage.addEventListener('wheel',e=>{
   e.preventDefault();
   if(locked){ openGate(); return; }
-  if(e.ctrlKey){ zoomBy(e.deltaY<0?1.08:1/1.08); return; }
+  if(e.ctrlKey) return;  /* pinch / ctrl+scroll does nothing: zoom only with + and − */
   tx-=e.deltaX; ty-=e.deltaY; apply();
 },{passive:false});
 
