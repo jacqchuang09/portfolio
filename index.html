@@ -69,10 +69,12 @@
   .hero p.lede{font-size:1.04rem;line-height:1.5;color:var(--ink);margin:14px 0 0;max-width:36ch}
   .scrawl{font-family:var(--font-hand);color:var(--pink);font-size:1.05rem}
 
-  .swatch-card{width:262px;text-align:left}
+  .swatch-card{width:var(--build-w,320px);text-align:left;display:flex;flex-direction:column}
+  .swatch-card .meta{flex:1;display:flex;flex-direction:column;align-items:flex-start}
+  .swatch-card .meta .pill-link{margin-top:auto!important;position:relative;top:10px}
   .swatch{display:block;width:100%;height:170px;overflow:visible}
   .build-media{position:relative;width:100%}
-  .build-media img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;
+  .build-media img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;
     border:2.5px solid var(--line);border-radius:6px}
   .build-media .swatch{display:none}
   .build-media.noimg .swatch{display:block}
@@ -281,6 +283,32 @@ function node(x,y,rot,cls,html){
   return n;
 }
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+/* uniform grid: rows of nodes centered on (cx,cy), tops aligned per row.
+   re-run as fonts and images settle, but never moves a card someone has dragged. */
+const GRIDS=[];
+function grid(cx,cy,rows,colGap,rowGap){ GRIDS.push({cx,cy,rows,colGap,rowGap}); layoutGrids(); }
+function layoutGrids(){
+  const narrow=vpW()<620;  /* phones: two columns, so the cards stay readable */
+  GRIDS.forEach(G=>{
+    const g=narrow?{...G, rows:G.rows.flatMap(r=>{const o=[];for(let i=0;i<r.length;i+=2)o.push(r.slice(i,i+2));return o;})}:G;
+    /* cards in the same row share one height, so the grid reads as even rows */
+    g.rows.forEach(r=>{
+      const cs=r.map(n=>n.querySelector(':scope > .tilt > .card')).filter(Boolean);
+      if(cs.length<2) return;
+      cs.forEach(c=>c.style.minHeight='');
+      const m=Math.max(...cs.map(c=>c.offsetHeight));
+      cs.forEach(c=>c.style.minHeight=m+'px');
+    });
+    const hs=g.rows.map(r=>Math.max(...r.map(n=>n.offsetHeight)));
+    let y=g.cy-(hs.reduce((a,b)=>a+b,0)+g.rowGap*(g.rows.length-1))/2;
+    g.rows.forEach((r,ri)=>{
+      const ws=r.map(n=>n.offsetWidth);
+      let x=g.cx-(ws.reduce((a,b)=>a+b,0)+g.colGap*(r.length-1))/2;
+      r.forEach((n,i)=>{ if(!n.dataset.dragged){ n.style.left=(x+ws[i]/2)+'px'; n.style.top=(y+n.offsetHeight/2)+'px'; } x+=ws[i]+g.colGap; });
+      y+=hs[ri]+g.rowGap;
+    });
+  });
+}
 function cv(v){return v.startsWith('--')?`var(${v})`:v;}
 
 function blobSVG(fill,blush,w,eyes){
@@ -803,19 +831,19 @@ photo(ZONES.about[0]-385, ZONES.about[1]-125, -4, "photos/taiwan-kid.jpg",
   "growing up in Taiwan 🇹🇼", "--pink-lt", "🇹🇼", 185, "4/3");
 
 /* ================= outer space behind builds ================= */
-node(ZONES.work[0]-700, ZONES.work[1]-250, 0,'',`<div class="bob slow">${astroDogSVG(164)}</div>`);
-node(ZONES.work[0]+710, ZONES.work[1]-260, 0,'',`<div class="bob">${planetSVG(156)}</div>`);
-node(ZONES.work[0]+700, ZONES.work[1]+300, -8,'',`<div class="bob slow">${rocketSVG(124)}</div>`);
-node(ZONES.work[0]-690, ZONES.work[1]+300, 0,'',`<div class="spin">${sparkleSVG('--mustard',52)}</div>`);
-node(ZONES.work[0]-300, ZONES.work[1]-430, 0,'',`<div class="spin">${sparkleSVG('--teal',44)}</div>`);
-node(ZONES.work[0]+300, ZONES.work[1]-430, 0,'',`<div class="bob fast">${sparkleSVG('--pink',40)}</div>`);
-node(ZONES.work[0]-720, ZONES.work[1]+40, 0,'',`<div class="bob fast">${sparkleSVG('--pink',38)}</div>`);
-node(ZONES.work[0]+300, ZONES.work[1]+440, 0,'',`<div class="spin">${sparkleSVG('--teal',42)}</div>`);
-node(ZONES.work[0]-320, ZONES.work[1]+450, 0,'',`<div class="bob">${sparkleSVG('--mustard',40)}</div>`);
+node(ZONES.work[0]-940, ZONES.work[1]-330, 0,'',`<div class="bob slow">${astroDogSVG(164)}</div>`);
+node(ZONES.work[0]+950, ZONES.work[1]-340, 0,'',`<div class="bob">${planetSVG(156)}</div>`);
+node(ZONES.work[0]+940, ZONES.work[1]+360, -8,'',`<div class="bob slow">${rocketSVG(124)}</div>`);
+node(ZONES.work[0]-930, ZONES.work[1]+380, 0,'',`<div class="spin">${sparkleSVG('--mustard',52)}</div>`);
+node(ZONES.work[0]-360, ZONES.work[1]-640, 0,'',`<div class="spin">${sparkleSVG('--teal',44)}</div>`);
+node(ZONES.work[0]+360, ZONES.work[1]-640, 0,'',`<div class="bob fast">${sparkleSVG('--pink',40)}</div>`);
+node(ZONES.work[0]-950, ZONES.work[1]+40, 0,'',`<div class="bob fast">${sparkleSVG('--pink',38)}</div>`);
+node(ZONES.work[0]+380, ZONES.work[1]+650, 0,'',`<div class="spin">${sparkleSVG('--teal',42)}</div>`);
+node(ZONES.work[0]-380, ZONES.work[1]+650, 0,'',`<div class="bob">${sparkleSVG('--mustard',40)}</div>`);
 
-/* ================= WORK: Locus flagship (centered) + build cards fanned to corners ================= */
-node(ZONES.work[0], ZONES.work[1], -2.5,'draggable',`
-  <div class="card" style="background:var(--red);color:#fff;max-width:330px;--line:#2C2620;--tape:var(--mustard)">
+/* ================= WORK: uniform 3 x 2 grid of build cards (Locus flagship top center), photos on the sides ================= */
+const locusNode = node(ZONES.work[0], ZONES.work[1], -1,'draggable',`
+  <div class="card" style="background:var(--red);color:#fff;width:var(--build-w,320px);max-width:none;--line:#2C2620;--tape:var(--mustard)">
     <span class="tape"></span>
     <p class="eyebrow" style="color:#ffe">⭐ flagship · Chief Technological Officer</p>
     <h2 style="color:#fff;font-size:2rem">Locus Suit</h2>
@@ -832,10 +860,8 @@ node(ZONES.work[0], ZONES.work[1], -2.5,'draggable',`
     </div>
   </div>`);
 
-const workCols = [ [-430,-230],[430,-230],[-430,255],[430,255] ];
-BUILDS.forEach((p,i)=>{
-  const [dx,dy]=workCols[i]||[i*260,0];
-  node(ZONES.work[0]+dx, ZONES.work[1]+dy, (i%2?1:-1)*(2+i), 'draggable', `
+const buildNodes = BUILDS.map((p,i)=>{
+  return node(ZONES.work[0], ZONES.work[1], (i%2?1:-1)*1.2, 'draggable', `
     <div class="card swatch-card" style="--accent:${cv(p.accent)}">
       <div class="build-media${p.img?'':' noimg'}">
         ${p.img?`<img src="${esc(p.img)}" alt="${esc(p.title)}" decoding="async"
@@ -854,30 +880,37 @@ BUILDS.forEach((p,i)=>{
       </div>
     </div>`);
 });
-photo(ZONES.work[0]+0, ZONES.work[1]+350, -3, "photos/tom-build.jpg",
-  "Tikkun Olam Makers build 🛠️", "--lime", "🛠️", 195, "4/3");
-photo(ZONES.work[0]+0, ZONES.work[1]-345, -3, "photos/building-sew.jpg",
-  "stitching a wearable 🧵", "--pink", "🧵", 185, "3/4");
+const sewPhoto = photo(ZONES.work[0], ZONES.work[1], -2, "photos/building-sew.jpg",
+  "stitching a wearable 🧵", "--pink", "🧵", 240, "4/3");
+const tomPhoto = photo(ZONES.work[0], ZONES.work[1], 2, "photos/tom-build.jpg",
+  "Tikkun Olam Makers build 🛠️", "--lime", "🛠️", 240, "4/3");
+{ const B=t=>buildNodes[BUILDS.findIndex(b=>b.title.startsWith(t))];
+  grid(ZONES.work[0], ZONES.work[1], [
+    [B('Hybrid'), locusNode, B('The Game')],
+    [B('NUVISION'), B('Adaptive'), B('In Tune')]
+  ], 36, 40);
+  /* the two photos sit centered on each side of the grid */
+  const rowHalf = 1.5*320 + 36 + 44;
+  sewPhoto.style.left=(ZONES.work[0]-rowHalf-sewPhoto.offsetWidth/2)+'px'; sewPhoto.style.top=ZONES.work[1]+'px';
+  tomPhoto.style.left=(ZONES.work[0]+rowHalf+tomPhoto.offsetWidth/2)+'px'; tomPhoto.style.top=ZONES.work[1]+'px'; }
 
 /* ================= fairytale behind research ================= */
-node(ZONES.research[0]-400, ZONES.research[1]-500, 0,'',`<div class="bob slow">${rainbowSVG(150)}</div>`);
-node(ZONES.research[0]-760, ZONES.research[1]-40, 0,'',`<div class="bob">${unicornSVG(150)}</div>`);
-node(ZONES.research[0]+800, ZONES.research[1]-30, 0,'',`<div class="bob slow">${dragonSVG(152)}</div>`);
-node(ZONES.research[0]+340, ZONES.research[1]-510, 0,'',`<div class="spin">${sparkleSVG('--mustard',46)}</div>`);
-node(ZONES.research[0]+760, ZONES.research[1]-430, 0,'',`<div class="bob fast">${sparkleSVG('--pink',40)}</div>`);
-node(ZONES.research[0]-680, ZONES.research[1]+340, 0,'',`<div class="bob">${sparkleSVG('--teal',44)}</div>`);
-node(ZONES.research[0]+770, ZONES.research[1]+300, 0,'',`<div class="spin">${sparkleSVG('--mustard',42)}</div>`);
-node(ZONES.research[0]-400, ZONES.research[1]+540, 0,'',`<div class="bob fast">${sparkleSVG('--pink',38)}</div>`);
+node(ZONES.research[0]-650, ZONES.research[1]-330, 0,'',`<div class="bob slow">${rainbowSVG(150)}</div>`);
+node(ZONES.research[0]-850, ZONES.research[1]-40, 0,'',`<div class="bob">${unicornSVG(150)}</div>`);
+node(ZONES.research[0]+850, ZONES.research[1]-30, 0,'',`<div class="bob slow">${dragonSVG(152)}</div>`);
+node(ZONES.research[0]+560, ZONES.research[1]-570, 0,'',`<div class="spin">${sparkleSVG('--mustard',46)}</div>`);
+node(ZONES.research[0]+930, ZONES.research[1]-430, 0,'',`<div class="bob fast">${sparkleSVG('--pink',40)}</div>`);
+node(ZONES.research[0]-920, ZONES.research[1]+380, 0,'',`<div class="bob">${sparkleSVG('--teal',44)}</div>`);
+node(ZONES.research[0]+930, ZONES.research[1]+360, 0,'',`<div class="spin">${sparkleSVG('--mustard',42)}</div>`);
+node(ZONES.research[0]-560, ZONES.research[1]+600, 0,'',`<div class="bob fast">${sparkleSVG('--pink',38)}</div>`);
 
 /* ================= RESEARCH ================= */
-node(ZONES.research[0]+150, ZONES.research[1]-430, -3,'',`
+const researchSign = node(ZONES.research[0], ZONES.research[1], -2,'',`
   <div class="signpost">${starSVG('--teal',64)}
     <div style="font-size:1.6rem;font-family:var(--font-hand);color:var(--ink);margin-top:2px">research & work 🔬</div></div>`);
-const rPos=[[-340,-70],[300,-90],[-540,160],[40,210],[360,235]];
-RESEARCH.forEach((r,i)=>{
-  const [dx,dy]=rPos[i%rPos.length];
-  node(ZONES.research[0]+dx, ZONES.research[1]+dy, (i%2?1:-1)*(2+i%3),'draggable',`
-    <div class="card" style="--tape:${cv(r.tape)};max-width:260px">
+const researchNodes = RESEARCH.map((r,i)=>{
+  return node(ZONES.research[0], ZONES.research[1], (i%2?1:-1)*1.2,'draggable',`
+    <div class="card" style="--tape:${cv(r.tape)};width:270px;max-width:none;align-self:stretch">
       <span class="tape"></span>
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
         <h3 style="font-size:1.15rem">${esc(r.org)}</h3>
@@ -888,34 +921,29 @@ RESEARCH.forEach((r,i)=>{
       <div class="links" style="margin-top:10px;gap:8px">${r.story?`<button class="pill-link" data-nodrag data-story="${esc(r.story)}" style="background:${cv(r.tape)}">learn more →</button>`:''}${r.link?`<a class="pill-link" href="${esc(r.link)}" target="_blank" rel="noopener" data-nodrag style="background:var(--pink-lt)">${esc(r.linkLabel||'visit →')}</a>`:''}</div>
     </div>`);
 });
-photo(ZONES.research[0]-470, ZONES.research[1]-260, -4, "photos/vena-team.jpg",
-  "the Vena Vitals team 🫀", "--sage", "🫀", 195, "4/3");
-photo(ZONES.research[0]+60, ZONES.research[1]-300, 4, "photos/vena-wearable.jpg",
-  "the Vena Vitals wearable 🫀", "--pink", "🫀", 190, "3/4");
-photo(ZONES.research[0]+560, ZONES.research[1]-290, -3, "photos/lab-group.jpg",
-  "my WashU lab family 🥼", "--mustard", "🥼", 215, "4/3");
-photo(ZONES.research[0]+580, ZONES.research[1]+40, 3, "photos/research-poster.jpg",
-  "presenting my NF1 research 🧠", "--pink-lt", "🧠", 205, "3/4");
-photo(ZONES.research[0]-300, ZONES.research[1]+370, 3, "photos/present-sinica.jpg",
-  "presenting @ Academia Sinica 🎤", "--teal", "🎤", 205, "4/3");
-photo(ZONES.research[0]+10, ZONES.research[1]+440, -3, "photos/lab-imaging.jpg",
-  "imaging tumor tissue 🔬", "--red-2", "🔬", 205, "4/3");
-photo(ZONES.research[0]+600, ZONES.research[1]+410, -3, "photos/lab-rig.jpg",
-  "my lab bench 🔬", "--teal", "🔬", 200, "4/3");
+{ const R=ZONES.research, P=(src,cap,c,e,rot,ar,w)=>photo(R[0],R[1],rot,src,cap,c,e,w||230,ar||"4/3");
+  const top=[P("photos/vena-team.jpg","the Vena Vitals team 🫀","--sage","🫀",-2),
+             P("photos/vena-wearable.jpg","the Vena Vitals wearable 🫀","--pink","🫀",2),
+             P("photos/lab-group.jpg","my WashU lab family 🥼","--mustard","🥼",-2),
+             P("photos/research-poster.jpg","presenting my NF1 research 🧠","--pink-lt","🧠",2)];
+  const bottom=[P("photos/present-sinica.jpg","presenting @ Academia Sinica 🎤","--teal","🎤",2),
+             P("photos/lab-imaging.jpg","imaging tumor tissue 🔬","--red-2","🔬",-2),
+             P("photos/lab-rig.jpg","my lab bench 🔬","--teal","🔬",2)];
+  grid(R[0], R[1], [[researchSign], top, researchNodes, bottom], 30, 30); }
 
 /* ================= farm behind celebrations ================= */
-node(ZONES.awards[0]-655, ZONES.awards[1]-295, 0,'',`<div class="bob slow">${barnSVG(150)}</div>`);
-node(ZONES.awards[0]-710, ZONES.awards[1]+165, 0,'',`<div class="bob">${cowSVG(140)}</div>`);
-node(ZONES.awards[0]+715, ZONES.awards[1]+110, 0,'',`<div class="bob slow">${sheepSVG(152)}</div>`);
-node(ZONES.awards[0]+720, ZONES.awards[1]+430, 0,'',`<div class="bob fast">${pigSVG(128)}</div>`);
-node(ZONES.awards[0]+250, ZONES.awards[1]-320, 0,'',`<div class="bob">${sheepSVG(96)}</div>`);
+node(ZONES.awards[0]-700, ZONES.awards[1]-300, 0,'',`<div class="bob slow">${barnSVG(150)}</div>`);
+node(ZONES.awards[0]-710, ZONES.awards[1]+60, 0,'',`<div class="bob">${cowSVG(140)}</div>`);
+node(ZONES.awards[0]+710, ZONES.awards[1]-120, 0,'',`<div class="bob slow">${sheepSVG(152)}</div>`);
+node(ZONES.awards[0]+700, ZONES.awards[1]+170, 0,'',`<div class="bob fast">${pigSVG(128)}</div>`);
+node(ZONES.awards[0]+560, ZONES.awards[1]-500, 0,'',`<div class="bob">${sheepSVG(96)}</div>`);
 
 /* ================= AWARDS / trophy shelf + startup life ================= */
-node(ZONES.awards[0], ZONES.awards[1]-465, 2,'',`
+const awardsSign = node(ZONES.awards[0], ZONES.awards[1], 2,'',`
   <div class="signpost">${starSVG('--mustard',68)}
     <div style="font-size:1.6rem;font-family:var(--font-hand);color:var(--ink);margin-top:2px">little celebrations ✨</div></div>`);
-node(ZONES.awards[0], ZONES.awards[1]-235, -1,'draggable',`
-  <div class="card" style="--tape:var(--teal);max-width:330px">
+const travelCard = node(ZONES.awards[0], ZONES.awards[1], -1,'draggable',`
+  <div class="card" style="--tape:var(--teal);width:380px;max-width:none">
     <span class="tape"></span>
     <p class="eyebrow">the places this work took me ✈️</p>
     <h3 style="font-size:1.15rem">so blessed to travel 🌎</h3>
@@ -924,14 +952,12 @@ node(ZONES.awards[0], ZONES.awards[1]-235, -1,'draggable',`
       Boston for the <a href="https://venturewell.org/spring-2026-e-team/" target="_blank" rel="noopener" data-nodrag style="color:var(--red-2);font-weight:700">VentureWell E-Team Pioneer</a> program (and stuffed cannolis), and Louisiana for the Sling Health
       National Demo Day, where we got to eat beignets sitting next to the lake in New Orleans. 💛</p>
   </div>`);
-const wPos=[[-320,-70],[10,-90],[320,-60],[-280,50],[40,40],[340,60]];
-WINS.forEach((w,i)=>{
-  const [dx,dy]=wPos[i%wPos.length];
-  node(ZONES.awards[0]+dx, ZONES.awards[1]+dy, (i%2?1:-1)*(2+i%4),'draggable',
+const winNodes = WINS.map((w,i)=>{
+  return node(ZONES.awards[0], ZONES.awards[1], (i%2?1:-1)*1.5,'draggable',
     `<div class="sticker" style="--c:${cv(w.c)}">${esc(w.t)}</div>`);
 });
-node(ZONES.awards[0]-350, ZONES.awards[1]+170, -2,'draggable',`
-  <div class="card" style="--tape:var(--pink);max-width:280px">
+const patentCard = node(ZONES.awards[0], ZONES.awards[1], 1.5,'draggable',`
+  <div class="card" style="--tape:var(--pink);width:380px;max-width:none">
     <span class="tape"></span>
     <p class="eyebrow">patent · co-inventor · 2023</p>
     <h3 style="font-size:1.2rem">CNN with Fixed-Point Processing 📜</h3>
@@ -939,16 +965,14 @@ node(ZONES.awards[0]-350, ZONES.awards[1]+170, -2,'draggable',`
       hardware optimization for neural-net efficiency in medical imaging: floating-point to fixed-point
       conversion for faster, lower-power inference.</p>
   </div>`);
-photo(ZONES.awards[0]+30, ZONES.awards[1]+180, 3, "photos/venturewell.jpg",
-  "VentureWell, Boston 🚀", "--lime", "🚀", 205, "4/3");
-photo(ZONES.awards[0]+320, ZONES.awards[1]+200, -3, "photos/bmes.jpg",
-  "BMES conf with my Locus team", "--teal", "🔬", 205, "4/3");
-photo(ZONES.awards[0]+180, ZONES.awards[1]+400, 3, "photos/venturewell2.jpg",
-  "pitching @ VentureWell 🚀", "--orange", "🚀", 195, "3/4");
-photo(ZONES.awards[0]-330, ZONES.awards[1]+410, -3, "photos/sling-demoday.jpg",
-  "1st @ Sling Health Demo Day, NOLA 🥇", "--pink", "🥇", 215, "4/3");
-photo(ZONES.awards[0]+430, ZONES.awards[1]+430, 3, "photos/skandy-win.jpg",
-  "Skandalaris funding winners 💰", "--sage", "💰", 235, "3/2", null, "locuswin");
+{ const A=ZONES.awards;
+  const pics=[
+    photo(A[0],A[1],-2,"photos/sling-demoday.jpg","1st @ Sling Health Demo Day, NOLA 🥇","--pink","🥇",230,"4/3"),
+    photo(A[0],A[1], 2,"photos/venturewell.jpg","VentureWell, Boston 🚀","--lime","🚀",230,"4/3"),
+    photo(A[0],A[1],-2,"photos/venturewell2.jpg","pitching @ VentureWell 🚀","--orange","🚀",185,"3/4"),
+    photo(A[0],A[1], 2,"photos/bmes.jpg","BMES conf with my Locus team","--teal","🔬",230,"4/3"),
+    photo(A[0],A[1],-2,"photos/skandy-win.jpg","Skandalaris funding winners 💰","--sage","💰",250,"3/2",null,"locuswin")];
+  grid(A[0], A[1], [[awardsSign],[travelCard, patentCard],winNodes.slice(0,3),winNodes.slice(3),pics], 26, 22); }
 
 /* ================= LIFE / hobbies — icy world ================= */
 node(ZONES.life[0]-700, ZONES.life[1]-70, 0,'',`<div class="bob slow">${foxSVG(150)}</div>`);
@@ -1058,6 +1082,38 @@ function centerOn(zx,zy,animate,vs){
     centerOn._t=setTimeout(()=>board.classList.remove('flying'),900); }
   apply();
 }
+/* frame a zone: zoom so its cards and photos fill the window (above the dock), on tablets and up */
+function zoneFit(zx,zy){
+  const w=vpW(), h=vpH();
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  if(w<620){ /* phones: fit the zone's grid to the width and start at its top; drag to see more */
+    const g=GRIDS.find(g=>g.cx===zx&&g.cy===zy); if(!g) return null;
+    g.rows.flat().forEach(n=>{ const cx=parseFloat(n.style.left), cy=parseFloat(n.style.top), hw=n.offsetWidth/2, hh=n.offsetHeight/2;
+      x0=Math.min(x0,cx-hw); x1=Math.max(x1,cx+hw); y0=Math.min(y0,cy-hh); y1=Math.max(y1,cy+hh); });
+    const s=Math.min(1, Math.max(0.3, (w-24)/(x1-x0)));
+    return { s, tx: w/2-(x0+x1)/2*s, ty: 96-y0*s };
+  }
+  board.querySelectorAll('.node').forEach(n=>{
+    if(!(n.classList.contains('draggable')||n.querySelector('.signpost'))) return;
+    const cx=parseFloat(n.style.left), cy=parseFloat(n.style.top);
+    if(Math.abs(cx-zx)>950||Math.abs(cy-zy)>850) return;
+    const hw=n.offsetWidth/2, hh=n.offsetHeight/2;
+    x0=Math.min(x0,cx-hw); x1=Math.max(x1,cx+hw); y0=Math.min(y0,cy-hh); y1=Math.max(y1,cy+hh);
+  });
+  if(x0>x1) return null;
+  const top=62, bot=96, side=40;
+  const s=Math.min(1.05, Math.max(MINS, Math.min((w-2*side)/(x1-x0), (h-top-bot)/(y1-y0))));
+  return { s, tx: w/2-(x0+x1)/2*s, ty: top+(h-top-bot)/2-(y0+y1)/2*s };
+}
+function flyTo(name,animate){
+  const z=ZONES[name]; if(!z) return;
+  const f=zoneFit(z[0],z[1]);
+  if(!f){ centerOn(z[0],z[1],animate,VIEW[name]||0.9); return; }
+  scale=f.s; tx=f.tx; ty=f.ty;
+  if(animate){ board.classList.add('flying'); clearTimeout(centerOn._t);
+    centerOn._t=setTimeout(()=>board.classList.remove('flying'),900); }
+  apply();
+}
 function zoomBy(factor){
   if(locked){ openGate(); return; }
   userMoved=true;
@@ -1075,7 +1131,7 @@ const zoneBtns=[...document.querySelectorAll('#dock [data-zone]')];
 zoneBtns.forEach(b=>b.onclick=()=>{
   const z=ZONES[b.dataset.zone]; if(!z) return;
   if(locked && b.dataset.zone!=='home'){ openGate(); return; }
-  userMoved=true; centerOn(z[0],z[1],true, VIEW[b.dataset.zone]||0.9);
+  userMoved=true; flyTo(b.dataset.zone,true);
   zoneBtns.forEach(x=>x.classList.toggle('active',x===b));
 });
 
@@ -1093,7 +1149,7 @@ function onDown(e){
   if(cardNode){
     mode='card'; curCard=cardNode;
     base.x=parseFloat(cardNode.style.left); base.y=parseFloat(cardNode.style.top);
-    cardNode.classList.add('dragging');
+    cardNode.classList.add('dragging'); cardNode.dataset.dragged=1;
   } else { mode='pan'; base.x=tx; base.y=ty; stage.classList.add('grabbing'); }
   board.classList.remove('flying');
   window.addEventListener('pointermove',onMove);
@@ -1271,7 +1327,7 @@ function fitScale(){
   return w < 620 ? 0.45 : w < 1000 ? 0.72 : 1;
 }
 let userMoved = false;
-function landHome(){ if(!userMoved){ centerOn(ZONES.home[0],ZONES.home[1],false, VIEW.home); } }
+function landHome(){ layoutGrids(); if(!userMoved){ flyTo('home',false); } }
 landHome();
 /* the embedded frame can report a 0 size until it settles; re-center home on load,
    on the next few frames, and on resize so the landing is always framed (unless exploring) */
