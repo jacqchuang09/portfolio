@@ -287,13 +287,13 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 /* uniform grid: rows of nodes centered on (cx,cy), tops aligned per row.
    re-run as fonts and images settle, but never moves a card someone has dragged. */
 const GRIDS=[];
-function grid(cx,cy,rows,colGap,rowGap){ GRIDS.push({cx,cy,rows,colGap,rowGap}); layoutGrids(); }
+function grid(cx,cy,rows,colGap,rowGap,opt){ GRIDS.push({cx,cy,rows,colGap,rowGap,opt:opt||{}}); layoutGrids(); }
 function layoutGrids(){
   const narrow=vpW()<620;  /* phones: two columns, so the cards stay readable */
   GRIDS.forEach(G=>{
-    const g=narrow?{...G, rows:G.rows.flatMap(r=>{const o=[];for(let i=0;i<r.length;i+=2)o.push(r.slice(i,i+2));return o;})}:G;
+    const g=narrow?{...G, rows:G.rows.flatMap(r=>{const o=[];let cur=[];r.forEach(n=>{ if(n.offsetWidth>300){ if(cur.length)o.push(cur); o.push([n]); cur=[]; } else { cur.push(n); if(cur.length===2){o.push(cur);cur=[];} } }); if(cur.length)o.push(cur); return o;})}:G;
     /* cards in the same row share one height, so the grid reads as even rows */
-    g.rows.forEach(r=>{
+    if(!(g.opt&&g.opt.noEqual)) g.rows.forEach(r=>{
       const cs=r.map(n=>n.querySelector(':scope > .tilt > .card')).filter(Boolean);
       if(cs.length<2) return;
       cs.forEach(c=>c.style.minHeight='');
@@ -305,7 +305,7 @@ function layoutGrids(){
     g.rows.forEach((r,ri)=>{
       const ws=r.map(n=>n.offsetWidth);
       let x=g.cx-(ws.reduce((a,b)=>a+b,0)+g.colGap*(r.length-1))/2;
-      r.forEach((n,i)=>{ if(!n.dataset.dragged){ n.style.left=(x+ws[i]/2)+'px'; n.style.top=(y+n.offsetHeight/2)+'px'; } x+=ws[i]+g.colGap; });
+      r.forEach((n,i)=>{ if(!n.dataset.dragged){ n.style.left=(x+ws[i]/2)+'px'; n.style.top=((g.opt&&g.opt.center)? y+hs[ri]/2 : y+n.offsetHeight/2)+'px'; } x+=ws[i]+g.colGap; });
       y+=hs[ri]+g.rowGap;
     });
   });
@@ -756,21 +756,21 @@ const VIEW = {
 };
 
 /* ================= ocean reef behind home ================= */
-node(ZONES.home[0]-430, ZONES.home[1]-255, 0,'',`<div class="bob">${fishSVG('--orange',108)}</div>`);
-node(ZONES.home[0]+80,  ZONES.home[1]-320, 0,'',`<div class="bob fast">${fishSVG('--teal',92,true)}</div>`);
-node(ZONES.home[0]+560, ZONES.home[1]-40,  0,'',`<div class="drift">${fishSVG('--mustard',116)}</div>`);
-node(ZONES.home[0]-560, ZONES.home[1]+40,  0,'',`<div class="drift">${fishSVG('--orange-2',104,true)}</div>`);
-node(ZONES.home[0]+385, ZONES.home[1]+250, 0,'',`<div class="bob fast">${fishSVG('--red',92)}</div>`);
-node(ZONES.home[0]-360, ZONES.home[1]+265, 0,'',`<div class="bob slow">${fishSVG('--teal',98,true)}</div>`);
-node(ZONES.home[0]-610, ZONES.home[1]+245, 2,'',`<div class="sway">${seaweedSVG('--sage',118)}</div>`);
-node(ZONES.home[0]+650, ZONES.home[1]+170, -3,'',`<div class="sway">${seaweedSVG('--lime',128)}</div>`);
-node(ZONES.home[0]+470, ZONES.home[1]+285, 1,'',`<div class="sway">${seaweedSVG('--sage',108)}</div>`);
-node(ZONES.home[0]-650, ZONES.home[1]+110, -2,'',`<div class="sway">${seaweedSVG('--lime',114)}</div>`);
-node(ZONES.home[0]+445, ZONES.home[1]-190, 0,'',`<div class="bob slow">${bubblesSVG('--teal',58)}</div>`);
-node(ZONES.home[0]-485, ZONES.home[1]-110, 0,'',`<div class="bob">${bubblesSVG('--teal',54)}</div>`);
+node(ZONES.home[0]-640, ZONES.home[1]-300, 0,'',`<div class="bob">${fishSVG('--orange',108)}</div>`);
+node(ZONES.home[0]+650, ZONES.home[1]-260, 0,'',`<div class="bob fast">${fishSVG('--teal',92,true)}</div>`);
+node(ZONES.home[0]+690, ZONES.home[1]+40,  0,'',`<div class="drift">${fishSVG('--mustard',116)}</div>`);
+node(ZONES.home[0]-690, ZONES.home[1]-20,  0,'',`<div class="drift">${fishSVG('--orange-2',104,true)}</div>`);
+node(ZONES.home[0]+650, ZONES.home[1]+300, 0,'',`<div class="bob fast">${fishSVG('--red',92)}</div>`);
+node(ZONES.home[0]-650, ZONES.home[1]+320, 0,'',`<div class="bob slow">${fishSVG('--teal',98,true)}</div>`);
+node(ZONES.home[0]-770, ZONES.home[1]+250, 2,'',`<div class="sway">${seaweedSVG('--sage',118)}</div>`);
+node(ZONES.home[0]+790, ZONES.home[1]+170, -3,'',`<div class="sway">${seaweedSVG('--lime',128)}</div>`);
+node(ZONES.home[0]+770, ZONES.home[1]+340, 1,'',`<div class="sway">${seaweedSVG('--sage',108)}</div>`);
+node(ZONES.home[0]-790, ZONES.home[1]+110, -2,'',`<div class="sway">${seaweedSVG('--lime',114)}</div>`);
+node(ZONES.home[0]+570, ZONES.home[1]-340, 0,'',`<div class="bob slow">${bubblesSVG('--teal',58)}</div>`);
+node(ZONES.home[0]-600, ZONES.home[1]-370, 0,'',`<div class="bob">${bubblesSVG('--teal',54)}</div>`);
 
 /* ================= HERO ================= */
-node(ZONES.home[0], ZONES.home[1], -1.5, 'draggable', `
+const heroNode = node(ZONES.home[0], ZONES.home[1], -1.5, 'draggable', `
   <div class="hero card" style="--tape:var(--pink)">
     <span class="tape"></span>
     <p class="eyebrow">welcome to my little corner ✿</p>
@@ -784,16 +784,13 @@ node(ZONES.home[0], ZONES.home[1], -1.5, 'draggable', `
   </div>`);
 
 /* a few memories scattered around home */
-photo(ZONES.home[0]-470, ZONES.home[1]+320, -4, "photos/liondance-team.jpg",
-  "WashU lion dance team 🦁", "--red", "🦁", 205, "4/3");
-photo(ZONES.home[0]+520, ZONES.home[1]+300, 4, "photos/bmes.jpg",
-  "BMES with my Locus team 🔬", "--teal", "🔬", 205, "4/3");
-photo(ZONES.home[0]-40, ZONES.home[1]+300, -2, "photos/tom-build.jpg",
-  "Tikkun Olam Makers build 🛠️", "--lime", "🛠️", 200, "4/3");
-photo(ZONES.home[0]-560, ZONES.home[1]-150, 3, "photos/building-rig.jpg",
-  "at the test rig 🔧", "--mustard", "🔧", 195, "3/4");
-photo(ZONES.home[0]+560, ZONES.home[1]-140, -3, "photos/newgen-selfie.jpg",
-  "STEM camp selfie 🔬", "--orange", "🔬", 195, "4/3");
+{ const Z=ZONES.home, P=(src,cap,c,e,rot)=>photo(Z[0],Z[1],rot,src,cap,c,e,230,"4/3");
+  const rig=P("photos/building-rig.jpg","at the test rig 🔧","--mustard","🔧",-2),
+        selfie=P("photos/newgen-selfie.jpg","STEM camp selfie 🔬","--orange","🔬",2),
+        lion=P("photos/liondance-team.jpg","WashU lion dance team 🦁","--red","🦁",-2),
+        tom=P("photos/tom-build.jpg","Tikkun Olam Makers build 🛠️","--lime","🛠️",2),
+        bmes=P("photos/bmes.jpg","BMES with my Locus team 🔬","--teal","🔬",-2);
+  grid(Z[0], Z[1], [[rig, heroNode, selfie],[lion, tom, bmes]], 40, 30, {center:true, noEqual:true}); }
 
 /* ================= woods behind about ================= */
 node(ZONES.about[0]-250, ZONES.about[1]-330, 1,'',`<div class="sway">${treeSVG(120,'--sage')}</div>`);
@@ -806,7 +803,7 @@ node(ZONES.about[0]-165, ZONES.about[1]+325, 0,'',`<div class="bob fast">${mushr
 node(ZONES.about[0]+165, ZONES.about[1]+320, 0,'',`<div class="bob">${mushroomSVG(46)}</div>`);
 
 /* ================= ABOUT ================= */
-node(ZONES.about[0], ZONES.about[1], 2, 'draggable', `
+const aboutCard = node(ZONES.about[0], ZONES.about[1], 1, 'draggable', `
   <div class="card" style="--tape:var(--lime);max-width:352px">
     <span class="tape"></span>
     <p class="eyebrow">who i am ✿</p>
@@ -818,18 +815,18 @@ node(ZONES.about[0], ZONES.about[1], 2, 'draggable', `
       combine hardware and software with an understanding of the people i build for to create
       <b style="color:var(--red)">tools that give independence back and help people feel seen.</b></p>
   </div>`);
-node(ZONES.about[0]+345, ZONES.about[1]-120, -3, 'draggable', `
-  <div class="card" style="--tape:var(--teal);max-width:270px">
+const schoolCard = node(ZONES.about[0], ZONES.about[1], -1.5, 'draggable', `
+  <div class="card" style="--tape:var(--teal);max-width:300px">
     <span class="tape"></span>
     <p class="eyebrow">the school bit 🎓</p>
     <p style="font-family:var(--font-hand);font-size:1.02rem;margin:4px 0 0;line-height:1.45">
       Washington University in St. Louis<br>B.S. Biomedical Engineering<br>
       <span style="color:var(--ink-soft)">minor: CS + Mechanical Eng · '24 to '28</span></p>
   </div>`);
-photo(ZONES.about[0]+360, ZONES.about[1]+235, 4, "photos/tom-crew.jpg",
-  "me + my Tikkun Olam Makers crew ♿", "--sage", "♿", 205, "4/3");
-photo(ZONES.about[0]-385, ZONES.about[1]-125, -4, "photos/taiwan-kid.jpg",
-  "growing up in Taiwan 🇹🇼", "--pink-lt", "🇹🇼", 185, "4/3");
+{ const Z=ZONES.about;
+  const taiwan=photo(Z[0],Z[1],-2,"photos/taiwan-kid.jpg","growing up in Taiwan 🇹🇼","--pink-lt","🇹🇼",240,"4/3"),
+        crew=photo(Z[0],Z[1],2,"photos/tom-crew.jpg","me + my Tikkun Olam Makers crew ♿","--sage","♿",240,"4/3");
+  grid(Z[0], Z[1], [[taiwan, aboutCard, crew],[schoolCard]], 40, 28, {center:true, noEqual:true}); }
 
 /* ================= outer space behind builds ================= */
 node(ZONES.work[0]-940, ZONES.work[1]-330, 0,'',`<div class="bob slow">${astroDogSVG(164)}</div>`);
@@ -983,30 +980,21 @@ node(ZONES.life[0]+520, ZONES.life[1]-330, 0,'',`<div class="spin">${snowflakeSV
 node(ZONES.life[0]-330, ZONES.life[1]-360, 0,'',`<div class="spin">${snowflakeSVG('--sage',46)}</div>`);
 node(ZONES.life[0]+430, ZONES.life[1]+330, 0,'',`<div class="spin">${snowflakeSVG('--teal',50)}</div>`);
 node(ZONES.life[0]-640, ZONES.life[1]+40, 0,'',`<div class="spin">${snowflakeSVG('--sage',40)}</div>`);
-node(ZONES.life[0], ZONES.life[1]-260, 3,'',`
+const lifeSign = node(ZONES.life[0], ZONES.life[1], 2,'',`
   <div class="signpost">${starSVG('--teal',64)}
     <div style="font-size:1.6rem;font-family:var(--font-hand);color:var(--ink);margin-top:2px">life beyond the lab ♡</div></div>`);
-photo(ZONES.life[0]-300, ZONES.life[1]-40, -4, "photos/liondance-team.jpg",
-  "WashU lion dance team 🦁", "--red", "🦁", 240, "4/3");
-photo(ZONES.life[0]+20, ZONES.life[1]+30, 3, "photos/liondance-stage.jpg",
-  "performing at the show", "--mustard", "🎭", 210, "4/3");
-node(ZONES.life[0]+30, ZONES.life[1]+160, -2,'',`
+{ const Z=ZONES.life, P=(src,cap,c,e,rot,pos)=>photo(Z[0],Z[1],rot,src,cap,c,e,230,"4/3",pos);
+  const ph=[P("photos/liondance-team.jpg","WashU lion dance team 🦁","--red","🦁",-2),
+            P("photos/liondance-stage.jpg","performing at the show","--mustard","🎭",2),
+            P("photos/liondance-gala.jpg","lion dancing at a gala 🧧","--red","🧧",-2),
+            P("photos/soccer.jpg","soccer szn ⚽","--sage","⚽",2),
+            P("photos/tsa-formal.jpg","Taiwanese Student Assoc fam","--pink-lt","🇹🇼",-2),
+            P("photos/tsa-newbies.jpg","TSA newbies night 🎮","--teal","🎮",2,"50% 30%")];
+  const lionPill = node(Z[0], Z[1], -1,'',`
   <a class="pill-link" href="https://www.youtube.com/watch?v=AIdryZRQfx4" target="_blank" rel="noopener" data-nodrag style="--accent:var(--red-2);color:#fff">▶️ watch our lion dance</a>`);
-photo(ZONES.life[0]+300, ZONES.life[1]-30, 5, "photos/soccer.jpg",
-  "soccer szn ⚽", "--sage", "⚽", 210, "4/3");
-photo(ZONES.life[0]-160, ZONES.life[1]+260, 2, "photos/tsa-formal.jpg",
-  "Taiwanese Student Assoc fam", "--pink-lt", "🇹🇼", 230, "4/3");
-photo(ZONES.life[0]+180, ZONES.life[1]+280, -3, "photos/tsa-newbies.jpg",
-  "TSA newbies night 🎮", "--teal", "🎮", 200, "3/4");
-photo(ZONES.life[0]-470, ZONES.life[1]+250, 4, "photos/liondance-gala.jpg",
-  "lion dancing at a gala 🧧", "--red", "🧧", 220, "4/3");
-/* hand-placed so no pill sits on the heading (at dy -260) or a photo */
-const intoPos=[[-430,-170],[440,-165],[540,70],[470,215],[-340,110],[-520,-70],[250,-160],[130,340],[380,330]];
-INTO.forEach((s,i)=>{
-  const [dx,dy]=intoPos[i%intoPos.length];
-  node(ZONES.life[0]+dx, ZONES.life[1]+dy,(i%2?1:-1)*4,'draggable',
-    `<div class="sticker" style="--c:${cv(s.c)}">${esc(s.t)}</div>`);
-});
+  const tags = INTO.map((s,i)=>node(Z[0], Z[1],(i%2?1:-1)*2,'draggable',
+    `<div class="sticker" style="--c:${cv(s.c)}">${esc(s.t)}</div>`));
+  grid(Z[0], Z[1], [[lifeSign],[lionPill], ph.slice(0,3), ph.slice(3), tags.slice(0,5), tags.slice(5)], 26, 22, {center:true}); }
 
 /* ================= TEACHING / New Gen Scientists — grassland ================= */
 node(ZONES.teaching[0]-700, ZONES.teaching[1]-50, 0,'',`<div class="bob slow">${giraffeSVG(150)}</div>`);
@@ -1016,11 +1004,11 @@ node(ZONES.teaching[0]-560, ZONES.teaching[1]+330, 2,'',`<div class="sway">${gra
 node(ZONES.teaching[0]+250, ZONES.teaching[1]+430, -1,'',`<div class="sway">${grassSVG('--sage',104)}</div>`);
 node(ZONES.teaching[0]-330, ZONES.teaching[1]-360, 1,'',`<div class="sway">${grassSVG('--sage',92)}</div>`);
 node(ZONES.teaching[0]+640, ZONES.teaching[1]+300, 2,'',`<div class="sway">${grassSVG('--lime',100)}</div>`);
-node(ZONES.teaching[0], ZONES.teaching[1]-300, -2,'',`
+const teachSign = node(ZONES.teaching[0], ZONES.teaching[1], -2,'',`
   <div class="signpost">${starSVG('--lime',66)}
     <div style="font-size:1.6rem;font-family:var(--font-hand);color:var(--ink);margin-top:2px">teaching the tiny scientists 🌏</div></div>`);
-node(ZONES.teaching[0]-40, ZONES.teaching[1]-70, -2,'draggable',`
-  <div class="card" style="--tape:var(--lime);max-width:300px">
+const ngCard = node(ZONES.teaching[0], ZONES.teaching[1], -1,'draggable',`
+  <div class="card" style="--tape:var(--lime);max-width:320px">
     <span class="tape"></span>
     <p class="eyebrow">founder & exec director</p>
     <h3 style="font-size:1.25rem">New Gen Scientists 🌏</h3>
@@ -1039,7 +1027,8 @@ const ngPhotos=[
   ["photos/newgen-kids3.jpg","camp crew 🎈","--sage","🎈",[10,310],-3,"4/3",215],
   ["photos/newgen-cart.jpg","they built a whole cart! 🛠️","--coral","🛠️",[380,240],-4,"4/3",210],
 ];
-ngPhotos.forEach(p=>photo(ZONES.teaching[0]+p[4][0], ZONES.teaching[1]+p[4][1], p[5], p[0], p[1], p[2], p[3], p[7], p[6], p[8]));
+{ const ng=ngPhotos.map((p,i)=>photo(ZONES.teaching[0], ZONES.teaching[1], i%2?2:-2, p[0], p[1], p[2], p[3], 240, "4/3", p[8]||(/crew|cart/.test(p[0])?"50% 30%":null)));
+  grid(ZONES.teaching[0], ZONES.teaching[1], [[teachSign],[ng[0], ngCard, ng[1]],[ng[2], ng[3], ng[4]]], 40, 26, {center:true, noEqual:true}); }
 
 /* ================= jungle around say hi ================= */
 node(ZONES.hi[0]-430, ZONES.hi[1]-340, 6,'',`<div class="sway">${leafSVG(120,'--lime')}</div>`);
@@ -1050,7 +1039,7 @@ node(ZONES.hi[0]-480, ZONES.hi[1]-40, 0,'',`<div class="bob">${monkeySVG(140)}</
 node(ZONES.hi[0]+480, ZONES.hi[1]-40, 0,'',`<div class="bob slow">${macawSVG(142,true)}</div>`);
 
 /* ================= SAY HI ================= */
-node(ZONES.hi[0], ZONES.hi[1], -1.5, 'draggable', `
+const hiCard = node(ZONES.hi[0], ZONES.hi[1], -1.5, 'draggable', `
   <div class="card contact" style="--tape:var(--teal)">
     <span class="tape"></span>
     <p class="eyebrow">the edge of the map</p>
@@ -1062,9 +1051,10 @@ node(ZONES.hi[0], ZONES.hi[1], -1.5, 'draggable', `
       <a href="https://www.linkedin.com/in/jacquelinec07" target="_blank" rel="noopener" data-nodrag>💼 linkedin</a>
     </div>
   </div>`);
+grid(ZONES.hi[0], ZONES.hi[1], [[hiCard]], 0, 0);
 
 /* ================= ambient doodles ================= */
-node(ZONES.home[0]-180, ZONES.home[1]-325, 0,'',`<div class="bob">${fishSVG('--pink',82)}</div>`);
+node(ZONES.home[0]-560, ZONES.home[1]-440, 0,'',`<div class="bob">${fishSVG('--pink',82)}</div>`);
 
 /* ===================== PAN / ZOOM ===================== */
 let tx=0, ty=0, scale=1;
@@ -1095,7 +1085,7 @@ function zoneFit(zx,zy){
     return { s, tx: w/2-(x0+x1)/2*s, ty: 96-y0*s };
   }
   board.querySelectorAll('.node').forEach(n=>{
-    if(!(n.classList.contains('draggable')||n.querySelector('.signpost'))) return;
+    if(!(n.classList.contains('draggable')||n.classList.contains('zc')||n.querySelector('.signpost'))) return;
     const cx=parseFloat(n.style.left), cy=parseFloat(n.style.top);
     if(Math.abs(cx-zx)>950||Math.abs(cy-zy)>850) return;
     const hw=n.offsetWidth/2, hh=n.offsetHeight/2;
@@ -1351,63 +1341,43 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
 })();
 </script>
 
-<!-- ===================== little guys: wander on their own; click or Tab to one, then steer with the arrow keys ===================== -->
+<!-- ===================== little guys: one on (almost) every page, swaying in place; one duck follows you around ===================== -->
 <style>
-  #critters{position:fixed;inset:0;pointer-events:none;z-index:190;overflow:hidden}
-  .critter{position:absolute;left:0;top:0;pointer-events:auto;background:none;border:0;padding:0;margin:0;cursor:grab;
-    -webkit-tap-highlight-color:transparent;touch-action:none;will-change:transform}
-  .critter:focus{outline:none}
-  .critter .flip{display:block;transform-origin:50% 100%;transition:transform .15s}
-  .critter img{display:block;height:var(--h);width:auto;transform-origin:50% 100%;pointer-events:none;user-select:none;-webkit-user-drag:none}
-  .critter::before{content:"";position:absolute;left:18%;right:18%;bottom:-4px;height:9px;border-radius:50%;background:rgba(44,38,32,.16);filter:blur(1px)}
-  .critter.float::before{display:none}
-  .critter.walking img{animation:waddle .34s ease-in-out infinite alternate}
-  .critter.idle img{animation:breathe 1.8s ease-in-out infinite}
-  .critter.float img{animation:floaty 3.4s ease-in-out infinite}
-  .critter.hop img{animation:hop .45s cubic-bezier(.3,1.6,.5,1)}
-  .critter:hover img{filter:drop-shadow(0 0 0 transparent) brightness(1.03)}
+  .zc{cursor:pointer}
+  .zc .zc-in{display:block;transform-origin:50% 100%}
+  .zc img{display:block;height:var(--h);width:auto;pointer-events:none;user-select:none;-webkit-user-drag:none;transform-origin:50% 100%}
+  .zc.sway .zc-in{animation:zcSway 2.8s ease-in-out infinite}
+  .zc.bounce .zc-in{animation:zcBounce 1.5s ease-in-out infinite}
+  .zc.float .zc-in{animation:zcFloat 4s ease-in-out infinite}
+  .zc.hop img,.duck.hop img{animation:zcHop .45s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes zcSway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+  @keyframes zcBounce{0%,100%{transform:translateY(0) scale(1,1)}45%{transform:translateY(-7px) scale(.98,1.03)}60%{transform:translateY(0) scale(1.04,.96)}}
+  @keyframes zcFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-16px) rotate(2deg)}}
+  @keyframes zcHop{0%{transform:translateY(0) scale(1.08,.9)}45%{transform:translateY(-26px) scale(.95,1.06)}100%{transform:translateY(0)}}
+
+  #duck{position:fixed;left:0;top:0;z-index:190;background:none;border:0;padding:0;margin:0;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;will-change:transform}
+  #duck:focus{outline:none}
+  #duck .flip{display:block;transform-origin:50% 100%}
+  #duck img{display:block;height:78px;width:auto;transform-origin:50% 100%;pointer-events:none;user-select:none;-webkit-user-drag:none}
+  #duck::before{content:"";position:absolute;left:18%;right:18%;bottom:-4px;height:8px;border-radius:50%;background:rgba(44,38,32,.16)}
+  #duck.walking img{animation:waddle .3s ease-in-out infinite alternate}
+  #duck.idle img{animation:breathe 1.8s ease-in-out infinite}
   @keyframes waddle{from{transform:rotate(-6deg) translateY(0)}to{transform:rotate(6deg) translateY(-4px)}}
   @keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.03,.97)}}
-  @keyframes floaty{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
-  @keyframes hop{0%{transform:translateY(0) scale(1.08,.9)}45%{transform:translateY(-26px) scale(.95,1.06)}100%{transform:translateY(0)}}
-  .critter.sel::after,.critter:focus-visible::after{content:attr(data-tip);position:absolute;left:50%;bottom:100%;translate:-50% -6px;white-space:nowrap;
-    font-family:var(--font-hand);font-size:.85rem;color:var(--ink);background:var(--paper,#fffdf6);border:2px solid var(--line,#2C2620);
-    border-radius:999px;padding:2px 10px;box-shadow:2px 3px 0 var(--shadow,rgba(0,0,0,.2))}
-  .critter.tip-l::after{left:0;translate:0 -6px}.critter.tip-r::after{left:auto;right:0;translate:0 -6px}
-  .critter.sel .flip{filter:drop-shadow(0 0 6px rgba(255,190,60,.9))}
-  #cpad{position:fixed;right:18px;bottom:96px;z-index:210;display:none;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(2,44px);gap:6px}
-  #cpad.on{display:grid}
-  #cpad button{font:700 1.1rem/1 var(--font-hand);border:2.5px solid var(--line,#2C2620);border-radius:12px;background:var(--paper,#fffdf6);
-    color:var(--ink);box-shadow:3px 3px 0 var(--shadow,rgba(0,0,0,.2));cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent}
-  #cpad button:active{translate:1px 1px;box-shadow:1px 1px 0 var(--shadow,rgba(0,0,0,.2))}
-  #cpad .up{grid-column:2}#cpad .x{grid-column:3;grid-row:1;font-size:.9rem}
-  #cpad .left{grid-column:1;grid-row:2}#cpad .down{grid-column:2;grid-row:2}#cpad .right{grid-column:3;grid-row:2}
-  @media (max-width:620px){#cpad{bottom:88px;right:10px}}
+  #duck .say{position:absolute;left:50%;bottom:100%;translate:-50% -8px;white-space:nowrap;font-family:var(--font-hand);font-size:.85rem;
+    color:var(--ink);background:var(--paper,#fffdf6);border:2px solid var(--line,#2C2620);border-radius:999px;padding:2px 10px;
+    box-shadow:2px 3px 0 var(--shadow,rgba(0,0,0,.2));opacity:0;transition:opacity .3s;pointer-events:none}
+  #duck.talk .say,#duck:hover .say,#duck:focus-visible .say{opacity:1}
+  #duck.edge-l .say{left:0;translate:0 -8px} #duck.edge-r .say{left:auto;right:0;translate:0 -8px}
+  @media (max-width:620px){#duck img{height:62px}}
 </style>
-<div id="critters" role="group" aria-label="little guys you can steer"></div>
-<div id="cpad" aria-label="steer the little guy">
-  <button class="up" type="button" data-k="ArrowUp" aria-label="up">↑</button>
-  <button class="x" type="button" aria-label="let it wander">✕</button>
-  <button class="left" type="button" data-k="ArrowLeft" aria-label="left">←</button>
-  <button class="down" type="button" data-k="ArrowDown" aria-label="down">↓</button>
-  <button class="right" type="button" data-k="ArrowRight" aria-label="right">→</button>
-</div>
+<button id="duck" type="button" class="idle" aria-label="duck: it follows your cursor, and the arrow keys walk it around">
+  <span class="say">arrow keys walk me ✨</span><span class="flip"><img src="critters/walk1.png" alt=""></span>
+</button>
 <script>
 (function(){
   const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
-  const layer = document.getElementById('critters'), pad = document.getElementById('cpad');
-  const D = [
-    {name:'walking chick', imgs:['critters/walk1.png','critters/walk2.png'], h:84},
-    {name:'waving chick', imgs:['critters/chick-wave.png'], h:80},
-    {name:'hula pig', imgs:['critters/pig-hula.png'], h:82},
-    {name:'cheering chick', imgs:['critters/chick-cheer.png'], h:76},
-    {name:'shocked pig', imgs:['critters/pig-shock.png'], h:80},
-    {name:'thank-you pig', imgs:['critters/pig-thanks.png'], h:78, noflip:true},
-    {name:'snacking pig', imgs:['critters/pig-eat.png'], h:76},
-    {name:'boxing chicks', imgs:['critters/chick-box.png'], h:92, lazy:true},
-    {name:'chick on the potty', imgs:['critters/chick-potty.png'], h:84, lazy:true},
-    {name:'balloon pig', imgs:['critters/pig-balloon.png'], h:118, float:true, noflip:true}
-  ];
 
   /* ---------- tiny synthesized sound effects (no audio files); they only play when you interact ---------- */
   const sfx=(()=>{
@@ -1430,14 +1400,6 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
       if(o.lp){ const f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=o.lp; osc.connect(f); f.connect(g); } else osc.connect(g);
       g.connect(master); osc.start(t); osc.stop(t+dur+0.03);
     }
-    function puff(){
-      const c=ac(); if(!c) return;
-      const n=Math.floor(c.sampleRate*0.4), b=c.createBuffer(1,n,c.sampleRate), d=b.getChannelData(0);
-      for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.sin(Math.PI*i/n);
-      const s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
-      s.buffer=b; f.type='bandpass'; f.frequency.value=420; f.Q.value=0.7; g.gain.value=0.35;
-      s.connect(f); f.connect(g); g.connect(master); s.start();
-    }
     return {
       voice(kind){
         if(kind==='pig'){ tone({type:'sawtooth',f0:270,f1:175,dur:0.12,vol:0.45,lp:900}); tone({type:'sawtooth',f0:250,f1:160,dur:0.15,vol:0.4,lp:900,delay:0.15}); }
@@ -1445,11 +1407,7 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
         else { tone({type:'triangle',f0:1300,f1:1900,dur:0.08,vol:0.45}); tone({type:'triangle',f0:1500,f1:2300,dur:0.09,vol:0.4,delay:0.1}); }
       },
       boing(){ tone({f0:170,f1:640,dur:0.15,vol:0.55}); tone({f0:640,f1:300,dur:0.2,vol:0.3,delay:0.14}); },
-      step(kind,alt){ const f=kind==='pig'?(alt?250:215):(alt?760:640); tone({type:'triangle',f0:f,f1:f*0.6,dur:0.05,vol:0.3}); },
-      puff,
-      squeak(){ tone({f0:900,f1:1600,dur:0.09,vol:0.35}); },
-      thud(){ tone({f0:180,f1:55,dur:0.16,vol:0.6}); },
-      bloop(){ tone({f0:720,f1:240,dur:0.2,vol:0.35}); },
+      step(alt){ const f=alt?760:640; tone({type:'triangle',f0:f,f1:f*0.6,dur:0.05,vol:0.3}); },
       get on(){ return on; },
       set on(v){ on=v; try{ localStorage.setItem('critterSound', v?'on':'off'); }catch(e){} if(!v && ctx) ctx.suspend(); }
     };
@@ -1458,104 +1416,97 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
   function paintSound(){ soundBtn.textContent=sfx.on?'🔊':'🔇'; soundBtn.setAttribute('aria-pressed', sfx.on?'true':'false');
     soundBtn.setAttribute('aria-label', sfx.on?'turn sound effects off':'turn sound effects on'); }
   if(soundBtn){ paintSound(); soundBtn.addEventListener('click',()=>{ sfx.on=!sfx.on; paintSound(); if(sfx.on) sfx.boing(); }); }
-  const kindOf=d=>d.float?'balloon':(/pig/.test(d.name)?'pig':'chick');
-  const W=()=>innerWidth, H=()=>innerHeight, small=()=>innerWidth<620;
-  /* walkers stay on a strip of "ground" just above the dock; the balloon drifts up top */
-  const ground=c=>{ const s=small()?0.72:1, h=c.h*s; return [H()-150-h*0.4, H()-92]; };
-  const sky=c=>[64, Math.max(90, H()*0.34)];
-  const list = (small()? D.filter(d=>!d.lazy&&!d.float).slice(0,5).concat(D.filter(d=>d.float)) : D).map((d,i)=>{
-    const b=document.createElement('button'); b.type='button'; b.className='critter idle'+(d.float?' float':'');
-    b.setAttribute('aria-label', d.name+': press the arrow keys to move it, Escape to let it wander');
-    b.dataset.tip = matchMedia('(pointer:coarse)').matches ? 'drag me or use the arrows' : '← ↑ ↓ → to move me';
-    const f=document.createElement('span'); f.className='flip';
-    const im=document.createElement('img'); im.src=d.imgs[0]; im.alt=''; im.decoding='async';
-    d.imgs.slice(1).forEach(s=>{ const p=new Image(); p.src=s; });
-    f.appendChild(im); b.appendChild(f); layer.appendChild(b);
-    const c={...d, el:b, flip:f, img:im, x:0, y:0, tx:0, ty:0, dir:1, wait:600+Math.random()*2500, frame:0, ft:0, moving:false};
-    const sc=small()?0.72:1; c.h=d.h*sc; im.style.setProperty('--h', c.h+'px');
-    const band=d.float?sky(c):ground(c);
-    c.x = 20+((i+0.5)/D.length)*(W()-120) + (Math.random()*60-30);
-    c.y = band[0]+Math.random()*(band[1]-band[0]) - c.h;   /* y is the top of the sprite */
-    c.tx=c.x; c.ty=c.y; c.speed = d.float? 22+Math.random()*10 : 34+Math.random()*26;
-    return c;
+
+  function hop(el){ el.classList.remove('hop'); void el.offsetWidth; el.classList.add('hop'); setTimeout(()=>el.classList.remove('hop'),480); }
+
+  /* ---------- the ones that live on a page: each sits by a corner of that page's grid ---------- */
+  const SPOTS=[
+    {zone:'home',     src:'chick-wave.png',  h:120, at:'bl', anim:'bounce', kind:'chick', name:'waving chick'},
+    {zone:'home',     src:'pig-balloon.png', h:170, at:'tr', anim:'float',  kind:'balloon', name:'balloon pig'},
+    {zone:'about',    src:'chick-cheer.png', h:112, at:'br', anim:'bounce', kind:'chick', name:'cheering chick'},
+    {zone:'work',     src:'chick-box.png',   h:128, at:'br', anim:'bounce', kind:'chick', name:'boxing chicks'},
+    {zone:'research', src:'pig-shock.png',   h:116, at:'bl', anim:'sway',   kind:'pig',   name:'shocked pig'},
+    {zone:'awards',   src:'pig-hula.png',    h:120, at:'br', anim:'sway',   kind:'pig',   name:'hula pig'},
+    {zone:'life',     src:'pig-eat.png',     h:110, at:'br', anim:'bounce', kind:'pig',   name:'snacking pig'},
+    {zone:'teaching', src:'chick-potty.png', h:118, at:'br', anim:'sway',   kind:'chick', name:'chick on the potty'},
+    {zone:'hi',       src:'pig-thanks.png',  h:124, at:'r',  anim:'bounce', kind:'pig',   name:'thank-you pig'}
+  ];
+  const spots=SPOTS.map((s,i)=>{
+    const z=ZONES[s.zone];
+    const n=node(z[0], z[1], 0, 'zc '+s.anim, `<button type="button" class="zc-btn" aria-label="${s.name}" style="all:unset;display:block;cursor:pointer">
+      <span class="zc-in" style="animation-delay:${-(i*0.37)%2}s"><img src="critters/${s.src}" alt="" style="--h:${s.h}px"></span></button>`);
+    n.querySelector('button').addEventListener('click',()=>{ if(typeof moved!=='undefined' && moved) return; sfx.voice(s.kind); hop(n); });
+    return {...s, n};
   });
-  let sel=null; const held=new Set();
-  function place(c){ c.el.style.transform=`translate(${Math.round(c.x)}px,${Math.round(c.y)}px)`;
-    c.el.style.zIndex = Math.round(c.y + c.h);
-    const cx=c.x+(c.img.offsetWidth||c.h)/2; c.el.classList.toggle('tip-l', cx<120); c.el.classList.toggle('tip-r', cx>W()-120);
-    c.flip.style.transform = c.noflip ? '' : `scaleX(${c.dir})`; }
-  function pickTarget(c){
-    const w=c.img.offsetWidth||c.h, band=c.float?sky(c):ground(c);
-    c.tx = 10+Math.random()*Math.max(10, W()-w-20);
-    c.ty = band[0]+Math.random()*(band[1]-band[0]) - c.h;
-    c.wait = 0;
-  }
-  function setState(c,moving){ if(c.moving===moving) return; c.moving=moving;
-    if(!c.float){ c.el.classList.toggle('walking',moving); c.el.classList.toggle('idle',!moving); }
-    if(!moving && c.imgs.length>1) c.img.src=c.imgs[0]; }
-  function hop(c,quiet){ if(!quiet) sfx.boing(); c.el.classList.remove('hop'); void c.el.offsetWidth; c.el.classList.add('hop');
-    setTimeout(()=>c.el.classList.remove('hop'),480); }
-  function select(c){ if(sel===c) return false; if(sel) release(true); sel=c; c.el.classList.add('sel'); pad.classList.add('on'); sfx.voice(kindOf(c)); hop(c,true); return true; }
-  function release(quiet){ if(!sel) return; if(!quiet) sfx.bloop(); sel.el.classList.remove('sel'); sel.wait=1500; sel.tx=sel.x; sel.ty=sel.y; setState(sel,false);
-    sel=null; held.clear(); pad.classList.remove('on'); }
-  list.forEach(c=>{
-    place(c);
-    c.el.addEventListener('focus',()=>select(c));
-    c.el.addEventListener('blur',e=>{ const to=e.relatedTarget; if(!(to && pad.contains(to)) && sel===c) release(!!(to && to.closest && to.closest('.critter'))); });
-    c.el.addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); hop(c); } });
-    /* pick one up and drop it somewhere else */
-    c.el.addEventListener('pointerdown',e=>{
-      e.stopPropagation(); const fresh=select(c); c.el.focus({preventScroll:true});
-      const sx=e.clientX, sy=e.clientY, ox=c.x, oy=c.y; let dragged=false; c.el.setPointerCapture(e.pointerId); c.el.style.cursor='grabbing';
-      const mv=ev=>{ const dx=ev.clientX-sx, dy=ev.clientY-sy;
-        if(!dragged && Math.abs(dx)+Math.abs(dy)>4){ dragged=true; sfx.squeak(); }
-        if(dragged){ c.x=clampX(c,ox+dx); c.y=clampY(c,oy+dy); if(dx) c.dir=dx<0?-1:1; place(c); } };
-      const up=()=>{ c.el.removeEventListener('pointermove',mv); c.el.removeEventListener('pointerup',up); c.el.style.cursor=''; if(dragged){ c.float?sfx.puff():sfx.thud(); } else if(!fresh) hop(c); };
-      c.el.addEventListener('pointermove',mv); c.el.addEventListener('pointerup',up);
+  function placeSpots(){
+    spots.forEach(s=>{
+      const z=ZONES[s.zone], g=GRIDS.find(g=>g.cx===z[0]&&g.cy===z[1]); if(!g) return;
+      let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+      g.rows.flat().forEach(n=>{ const cx=parseFloat(n.style.left), cy=parseFloat(n.style.top), hw=n.offsetWidth/2, hh=n.offsetHeight/2;
+        x0=Math.min(x0,cx-hw); x1=Math.max(x1,cx+hw); y0=Math.min(y0,cy-hh); y1=Math.max(y1,cy+hh); });
+      const w=s.n.offsetWidth||s.h, h=s.n.offsetHeight||s.h;
+      const p = s.at==='bl' ? [x0-w*0.35, y1-h/2]
+              : s.at==='br' ? [x1+w*0.35, y1-h/2]
+              : s.at==='tr' ? [x1+w*0.3,  y0+h/2-30]
+              :               [x1+w/2+36, (y0+y1)/2];
+      s.n.style.left=p[0]+'px'; s.n.style.top=p[1]+'px';
     });
-  });
-  const clampX=(c,x)=>Math.min(W()-(c.img.offsetWidth||c.h)-4, Math.max(4,x));
-  const clampY=(c,y)=>Math.min(H()-c.h-8, Math.max(56,y));
+  }
+  const _layout=layoutGrids;
+  layoutGrids=function(){ _layout(); placeSpots(); };
+  placeSpots();
+  addEventListener('load',()=>{ layoutGrids(); });
+
+  /* ---------- the duck: follows your cursor (or your taps); the arrow keys take over until you move the mouse again ---------- */
+  const duck=document.getElementById('duck'), img=duck.querySelector('img'), flip=duck.querySelector('.flip');
+  const frames=['critters/walk1.png','critters/walk2.png']; new Image().src=frames[1];
+  let x=innerWidth*0.5-30, y=innerHeight-190, dir=1, mode='follow', tx=x, ty=y, frame=0, ft=0, st=0, alt=false, wasMoving=false, mouseSince=0;
+  const held=new Set();
+  const dw=()=>img.offsetWidth||60, dh=()=>img.offsetHeight||78;
+  const clampX=v=>Math.min(innerWidth-dw()-6, Math.max(6,v));
+  const clampY=v=>Math.min(innerHeight-dh()-10, Math.max(50,v));
+  function aimAt(px,py){ tx=clampX(px+26); ty=clampY(py+18); }
+  addEventListener('pointermove',e=>{
+    if(e.pointerType!=='mouse') return;
+    if(mode==='keys'){ mouseSince+=Math.abs(e.movementX||0)+Math.abs(e.movementY||0); if(mouseSince<60) return; mode='follow'; }
+    aimAt(e.clientX,e.clientY);
+  },{passive:true});
+  addEventListener('pointerdown',e=>{ if(e.pointerType!=='mouse' && !duck.contains(e.target)){ mode='follow'; aimAt(e.clientX-40,e.clientY-60); } },{passive:true});
+  function typing(){ const a=document.activeElement; return a && (a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.isContentEditable); }
+  function overlayOpen(){ return [...document.querySelectorAll('.modal,#gate')].some(m=>!m.hidden && getComputedStyle(m).display!=='none'); }
   addEventListener('keydown',e=>{
-    if(!sel) return;
-    if(e.key==='Escape'){ const el=sel.el; release(); el.blur(); return; }
-    if(e.key.startsWith('Arrow')){ e.preventDefault(); held.add(e.key); }
+    if(!e.key.startsWith('Arrow') || typing() || overlayOpen()) return;
+    e.preventDefault(); held.add(e.key); mode='keys'; mouseSince=0; duck.classList.remove('talk');
   });
   addEventListener('keyup',e=>held.delete(e.key));
   addEventListener('blur',()=>held.clear());
-  pad.querySelectorAll('[data-k]').forEach(b=>{
-    const k=b.dataset.k;
-    b.addEventListener('pointerdown',e=>{ e.preventDefault(); held.add(k); b.setPointerCapture(e.pointerId); });
-    ['pointerup','pointercancel','pointerleave'].forEach(t=>b.addEventListener(t,()=>held.delete(k)));
-  });
-  pad.querySelector('.x').addEventListener('click',()=>release());
-  document.addEventListener('pointerdown',e=>{ if(sel && !e.target.closest('.critter') && !pad.contains(e.target)) release(); });
-  addEventListener('resize',()=>list.forEach(c=>{ c.x=clampX(c,c.x); c.y=clampY(c,c.y); if(c!==sel) pickTarget(c); place(c); }));
+  duck.addEventListener('click',()=>{ sfx.voice('chick'); hop(duck); });
+  duck.addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); sfx.voice('chick'); hop(duck); } });
+  addEventListener('resize',()=>{ x=clampX(x); y=clampY(y); tx=clampX(tx); ty=clampY(ty); });
+  if(matchMedia('(hover:none)').matches) duck.querySelector('.say').textContent='tap anywhere, i\'ll follow ✨';
+  /* say hi once, a moment after the page loads */
+  setTimeout(()=>{ duck.classList.add('talk'); setTimeout(()=>duck.classList.remove('talk'),5000); }, 2600);
 
   let last=performance.now();
   function tick(now){
     const dt=Math.min(0.05,(now-last)/1000); last=now;
-    list.forEach(c=>{
-      let moving=false;
-      if(c===sel){
-        const v=c.float?200:230; let dx=0, dy=0;
-        if(held.has('ArrowLeft')) dx-=1; if(held.has('ArrowRight')) dx+=1;
-        if(held.has('ArrowUp')) dy-=1;   if(held.has('ArrowDown')) dy+=1;
-        if(dx||dy){ const n=Math.hypot(dx,dy); c.x=clampX(c,c.x+dx/n*v*dt); c.y=clampY(c,c.y+dy/n*v*dt); if(dx) c.dir=dx<0?-1:1; moving=true; }
-      } else if(!reduce){
-        if(c.wait>0){ c.wait-=dt*1000; if(c.wait<=0) pickTarget(c); }
-        else {
-          const dx=c.tx-c.x, dy=c.ty-c.y, d=Math.hypot(dx,dy);
-          if(d<2){ c.wait=1200+Math.random()*3800; }
-          else { const s=Math.min(d,c.speed*dt); c.x+=dx/d*s; c.y+=dy/d*s; if(Math.abs(dx)>1) c.dir=dx<0?-1:1; moving=true; }
-        }
-      }
-      if(c===sel && moving){ c.st=(c.st||0)+dt; const every=c.float?0.6:(kindOf(c)==='pig'?0.24:0.19);
-        if(c.st>=every){ c.st=0; c.float?sfx.puff():sfx.step(kindOf(c), c.alt=!c.alt); } }
-      setState(c,moving);
-      if(moving && c.imgs.length>1){ c.ft+=dt; if(c.ft>0.17){ c.ft=0; c.frame^=1; c.img.src=c.imgs[c.frame]; } }
-      place(c);
-    });
+    let moving=false;
+    if(mode==='keys'){
+      let dx=0, dy=0;
+      if(held.has('ArrowLeft')) dx-=1; if(held.has('ArrowRight')) dx+=1;
+      if(held.has('ArrowUp')) dy-=1;   if(held.has('ArrowDown')) dy+=1;
+      if(dx||dy){ const n=Math.hypot(dx,dy); x=clampX(x+dx/n*240*dt); y=clampY(y+dy/n*240*dt); if(dx) dir=dx<0?-1:1; moving=true;
+        st+=dt; if(st>=0.18){ st=0; sfx.step(alt=!alt); } }
+      tx=x; ty=y;
+    } else if(!reduce){
+      const dx=tx-x, dy=ty-y, d=Math.hypot(dx,dy);
+      if(d>6){ const v=Math.min(420, 50+d*2.6), s=Math.min(d, v*dt); x+=dx/d*s; y+=dy/d*s; if(Math.abs(dx)>2) dir=dx<0?-1:1; moving=true; }
+    }
+    if(moving!==wasMoving){ duck.classList.toggle('walking',moving); duck.classList.toggle('idle',!moving); if(!moving){ img.src=frames[0]; frame=0; } wasMoving=moving; }
+    if(moving){ ft+=dt; if(ft>0.16){ ft=0; frame^=1; img.src=frames[frame]; } }
+    duck.style.transform=`translate(${Math.round(x)}px,${Math.round(y)}px)`;
+    flip.style.transform=`scaleX(${dir})`;
+    const cx=x+dw()/2; duck.classList.toggle('edge-l',cx<110); duck.classList.toggle('edge-r',cx>innerWidth-110);
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
