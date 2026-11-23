@@ -1350,6 +1350,163 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
 })();
 </script>
 
+<!-- ===================== little guys: wander on their own; click or Tab to one, then steer with the arrow keys ===================== -->
+<style>
+  #critters{position:fixed;inset:0;pointer-events:none;z-index:190;overflow:hidden}
+  .critter{position:absolute;left:0;top:0;pointer-events:auto;background:none;border:0;padding:0;margin:0;cursor:grab;
+    -webkit-tap-highlight-color:transparent;touch-action:none;will-change:transform}
+  .critter:focus{outline:none}
+  .critter .flip{display:block;transform-origin:50% 100%;transition:transform .15s}
+  .critter img{display:block;height:var(--h);width:auto;transform-origin:50% 100%;pointer-events:none;user-select:none;-webkit-user-drag:none}
+  .critter::before{content:"";position:absolute;left:18%;right:18%;bottom:-4px;height:9px;border-radius:50%;background:rgba(44,38,32,.16);filter:blur(1px)}
+  .critter.float::before{display:none}
+  .critter.walking img{animation:waddle .34s ease-in-out infinite alternate}
+  .critter.idle img{animation:breathe 1.8s ease-in-out infinite}
+  .critter.float img{animation:floaty 3.4s ease-in-out infinite}
+  .critter.hop img{animation:hop .45s cubic-bezier(.3,1.6,.5,1)}
+  .critter:hover img{filter:drop-shadow(0 0 0 transparent) brightness(1.03)}
+  @keyframes waddle{from{transform:rotate(-6deg) translateY(0)}to{transform:rotate(6deg) translateY(-4px)}}
+  @keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.03,.97)}}
+  @keyframes floaty{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
+  @keyframes hop{0%{transform:translateY(0) scale(1.08,.9)}45%{transform:translateY(-26px) scale(.95,1.06)}100%{transform:translateY(0)}}
+  .critter.sel::after,.critter:focus-visible::after{content:attr(data-tip);position:absolute;left:50%;bottom:100%;translate:-50% -6px;white-space:nowrap;
+    font-family:var(--font-hand);font-size:.85rem;color:var(--ink);background:var(--paper,#fffdf6);border:2px solid var(--line,#2C2620);
+    border-radius:999px;padding:2px 10px;box-shadow:2px 3px 0 var(--shadow,rgba(0,0,0,.2))}
+  .critter.tip-l::after{left:0;translate:0 -6px}.critter.tip-r::after{left:auto;right:0;translate:0 -6px}
+  .critter.sel .flip{filter:drop-shadow(0 0 6px rgba(255,190,60,.9))}
+  #cpad{position:fixed;right:18px;bottom:96px;z-index:210;display:none;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(2,44px);gap:6px}
+  #cpad.on{display:grid}
+  #cpad button{font:700 1.1rem/1 var(--font-hand);border:2.5px solid var(--line,#2C2620);border-radius:12px;background:var(--paper,#fffdf6);
+    color:var(--ink);box-shadow:3px 3px 0 var(--shadow,rgba(0,0,0,.2));cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent}
+  #cpad button:active{translate:1px 1px;box-shadow:1px 1px 0 var(--shadow,rgba(0,0,0,.2))}
+  #cpad .up{grid-column:2}#cpad .x{grid-column:3;grid-row:1;font-size:.9rem}
+  #cpad .left{grid-column:1;grid-row:2}#cpad .down{grid-column:2;grid-row:2}#cpad .right{grid-column:3;grid-row:2}
+  @media (max-width:620px){#cpad{bottom:88px;right:10px}}
+</style>
+<div id="critters" role="group" aria-label="little guys you can steer"></div>
+<div id="cpad" aria-label="steer the little guy">
+  <button class="up" type="button" data-k="ArrowUp" aria-label="up">↑</button>
+  <button class="x" type="button" aria-label="let it wander">✕</button>
+  <button class="left" type="button" data-k="ArrowLeft" aria-label="left">←</button>
+  <button class="down" type="button" data-k="ArrowDown" aria-label="down">↓</button>
+  <button class="right" type="button" data-k="ArrowRight" aria-label="right">→</button>
+</div>
+<script>
+(function(){
+  const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const layer = document.getElementById('critters'), pad = document.getElementById('cpad');
+  const D = [
+    {name:'walking chick', imgs:['critters/walk1.png','critters/walk2.png'], h:84},
+    {name:'waving chick', imgs:['critters/chick-wave.png'], h:80},
+    {name:'hula pig', imgs:['critters/pig-hula.png'], h:82},
+    {name:'cheering chick', imgs:['critters/chick-cheer.png'], h:76},
+    {name:'shocked pig', imgs:['critters/pig-shock.png'], h:80},
+    {name:'thank-you pig', imgs:['critters/pig-thanks.png'], h:78, noflip:true},
+    {name:'snacking pig', imgs:['critters/pig-eat.png'], h:76},
+    {name:'boxing chicks', imgs:['critters/chick-box.png'], h:92, lazy:true},
+    {name:'chick on the potty', imgs:['critters/chick-potty.png'], h:84, lazy:true},
+    {name:'balloon pig', imgs:['critters/pig-balloon.png'], h:118, float:true, noflip:true}
+  ];
+  const W=()=>innerWidth, H=()=>innerHeight, small=()=>innerWidth<620;
+  /* walkers stay on a strip of "ground" just above the dock; the balloon drifts up top */
+  const ground=c=>{ const s=small()?0.72:1, h=c.h*s; return [H()-150-h*0.4, H()-92]; };
+  const sky=c=>[64, Math.max(90, H()*0.34)];
+  const list = (small()? D.filter(d=>!d.lazy&&!d.float).slice(0,5).concat(D.filter(d=>d.float)) : D).map((d,i)=>{
+    const b=document.createElement('button'); b.type='button'; b.className='critter idle'+(d.float?' float':'');
+    b.setAttribute('aria-label', d.name+': press the arrow keys to move it, Escape to let it wander');
+    b.dataset.tip = matchMedia('(pointer:coarse)').matches ? 'drag me or use the arrows' : '← ↑ ↓ → to move me';
+    const f=document.createElement('span'); f.className='flip';
+    const im=document.createElement('img'); im.src=d.imgs[0]; im.alt=''; im.decoding='async';
+    d.imgs.slice(1).forEach(s=>{ const p=new Image(); p.src=s; });
+    f.appendChild(im); b.appendChild(f); layer.appendChild(b);
+    const c={...d, el:b, flip:f, img:im, x:0, y:0, tx:0, ty:0, dir:1, wait:600+Math.random()*2500, frame:0, ft:0, moving:false};
+    const sc=small()?0.72:1; c.h=d.h*sc; im.style.setProperty('--h', c.h+'px');
+    const band=d.float?sky(c):ground(c);
+    c.x = 20+((i+0.5)/D.length)*(W()-120) + (Math.random()*60-30);
+    c.y = band[0]+Math.random()*(band[1]-band[0]) - c.h;   /* y is the top of the sprite */
+    c.tx=c.x; c.ty=c.y; c.speed = d.float? 22+Math.random()*10 : 34+Math.random()*26;
+    return c;
+  });
+  let sel=null; const held=new Set();
+  function place(c){ c.el.style.transform=`translate(${Math.round(c.x)}px,${Math.round(c.y)}px)`;
+    c.el.style.zIndex = Math.round(c.y + c.h);
+    const cx=c.x+(c.img.offsetWidth||c.h)/2; c.el.classList.toggle('tip-l', cx<120); c.el.classList.toggle('tip-r', cx>W()-120);
+    c.flip.style.transform = c.noflip ? '' : `scaleX(${c.dir})`; }
+  function pickTarget(c){
+    const w=c.img.offsetWidth||c.h, band=c.float?sky(c):ground(c);
+    c.tx = 10+Math.random()*Math.max(10, W()-w-20);
+    c.ty = band[0]+Math.random()*(band[1]-band[0]) - c.h;
+    c.wait = 0;
+  }
+  function setState(c,moving){ if(c.moving===moving) return; c.moving=moving;
+    if(!c.float){ c.el.classList.toggle('walking',moving); c.el.classList.toggle('idle',!moving); }
+    if(!moving && c.imgs.length>1) c.img.src=c.imgs[0]; }
+  function hop(c){ c.el.classList.remove('hop'); void c.el.offsetWidth; c.el.classList.add('hop');
+    setTimeout(()=>c.el.classList.remove('hop'),480); }
+  function select(c){ if(sel===c) return; if(sel) release(true); sel=c; c.el.classList.add('sel'); pad.classList.add('on'); hop(c); }
+  function release(quiet){ if(!sel) return; sel.el.classList.remove('sel'); sel.wait=1500; sel.tx=sel.x; sel.ty=sel.y; setState(sel,false);
+    sel=null; held.clear(); pad.classList.remove('on'); }
+  list.forEach(c=>{
+    place(c);
+    c.el.addEventListener('focus',()=>select(c));
+    c.el.addEventListener('blur',e=>{ if(!(e.relatedTarget && pad.contains(e.relatedTarget)) && sel===c) release(); });
+    c.el.addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); hop(c); } });
+    /* pick one up and drop it somewhere else */
+    c.el.addEventListener('pointerdown',e=>{
+      e.stopPropagation(); select(c); c.el.focus({preventScroll:true});
+      const sx=e.clientX, sy=e.clientY, ox=c.x, oy=c.y; let dragged=false; c.el.setPointerCapture(e.pointerId); c.el.style.cursor='grabbing';
+      const mv=ev=>{ const dx=ev.clientX-sx, dy=ev.clientY-sy; if(Math.abs(dx)+Math.abs(dy)>4) dragged=true;
+        if(dragged){ c.x=clampX(c,ox+dx); c.y=clampY(c,oy+dy); if(dx) c.dir=dx<0?-1:1; place(c); } };
+      const up=()=>{ c.el.removeEventListener('pointermove',mv); c.el.removeEventListener('pointerup',up); c.el.style.cursor=''; if(!dragged) hop(c); };
+      c.el.addEventListener('pointermove',mv); c.el.addEventListener('pointerup',up);
+    });
+  });
+  const clampX=(c,x)=>Math.min(W()-(c.img.offsetWidth||c.h)-4, Math.max(4,x));
+  const clampY=(c,y)=>Math.min(H()-c.h-8, Math.max(56,y));
+  addEventListener('keydown',e=>{
+    if(!sel) return;
+    if(e.key==='Escape'){ const el=sel.el; release(); el.blur(); return; }
+    if(e.key.startsWith('Arrow')){ e.preventDefault(); held.add(e.key); }
+  });
+  addEventListener('keyup',e=>held.delete(e.key));
+  addEventListener('blur',()=>held.clear());
+  pad.querySelectorAll('[data-k]').forEach(b=>{
+    const k=b.dataset.k;
+    b.addEventListener('pointerdown',e=>{ e.preventDefault(); held.add(k); b.setPointerCapture(e.pointerId); });
+    ['pointerup','pointercancel','pointerleave'].forEach(t=>b.addEventListener(t,()=>held.delete(k)));
+  });
+  pad.querySelector('.x').addEventListener('click',()=>release());
+  document.addEventListener('pointerdown',e=>{ if(sel && !e.target.closest('.critter') && !pad.contains(e.target)) release(); });
+  addEventListener('resize',()=>list.forEach(c=>{ c.x=clampX(c,c.x); c.y=clampY(c,c.y); if(c!==sel) pickTarget(c); place(c); }));
+
+  let last=performance.now();
+  function tick(now){
+    const dt=Math.min(0.05,(now-last)/1000); last=now;
+    list.forEach(c=>{
+      let moving=false;
+      if(c===sel){
+        const v=c.float?200:230; let dx=0, dy=0;
+        if(held.has('ArrowLeft')) dx-=1; if(held.has('ArrowRight')) dx+=1;
+        if(held.has('ArrowUp')) dy-=1;   if(held.has('ArrowDown')) dy+=1;
+        if(dx||dy){ const n=Math.hypot(dx,dy); c.x=clampX(c,c.x+dx/n*v*dt); c.y=clampY(c,c.y+dy/n*v*dt); if(dx) c.dir=dx<0?-1:1; moving=true; }
+      } else if(!reduce){
+        if(c.wait>0){ c.wait-=dt*1000; if(c.wait<=0) pickTarget(c); }
+        else {
+          const dx=c.tx-c.x, dy=c.ty-c.y, d=Math.hypot(dx,dy);
+          if(d<2){ c.wait=1200+Math.random()*3800; }
+          else { const s=Math.min(d,c.speed*dt); c.x+=dx/d*s; c.y+=dy/d*s; if(Math.abs(dx)>1) c.dir=dx<0?-1:1; moving=true; }
+        }
+      }
+      setState(c,moving);
+      if(moving && c.imgs.length>1){ c.ft+=dt; if(c.ft>0.17){ c.ft=0; c.frame^=1; c.img.src=c.imgs[c.frame]; } }
+      place(c);
+    });
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+
 <!-- Cloudflare Web Analytics — replace PASTE_YOUR_TOKEN_HERE with the token from your Cloudflare dashboard.
      Note: only records data on your live deployed site (not the local/artifact preview). -->
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "PASTE_YOUR_TOKEN_HERE"}'></script>
