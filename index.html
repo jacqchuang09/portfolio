@@ -1085,8 +1085,7 @@ const hiCard = node(ZONES.hi[0], ZONES.hi[1], -1.5, 'draggable', `
       <a href="https://www.linkedin.com/in/jacquelinec07" target="_blank" rel="noopener" data-nodrag>💼 linkedin</a>
     </div>
   </div>`);
-const sfxCredit = node(ZONES.hi[0], ZONES.hi[1], 0,'',`<p class="sfx-credit">sound effects: <a href="https://developers.google.com/actions/tools/sound-library/cartoon" target="_blank" rel="noopener" data-nodrag>Google Sound Library</a> (CC BY 4.0) · pig oinks by Mike Koenig, <a href="https://soundbible.com/1221-Pig-Oink.html" target="_blank" rel="noopener" data-nodrag>SoundBible</a> (CC BY 3.0)</p>`);
-grid(ZONES.hi[0], ZONES.hi[1], [[hiCard],[sfxCredit]], 0, 26, {center:true, noEqual:true});
+grid(ZONES.hi[0], ZONES.hi[1], [[hiCard]], 0, 0);
 
 /* ================= ambient doodles ================= */
 node(ZONES.home[0]-560, ZONES.home[1]-440, 0,'',`<div class="bob">${fishSVG('--pink',82)}</div>`);
@@ -1386,8 +1385,6 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
 
 <!-- ===================== little guys: one on (almost) every page, swaying in place; one duck follows you around ===================== -->
 <style>
-  .sfx-credit{margin:0;max-width:360px;text-align:center;font-size:.72rem;line-height:1.45;color:var(--ink-soft)}
-  .sfx-credit a{color:inherit}
   .zc{cursor:pointer}
   .zc .zc-in{display:block;transform-origin:50% 100%}
   .zc img{display:block;height:var(--h);width:auto;pointer-events:none;user-select:none;-webkit-user-drag:none;transform-origin:50% 100%}
