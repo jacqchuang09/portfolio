@@ -22,8 +22,7 @@
   body{font-family:var(--font-body);color:var(--ink);background:var(--cream);
     -webkit-font-smoothing:antialiased;touch-action:none}
 
-  #stage{position:fixed;inset:0;overflow:hidden;cursor:grab;background:var(--desk,#d8cfbf);
-    background-image:radial-gradient(rgba(44,38,32,.08) 1.4px,transparent 1.4px);background-size:22px 22px}
+  #stage{position:fixed;inset:0;overflow:hidden;cursor:grab;background:var(--cream)}
   #stage.grabbing{cursor:grabbing}
   /* ---------- terrain: each page sits on its own ground (ocean, woods, space, ...) that fades into the next ---------- */
   .terrain{position:absolute;pointer-events:none;z-index:0}
@@ -53,8 +52,7 @@
   /* words that sit straight on the night sky need to stay readable */
   .on-space .signpost div{color:#fff!important}
 
-  #board{position:absolute;left:0;top:0;width:6100px;height:6150px;transform-origin:0 0;overflow:hidden;border-radius:90px;
-    box-shadow:0 0 0 10px var(--line),0 40px 120px rgba(0,0,0,.28);
+  #board{position:absolute;left:0;top:0;width:6100px;height:6150px;transform-origin:0 0;overflow:hidden;
     background-image:radial-gradient(var(--dot) 1.6px,transparent 1.6px);
     background-size:34px 34px;will-change:transform}
   #board.flying{transition:transform .85s cubic-bezier(.22,.61,.36,1)}
@@ -275,7 +273,7 @@
   <button data-zone="teaching">teaching</button>
   <button data-zone="hi">say hi</button>
   <span class="sep"></span>
-  <button class="icon" id="mapBtn" aria-label="see the whole map" title="see the whole map">🗺️</button>
+  <button class="icon" id="mapBtn" aria-label="zoom all the way out" title="zoom all the way out">🗺️</button>
   <button class="icon" id="zoomOut" aria-label="zoom out">−</button>
   <button class="icon" id="zoomIn" aria-label="zoom in">+</button>
   <button class="icon" id="soundBtn" aria-label="turn sound effects off" aria-pressed="true">🔊</button>
@@ -1096,11 +1094,11 @@ node(ZONES.home[0]-560, ZONES.home[1]-440, 0,'',`<div class="bob">${fishSVG('--p
 /* ===================== PAN / ZOOM ===================== */
 let tx=0, ty=0, scale=1;
 const MAXS=1.4;
-/* the most you can zoom out is "the whole map fits in the window" */
-function minScale(){ const w=vpW(), h=vpH(); return Math.min((w-48)/WORLD_W, (h-150)/WORLD_H); }
+/* the most you can zoom out is "the map still covers the whole window", so its edges never show */
+function minScale(){ const w=vpW(), h=vpH(); return Math.max(w/WORLD_W, h/WORLD_H); }
 /* keep the map from sliding off: once it is bigger than the window you can pan only to its edges; smaller, it sits centred */
 function clampView(){
-  const w=vpW(), h=vpH(), top=64, bot=100, side=24;
+  const w=vpW(), h=vpH(), top=0, bot=0, side=0;
   scale=Math.min(MAXS, Math.max(minScale(), scale));
   const bw=WORLD_W*scale, bh=WORLD_H*scale;
   tx = bw <= w-2*side ? (w-bw)/2 : Math.min(side, Math.max(w-side-bw, tx));
