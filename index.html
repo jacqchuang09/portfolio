@@ -265,6 +265,7 @@
   <button class="icon" id="zoomOut" aria-label="zoom out">−</button>
   <button class="icon" id="zoomIn" aria-label="zoom in">+</button>
   <button class="icon" id="themeBtn" aria-label="toggle light or dark">☾</button>
+  <button class="icon" id="soundBtn" aria-label="turn sound effects off" aria-pressed="true">🔊</button>
 </nav>
 
 <script>
@@ -1407,6 +1408,57 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
     {name:'chick on the potty', imgs:['critters/chick-potty.png'], h:84, lazy:true},
     {name:'balloon pig', imgs:['critters/pig-balloon.png'], h:118, float:true, noflip:true}
   ];
+
+  /* ---------- tiny synthesized sound effects (no audio files); they only play when you interact ---------- */
+  const sfx=(()=>{
+    let ctx=null, master=null, on=true;
+    try{ on = localStorage.getItem('critterSound')!=='off'; }catch(e){}
+    function ac(){
+      if(!on) return null;
+      if(!ctx){ const A=window.AudioContext||window.webkitAudioContext; if(!A) return null;
+        ctx=new A(); master=ctx.createGain(); master.gain.value=0.16; master.connect(ctx.destination); }
+      if(ctx.state==='suspended') ctx.resume();
+      return ctx;
+    }
+    function tone(o){
+      const c=ac(); if(!c) return;
+      const t=c.currentTime+(o.delay||0), dur=o.dur||0.12;
+      const osc=c.createOscillator(), g=c.createGain();
+      osc.type=o.type||'sine'; osc.frequency.setValueAtTime(o.f0,t);
+      if(o.f1) osc.frequency.exponentialRampToValueAtTime(o.f1,t+dur);
+      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(o.vol||0.5,t+0.012); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+      if(o.lp){ const f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=o.lp; osc.connect(f); f.connect(g); } else osc.connect(g);
+      g.connect(master); osc.start(t); osc.stop(t+dur+0.03);
+    }
+    function puff(){
+      const c=ac(); if(!c) return;
+      const n=Math.floor(c.sampleRate*0.4), b=c.createBuffer(1,n,c.sampleRate), d=b.getChannelData(0);
+      for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.sin(Math.PI*i/n);
+      const s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
+      s.buffer=b; f.type='bandpass'; f.frequency.value=420; f.Q.value=0.7; g.gain.value=0.35;
+      s.connect(f); f.connect(g); g.connect(master); s.start();
+    }
+    return {
+      voice(kind){
+        if(kind==='pig'){ tone({type:'sawtooth',f0:270,f1:175,dur:0.12,vol:0.45,lp:900}); tone({type:'sawtooth',f0:250,f1:160,dur:0.15,vol:0.4,lp:900,delay:0.15}); }
+        else if(kind==='balloon'){ tone({f0:420,f1:880,dur:0.32,vol:0.35}); tone({type:'triangle',f0:880,f1:1320,dur:0.16,vol:0.2,delay:0.26}); }
+        else { tone({type:'triangle',f0:1300,f1:1900,dur:0.08,vol:0.45}); tone({type:'triangle',f0:1500,f1:2300,dur:0.09,vol:0.4,delay:0.1}); }
+      },
+      boing(){ tone({f0:170,f1:640,dur:0.15,vol:0.55}); tone({f0:640,f1:300,dur:0.2,vol:0.3,delay:0.14}); },
+      step(kind,alt){ const f=kind==='pig'?(alt?250:215):(alt?760:640); tone({type:'triangle',f0:f,f1:f*0.6,dur:0.05,vol:0.3}); },
+      puff,
+      squeak(){ tone({f0:900,f1:1600,dur:0.09,vol:0.35}); },
+      thud(){ tone({f0:180,f1:55,dur:0.16,vol:0.6}); },
+      bloop(){ tone({f0:720,f1:240,dur:0.2,vol:0.35}); },
+      get on(){ return on; },
+      set on(v){ on=v; try{ localStorage.setItem('critterSound', v?'on':'off'); }catch(e){} if(!v && ctx) ctx.suspend(); }
+    };
+  })();
+  const soundBtn=document.getElementById('soundBtn');
+  function paintSound(){ soundBtn.textContent=sfx.on?'🔊':'🔇'; soundBtn.setAttribute('aria-pressed', sfx.on?'true':'false');
+    soundBtn.setAttribute('aria-label', sfx.on?'turn sound effects off':'turn sound effects on'); }
+  if(soundBtn){ paintSound(); soundBtn.addEventListener('click',()=>{ sfx.on=!sfx.on; paintSound(); if(sfx.on) sfx.boing(); }); }
+  const kindOf=d=>d.float?'balloon':(/pig/.test(d.name)?'pig':'chick');
   const W=()=>innerWidth, H=()=>innerHeight, small=()=>innerWidth<620;
   /* walkers stay on a strip of "ground" just above the dock; the balloon drifts up top */
   const ground=c=>{ const s=small()?0.72:1, h=c.h*s; return [H()-150-h*0.4, H()-92]; };
@@ -1441,23 +1493,24 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
   function setState(c,moving){ if(c.moving===moving) return; c.moving=moving;
     if(!c.float){ c.el.classList.toggle('walking',moving); c.el.classList.toggle('idle',!moving); }
     if(!moving && c.imgs.length>1) c.img.src=c.imgs[0]; }
-  function hop(c){ c.el.classList.remove('hop'); void c.el.offsetWidth; c.el.classList.add('hop');
+  function hop(c,quiet){ if(!quiet) sfx.boing(); c.el.classList.remove('hop'); void c.el.offsetWidth; c.el.classList.add('hop');
     setTimeout(()=>c.el.classList.remove('hop'),480); }
-  function select(c){ if(sel===c) return; if(sel) release(true); sel=c; c.el.classList.add('sel'); pad.classList.add('on'); hop(c); }
-  function release(quiet){ if(!sel) return; sel.el.classList.remove('sel'); sel.wait=1500; sel.tx=sel.x; sel.ty=sel.y; setState(sel,false);
+  function select(c){ if(sel===c) return false; if(sel) release(true); sel=c; c.el.classList.add('sel'); pad.classList.add('on'); sfx.voice(kindOf(c)); hop(c,true); return true; }
+  function release(quiet){ if(!sel) return; if(!quiet) sfx.bloop(); sel.el.classList.remove('sel'); sel.wait=1500; sel.tx=sel.x; sel.ty=sel.y; setState(sel,false);
     sel=null; held.clear(); pad.classList.remove('on'); }
   list.forEach(c=>{
     place(c);
     c.el.addEventListener('focus',()=>select(c));
-    c.el.addEventListener('blur',e=>{ if(!(e.relatedTarget && pad.contains(e.relatedTarget)) && sel===c) release(); });
+    c.el.addEventListener('blur',e=>{ const to=e.relatedTarget; if(!(to && pad.contains(to)) && sel===c) release(!!(to && to.closest && to.closest('.critter'))); });
     c.el.addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); hop(c); } });
     /* pick one up and drop it somewhere else */
     c.el.addEventListener('pointerdown',e=>{
-      e.stopPropagation(); select(c); c.el.focus({preventScroll:true});
+      e.stopPropagation(); const fresh=select(c); c.el.focus({preventScroll:true});
       const sx=e.clientX, sy=e.clientY, ox=c.x, oy=c.y; let dragged=false; c.el.setPointerCapture(e.pointerId); c.el.style.cursor='grabbing';
-      const mv=ev=>{ const dx=ev.clientX-sx, dy=ev.clientY-sy; if(Math.abs(dx)+Math.abs(dy)>4) dragged=true;
+      const mv=ev=>{ const dx=ev.clientX-sx, dy=ev.clientY-sy;
+        if(!dragged && Math.abs(dx)+Math.abs(dy)>4){ dragged=true; sfx.squeak(); }
         if(dragged){ c.x=clampX(c,ox+dx); c.y=clampY(c,oy+dy); if(dx) c.dir=dx<0?-1:1; place(c); } };
-      const up=()=>{ c.el.removeEventListener('pointermove',mv); c.el.removeEventListener('pointerup',up); c.el.style.cursor=''; if(!dragged) hop(c); };
+      const up=()=>{ c.el.removeEventListener('pointermove',mv); c.el.removeEventListener('pointerup',up); c.el.style.cursor=''; if(dragged){ c.float?sfx.puff():sfx.thud(); } else if(!fresh) hop(c); };
       c.el.addEventListener('pointermove',mv); c.el.addEventListener('pointerup',up);
     });
   });
@@ -1497,6 +1550,8 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
           else { const s=Math.min(d,c.speed*dt); c.x+=dx/d*s; c.y+=dy/d*s; if(Math.abs(dx)>1) c.dir=dx<0?-1:1; moving=true; }
         }
       }
+      if(c===sel && moving){ c.st=(c.st||0)+dt; const every=c.float?0.6:(kindOf(c)==='pig'?0.24:0.19);
+        if(c.st>=every){ c.st=0; c.float?sfx.puff():sfx.step(kindOf(c), c.alt=!c.alt); } }
       setState(c,moving);
       if(moving && c.imgs.length>1){ c.ft+=dt; if(c.ft>0.17){ c.ft=0; c.frame^=1; c.img.src=c.imgs[c.frame]; } }
       place(c);
