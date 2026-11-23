@@ -35,6 +35,33 @@
 
   #stage{position:fixed;inset:0;overflow:hidden;cursor:grab;background:var(--cream)}
   #stage.grabbing{cursor:grabbing}
+  /* ---------- terrain: each page sits on its own ground (ocean, woods, space, ...) that fades into the next ---------- */
+  .terrain{position:absolute;width:3800px;height:3200px;translate:-50% -50%;pointer-events:none;z-index:0;
+    -webkit-mask-image:radial-gradient(closest-side,#000 66%,transparent 100%);mask-image:radial-gradient(closest-side,#000 66%,transparent 100%);
+    transition:opacity .5s}
+  .terrain.on{z-index:1}
+  #board > .node{z-index:2}
+  .t-ocean{background:radial-gradient(circle,rgba(255,255,255,.55) 0 3px,transparent 4px) 0 0/96px 96px,
+    radial-gradient(circle,rgba(255,255,255,.35) 0 2px,transparent 3px) 40px 55px/64px 64px,linear-gradient(180deg,#d4f0f1,#a7d9df)}
+  .t-woods{background:radial-gradient(ellipse 9px 5px,rgba(96,130,60,.22) 0 98%,transparent) 0 0/80px 70px,
+    radial-gradient(ellipse 7px 4px,rgba(96,130,60,.16) 0 98%,transparent) 40px 35px/80px 70px,linear-gradient(180deg,#e2ecc9,#cadcac)}
+  .t-space{background:radial-gradient(circle,#fff 0 1.6px,transparent 2.2px) 0 0/110px 110px,
+    radial-gradient(circle,rgba(255,255,255,.7) 0 1px,transparent 1.6px) 37px 61px/70px 70px,
+    radial-gradient(circle,rgba(255,236,170,.9) 0 2.2px,transparent 3px) 80px 20px/190px 190px,linear-gradient(180deg,#1f2245,#33295a)}
+  .t-fairy{background:radial-gradient(circle,rgba(255,255,255,.8) 0 2px,transparent 3px) 0 0/72px 72px,
+    radial-gradient(circle,rgba(255,200,240,.7) 0 2px,transparent 3px) 36px 36px/72px 72px,linear-gradient(160deg,#f8e2f1,#e4dcf8)}
+  .t-farm{background:repeating-linear-gradient(0deg,rgba(120,150,40,.10) 0 16px,transparent 16px 58px),linear-gradient(180deg,#eef2c8,#d9e6a8)}
+  .t-ice{background:radial-gradient(circle,rgba(255,255,255,.95) 0 2.4px,transparent 3.2px) 0 0/84px 84px,
+    radial-gradient(circle,rgba(255,255,255,.7) 0 1.6px,transparent 2.4px) 42px 30px/60px 60px,linear-gradient(180deg,#eaf6fa,#d3e8f2)}
+  .t-savanna{background:radial-gradient(ellipse 3px 8px,rgba(150,120,40,.22) 0 98%,transparent) 0 0/70px 60px,
+    radial-gradient(ellipse 3px 6px,rgba(150,120,40,.16) 0 98%,transparent) 35px 30px/70px 60px,linear-gradient(180deg,#f6e7bd,#ecd79b)}
+  .t-jungle{background:radial-gradient(ellipse 22px 12px,rgba(40,110,60,.16) 0 98%,transparent) 0 0/120px 110px,
+    radial-gradient(ellipse 16px 9px,rgba(40,110,60,.12) 0 98%,transparent) 60px 55px/120px 110px,linear-gradient(180deg,#d6ead0,#b3d6a6)}
+  :root[data-theme="dark"] .terrain:not(.t-space){filter:brightness(.42) saturate(.9)}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .terrain:not(.t-space){filter:brightness(.42) saturate(.9)}}
+  /* words that sit straight on the night sky need to stay readable */
+  .on-space .signpost div{color:#fff!important}
+
   #board{position:absolute;left:0;top:0;width:6100px;height:6150px;transform-origin:0 0;
     background-image:radial-gradient(var(--dot) 1.6px,transparent 1.6px);
     background-size:34px 34px;will-change:transform}
@@ -187,7 +214,8 @@
     background-image:radial-gradient(var(--dot) 1.6px,transparent 1.6px);background-size:34px 34px;
     transition:opacity .6s ease}
   #pre.gone{opacity:0;pointer-events:none}
-  #pre .pblob{width:150px;animation:bob 2.2s ease-in-out infinite}
+  #pre .pchick{width:230px;height:120px;position:relative}
+  #pre .pchick img{position:absolute;bottom:0;left:0;height:110px;transform-origin:50% 100%;animation:waddle .3s ease-in-out infinite alternate;transition:left .2s linear}
   #pre .ptxt{font-family:var(--font-hand);color:var(--ink);font-size:1.15rem}
   #pre .bar{width:230px;height:20px;background:var(--paper);border:2.5px solid var(--line);
     border-radius:40px;overflow:hidden;box-shadow:3px 3px 0 var(--shadow)}
@@ -210,15 +238,8 @@
 
 <!-- PRELOADER -->
 <div id="pre">
-  <svg class="pblob" viewBox="0 0 120 120" aria-hidden="true">
-    <path d="M60 8c26 0 46 18 46 44 0 30-22 56-46 56S14 82 14 52C14 26 34 8 60 8Z" fill="#F49306" filter="url(#rough2)"/>
-    <circle cx="45" cy="58" r="6" fill="#2C2620"/><circle cx="75" cy="58" r="6" fill="#2C2620"/>
-    <circle cx="47" cy="56" r="2" fill="#fff"/><circle cx="77" cy="56" r="2" fill="#fff"/>
-    <ellipse cx="38" cy="72" rx="7" ry="4" fill="#F13D09" opacity=".55"/>
-    <ellipse cx="82" cy="72" rx="7" ry="4" fill="#F13D09" opacity=".55"/>
-    <path d="M50 74c4 5 16 5 20 0" stroke="#2C2620" stroke-width="3" fill="none" stroke-linecap="round"/>
-  </svg>
-  <div class="ptxt">painting my little corner…</div>
+  <div class="pchick" id="preChick" aria-hidden="true"><img src="critters/walk1.png" alt=""></div>
+  <div class="ptxt">waddling into my little corner…</div>
   <div class="bar"><div class="fill" id="preFill"></div></div>
   <div class="pct" id="prePct">0%</div>
   <button class="skip" id="preSkip">skip →</button>
@@ -748,6 +769,19 @@ const ZONES = {
   research:[950,3270], awards:[3174,3158], life:[5110,3254],
   teaching:[2342,5126], hi:[4998,5174]
 };
+
+/* ---------- terrain under each page; the one you're looking at sits on top so its ground fills the window ---------- */
+const TERRAIN={home:'ocean',about:'woods',work:'space',research:'fairy',awards:'farm',life:'ice',teaching:'savanna',hi:'jungle'};
+const terrainEls={};
+Object.keys(TERRAIN).forEach(z=>{ const d=document.createElement('div'); d.className='terrain t-'+TERRAIN[z];
+  d.style.left=ZONES[z][0]+'px'; d.style.top=ZONES[z][1]+'px'; board.prepend(d); terrainEls[z]=d; });
+let terrainOn=null;
+function updateTerrain(){
+  const w=(typeof vpW==='function'?vpW():innerWidth), hh=(typeof vpH==='function'?vpH():innerHeight);
+  const cx=(w/2-tx)/scale, cy=(hh/2-ty)/scale; let best=null, bd=1e18;
+  Object.keys(ZONES).forEach(z=>{ const d=(ZONES[z][0]-cx)**2+(ZONES[z][1]-cy)**2; if(d<bd){ bd=d; best=z; } });
+  if(best!==terrainOn){ if(terrainOn) terrainEls[terrainOn].classList.remove('on'); terrainEls[best].classList.add('on'); terrainOn=best; }
+}
 /* per-zone "fit" zoom: denser clusters sit back a little so the whole group
    lands in frame when you fly to it (scaled down further on small screens). */
 const VIEW = {
@@ -1060,7 +1094,7 @@ node(ZONES.home[0]-560, ZONES.home[1]-440, 0,'',`<div class="bob">${fishSVG('--p
 /* ===================== PAN / ZOOM ===================== */
 let tx=0, ty=0, scale=1;
 const MINS=0.25, MAXS=1.4;
-function apply(){ board.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`; }
+function apply(){ board.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`; updateTerrain(); }
 function vpW(){ return window.innerWidth || document.documentElement.clientWidth || 1024; }
 function vpH(){ return window.innerHeight || document.documentElement.clientHeight || 768; }
 function centerOn(zx,zy,animate,vs){
@@ -1331,10 +1365,12 @@ setTimeout(landHome, 120); setTimeout(landHome, 400);
 /* ===================== preloader ===================== */
 (function(){
   const fill=document.getElementById('preFill'), pct=document.getElementById('prePct'), pre=document.getElementById('pre');
+  const chick=document.querySelector('#preChick img'), walk=['critters/walk1.png','critters/walk2.png']; let pstep=0; new Image().src=walk[1];
   let p=0; const step=reduce?100:4, dur=reduce?300:1700;
   const iv=setInterval(()=>{
     p=Math.min(100,p+step+Math.round(Math.random()*3));
     fill.style.width=p+'%'; pct.textContent=p+'%';
+    if(chick){ chick.src=walk[(pstep++)%2]; chick.style.left=(p/100*(230-chick.offsetWidth))+'px'; }
     if(p>=100){ clearInterval(iv); setTimeout(done,260); }
   }, dur/(100/step));
   function done(){ pre.classList.add('gone'); setTimeout(()=>pre&&pre.remove(),650); }
